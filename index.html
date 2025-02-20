@@ -1,22 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>আমার স্টাইলিশ ওয়েবসাইট</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার ওয়েবসাইট</title>
+    <style>
+        /* 🌟 বেসিক স্টাইল এবং উন্নত ডিজাইন 🌟 */
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: background-color 0.5s ease;
+        }
+
+        h1 {
+            color: #ffdd57;
+            font-size: 3rem;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            animation: fadeIn 3s ease-in-out;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #ffdd57;
+            color: #4b0082;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dark-mode {
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+        }
+
+        .dark-mode button {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .dark-mode button:hover {
+            background-color: #555;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>স্বাগতম আমার ওয়েবসাইটে!</h1>
-    </header>
+    <h1>👋 স্বাগতম আমার ওয়েবসাইটে!</h1>
+    <p>🚀 আমি GitHub ব্যবহার করে ওয়েবসাইট তৈরি করতে শিখছি।</p>
+    
     <section>
-        <p>এটি আমার প্রথম ফ্রি ওয়েবসাইট, যা আমি নিজে তৈরি করেছি!</p>
-        <a href="#" class="btn">আরও জানুন</a>
+        <h2>🌟 আমার সম্পর্কে 🌟</h2>
+        <p>আমি একজন ওয়েব ডেভেলপার, যা নতুন কিছু শেখার জার্নিতে আছে। 💡</p>
     </section>
+
+    <button id="darkModeToggle">🌙 ডার্ক মোড চালু করুন</button>
+
+    <script>
+        const toggleButton = document.getElementById('darkModeToggle');
+        toggleButton.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            toggleButton.textContent = document.body.classList.contains('dark-mode')
+                ? '🌞 লাইট মোড চালু করুন'
+                : '🌙 ডার্ক মোড চালু করুন';
+        });
+    </script>
 </body>
 </html>
-
-
-<section>
-    <h2>🌟 আমার সম্পর্কে 🌟</h2>
-    <p>আমি একজন ওয়েব ডেভেলপার, যে GitHub ব্যবহার করে ওয়েবসাইট তৈরি করতে শিখছে। 🚀</p>
-</section>
