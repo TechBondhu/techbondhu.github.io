@@ -1,16 +1,41 @@
+/* পুরো ওয়েবসাইটের ব্যাকগ্রাউন্ড ও ফন্ট সেটিংস */
 body {
-    background-color: lightblue !important; /* ব্যাকগ্রাউন্ড পরিবর্তন */
-    font-family: Arial, sans-serif;
+    background-image: url('https://source.unsplash.com/1600x900/?nature,water'); /* ব্যাকগ্রাউন্ড ইমেজ */
+    background-size: cover;
+    font-family: 'Arial', sans-serif;
     text-align: center;
     padding: 50px;
+    color: white;
+}
+
+/* হেডার ডিজাইন */
+header {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
 }
 
 h1 {
-    color: darkblue;
-    font-size: 36px;
+    font-size: 40px;
 }
 
+/* টেক্সট ডিজাইন */
 p {
-    color: darkgreen;
+    font-size: 22px;
+}
+
+/* বাটনের ডিজাইন */
+.btn {
+    display: inline-block;
+    background: #ff5722;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
     font-size: 20px;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    background: #e64a19;
 }
