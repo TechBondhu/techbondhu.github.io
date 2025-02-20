@@ -1,200 +1,213 @@
-<!-- 🌟 Navigation Menu 🌟 -->
-<nav>
-    <ul>
-        <li><a href="#home">🏠 হোম</a></li>
-        <li><a href="#about">💡 আমাদের সম্পর্কে</a></li>
-        <li><a href="#services">🛠️ সেবা</a></li>
-        <li><a href="#portfolio">🎨 প্রজেক্ট</a></li>
-        <li><a href="#contact">📞 যোগাযোগ</a></li>
-    </ul>
-</nav>
- <!-- 💬 আমাদের সম্পর্কে সেকশন 💬 -->
-<section id="about" class="about-section">
-    <h2>আমাদের সম্পর্কে 🌟</h2>
-    <p>আমরা এমন ওয়েবসাইট তৈরি করি যা শুধু দেখতে আকর্ষণীয় নয়, বরং ব্যবহার করতেও সহজ।  
-    💡 আধুনিক ডিজাইন, 🔒 নিরাপত্তা এবং 🚀 দ্রুত পারফরমেন্স—সবকিছু এক জায়গায়।</p>
-</section>
-
-<!-- 🌟 Hero Section 🌟 -->
-<section id="home" class="hero-section">
-    <div class="hero-content">
-        <h1>🌟 তোমার স্বপ্নের ওয়েবসাইট 🌟</h1>
-        <p>💡 এখনই তৈরি করো আধুনিক, আকর্ষণীয় এবং প্রফেশনাল ডিজাইনের ওয়েবসাইট।</p>
-        <a href="#contact" class="cta-button">যোগাযোগ করো 📞</a>
-    </div>
-</section>
-
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আমার ওয়েবসাইট</title>
+    <title>আমার প্রফেশনাল ওয়েবসাইট</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* 🌟 বেসিক স্টাইল এবং উন্নত ডিজাইন 🌟 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
         body {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            font-family: 'Arial', sans-serif;
-            color: #fff;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            color: #4CAF50;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #4CAF50;
+        }
+
+        section {
+            padding: 100px 10% 80px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            transition: background-color 0.5s ease;
         }
 
-        h1 {
-            color: #ffdd57;
+        .hero {
+            text-align: center;
+            padding-top: 150px;
+        }
+
+        .hero h2 {
             font-size: 3rem;
-            animation: fadeIn 2s ease-in-out;
+            color: #333;
+            margin-bottom: 20px;
         }
 
-        p {
-            font-size: 1.5rem;
-            line-height: 1.6;
-            animation: fadeIn 3s ease-in-out;
-        }
-
-        button {
-            padding: 15px 30px;
+        .hero p {
             font-size: 1.2rem;
-            background-color: #ffdd57;
-            color: #4b0082;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        .hero button {
+            padding: 15px 30px;
+            border-radius: 30px;
             border: none;
-            border-radius: 50px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: transform 0.2s, background-color 0.3s;
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
         }
 
-        button:hover {
-            background-color: #ffcc00;
-            transform: scale(1.1);
+        .hero button:hover {
+            background-color: #45a049;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
-        .dark-mode {
-            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-            color: #f0f0f0;
+        .project-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
         }
 
-        .dark-mode button {
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
+
+        .contact-form button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .contact-form button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
             background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer a {
+            color: #4CAF50;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
             color: #fff;
         }
 
-        .dark-mode button:hover {
-            background-color: #555;
-        }
-
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            p {
-                font-size: 1.2rem;
-            }
-
-            button {
-                width: 100%;
+            .hero h2 {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <h1>👋 স্বাগতম আমার ওয়েবসাইটে!</h1>
-    <p>🚀 আমি GitHub ব্যবহার করে ওয়েবসাইট তৈরি করতে শিখছি।</p>
-    
-    <section>
-        <h2>🌟 আমার সম্পর্কে 🌟</h2>
-        <p>আমি একজন ওয়েব ডেভেলপার, যা নতুন কিছু শেখার জার্নিতে আছে। 💡</p>
+
+    <header>
+        <h1>🌟 আমার ওয়েবসাইট 🌟</h1>
+        <nav>
+            <a href="#home">হোম</a>
+            <a href="#projects">প্রজেক্ট</a>
+            <a href="#contact">যোগাযোগ</a>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <h2>👋 হ্যালো, আমি একজন ওয়েব ডেভেলপার!</h2>
+        <p>আমি আধুনিক ও প্রতিক্রিয়াশীল ওয়েবসাইট তৈরি করি। 🌐✨</p>
+        <button>আমার কাজ দেখুন 🚀</button>
     </section>
 
-    <button id="darkModeToggle">🌙 ডার্ক মোড চালু করুন</button>
+    <section id="projects">
+        <h2>💼 আমার প্রজেক্টসমূহ</h2>
+        <div class="projects">
+            <div class="project-card">
+                <h3>📱 প্রজেক্ট ১: প্রতিক্রিয়াশীল ওয়েবসাইট</h3>
+                <p>সম্পূর্ণ মোবাইল-বান্ধব ওয়েবসাইট যা সব ধরনের ডিভাইসে কাজ করে।</p>
+            </div>
+            <div class="project-card">
+                <h3>🛒 প্রজেক্ট ২: ই-কমার্স সাইট</h3>
+                <p>একটি সুন্দর এবং কার্যকরী ই-কমার্স ওয়েবসাইট যা ব্যবহারকারী অভিজ্ঞতাকে উন্নত করে।</p>
+            </div>
+        </div>
+    </section>
 
-    <script>
-        const toggleButton = document.getElementById('darkModeToggle');
-        toggleButton.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            toggleButton.textContent = document.body.classList.contains('dark-mode')
-                ? '🌞 লাইট মোড চালু করুন'
-                : '🌙 ডার্ক মোড চালু করুন';
-        });
-    </script>
+    <section id="contact">
+        <h2>📩 যোগাযোগ করুন</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="আপনার নাম" required>
+            <input type="email" placeholder="আপনার ইমেইল" required>
+            <textarea rows="5" placeholder="আপনার বার্তা" required></textarea>
+            <button type="submit">বার্তা পাঠান 🚀</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>© 2024 | সর্বস্বত্ব সংরক্ষিত | 🌟 আপনার ওয়েবসাইট 🌟</p>
+        <div>
+            <a href="#">🌐 ফেসবুক</a>
+            <a href="#">🐦 টুইটার</a>
+            <a href="#">📸 ইনস্টাগ্রাম</a>
+        </div>
+    </footer>
+
 </body>
 </html>
-<!-- 🚀 আমাদের সেবা সেকশন 🚀 -->
-<section id="services" class="services-section">
-    <h2>আমাদের সেবা 🛠️</h2>
-    <div class="services-container">
-        <div class="service-card">
-            <h3>🌐 ওয়েব ডিজাইন</h3>
-            <p>আধুনিক এবং রেস্পনসিভ ডিজাইন যা যেকোনো ডিভাইসে চমৎকার দেখাবে।</p>
-        </div>
-        <div class="service-card">
-            <h3>⚡ ফাস্ট লোডিং</h3>
-            <p>দ্রুতগতির ওয়েবসাইট যা ইউজারদের অসাধারণ অভিজ্ঞতা প্রদান করবে।</p>
-        </div>
-        <div class="service-card">
-            <h3>🔒 নিরাপত্তা</h3>
-            <p>শীর্ষ মানের সিকিউরিটি সিস্টেম যাতে ডেটা সর্বদা নিরাপদ থাকে।</p>
-        </div>
-    </div>
-</section>
-<!-- 💼 আমাদের প্রজেক্ট সেকশন 💼 -->
-<section id="portfolio" class="portfolio-section">
-    <h2>আমাদের প্রজেক্টসমূহ 🎨</h2>
-    <div class="portfolio-container">
-        <div class="portfolio-item">
-            <img src="https://via.placeholder.com/300" alt="প্রজেক্ট ১">
-            <h3>🌟 ই-কমার্স ওয়েবসাইট</h3>
-            <p>একটি সম্পূর্ণ রেস্পনসিভ ও ইউজার-ফ্রেন্ডলি ই-কমার্স সাইট।</p>
-        </div>
-        <div class="portfolio-item">
-            <img src="https://via.placeholder.com/300" alt="প্রজেক্ট ২">
-            <h3>📱 মোবাইল অ্যাপ্লিকেশন</h3>
-            <p>একটি দ্রুতগতির এবং সিকিউর মোবাইল অ্যাপ যা ব্যবহারকারীদের সুবিধা দেয়।</p>
-        </div>
-        <div class="portfolio-item">
-            <img src="https://via.placeholder.com/300" alt="প্রজেক্ট ৩">
-            <h3>💼 বিজনেস ওয়েবসাইট</h3>
-            <p>ছোট এবং বড় ব্যবসার জন্য প্রফেশনাল ওয়েবসাইট ডিজাইন।</p>
-        </div>
-    </div>
-</section>
-
-<!-- 📩 যোগাযোগ সেকশন 📩 -->
-<section id="contact" class="contact-section">
-    <h2>যোগাযোগ করুন 📞</h2>
-    <form class="contact-form">
-        <input type="text" placeholder="আপনার নাম" required>
-        <input type="email" placeholder="আপনার ইমেইল" required>
-        <textarea rows="5" placeholder="আপনার বার্তা" required></textarea>
-        <button type="submit">বার্তা পাঠান 🚀</button>
-    </form>
-</section>
-
-<!-- 🔻 ফুটার সেকশন 🔻 -->
-<footer class="footer-section">
-    <p>© 2025| Copyright protected | 🌟 TechBondhu 🌟</p>
-    <div class="social-links">
-        <a href="#" target="_blank">🌐 ফেসবুক</a>
-        <a href="#" target="_blank">🐦 টুইটার</a>
-        <a href="#" target="_blank">📸 ইনস্টাগ্রাম</a>
-    </div>
-</footer>
