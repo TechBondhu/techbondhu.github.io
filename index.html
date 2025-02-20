@@ -1,114 +1,213 @@
-/* style.css */
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার প্রফেশনাল ওয়েবসাইট</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+        }
 
-body {
-    font-family: 'Hind Siliguri', sans-serif;
-    line-height: 1.6;
-    background-color: #f9f9f9;
-    color: #333;
-}
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+        header h1 {
+            font-size: 1.8rem;
+            color: #4CAF50;
+        }
 
-header {
-    background: linear-gradient(135deg, #4e54c8, #8f94fb);
-    color: #fff;
-    padding: 100px 0;
-    text-align: center;
-    border-radius: 0 0 50px 50px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
 
-header h1 {
-    font-size: 3rem;
-    font-weight: 600;
-}
+        nav a:hover {
+            color: #4CAF50;
+        }
 
-header p {
-    margin: 20px 0;
-    font-size: 1.2rem;
-}
+        section {
+            padding: 100px 10% 80px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-.btn {
-    display: inline-block;
-    padding: 12px 30px;
-    background-color: #ff7e5f;
-    color: white;
-    text-decoration: none;
-    border-radius: 30px;
-    transition: background-color 0.3s ease;
-    font-weight: 600;
-}
+        .hero {
+            text-align: center;
+            padding-top: 150px;
+        }
 
-.btn:hover {
-    background-color: #eb5757;
-}
+        .hero h2 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-.section {
-    padding: 60px 0;
-    text-align: center;
-}
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #555;
+        }
 
-.section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    color: #4e54c8;
-}
+        .hero button {
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-.section p {
-    font-size: 1rem;
-    color: #555;
-}
+        .hero button:hover {
+            background-color: #45a049;
+        }
 
-.form-section form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 600px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
 
-.form-section input,
-.form-section select {
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 1rem;
-}
+        .project-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
 
-.btn-submit {
-    padding: 14px;
-    background-color: #4e54c8;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        .project-card:hover {
+            transform: translateY(-10px);
+        }
 
-.btn-submit:hover {
-    background-color: #8f94fb;
-}
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+        }
 
-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 20px 0;
-    border-radius: 50px 50px 0 0;
-}
+        .contact-form button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .contact-form button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        footer a {
+            color: #4CAF50;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        footer a:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌟 আমার ওয়েবসাইট 🌟</h1>
+        <nav>
+            <a href="#home">হোম</a>
+            <a href="#projects">প্রজেক্ট</a>
+            <a href="#contact">যোগাযোগ</a>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <h2>👋 হ্যালো, আমি একজন ওয়েব ডেভেলপার!</h2>
+        <p>আমি আধুনিক ও প্রতিক্রিয়াশীল ওয়েবসাইট তৈরি করি। 🌐✨</p>
+        <button>আমার কাজ দেখুন 🚀</button>
+    </section>
+
+    <section id="projects">
+        <h2>💼 আমার প্রজেক্টসমূহ</h2>
+        <div class="projects">
+            <div class="project-card">
+                <h3>📱 প্রজেক্ট ১: প্রতিক্রিয়াশীল ওয়েবসাইট</h3>
+                <p>সম্পূর্ণ মোবাইল-বান্ধব ওয়েবসাইট যা সব ধরনের ডিভাইসে কাজ করে।</p>
+            </div>
+            <div class="project-card">
+                <h3>🛒 প্রজেক্ট ২: ই-কমার্স সাইট</h3>
+                <p>একটি সুন্দর এবং কার্যকরী ই-কমার্স ওয়েবসাইট যা ব্যবহারকারী অভিজ্ঞতাকে উন্নত করে।</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>📩 যোগাযোগ করুন</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="আপনার নাম" required>
+            <input type="email" placeholder="আপনার ইমেইল" required>
+            <textarea rows="5" placeholder="আপনার বার্তা" required></textarea>
+            <button type="submit">বার্তা পাঠান 🚀</button>
+        </form>
+    </section>
+
+    <footer>
+        <p>© 2024 | সর্বস্বত্ব সংরক্ষিত | 🌟 আপনার ওয়েবসাইট 🌟</p>
+        <div>
+            <a href="#">🌐 ফেসবুক</a>
+            <a href="#">🐦 টুইটার</a>
+            <a href="#">📸 ইনস্টাগ্রাম</a>
+        </div>
+    </footer>
+
+</body>
+</html>
