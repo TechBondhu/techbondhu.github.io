@@ -1,72 +1,108 @@
-/* ======== গ্লোবাল ডিজাইন ======== */
+/* সাধারণ স্টাইল */
 body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-    text-align: center;
-    padding: 50px;
+    font-family: Arial, sans-serif;
+    background: #f0f8ff;
     margin: 0;
+    padding: 0;
+    text-align: center;
 }
 
-/* ======== ফর্ম ডিজাইন ======== */
+/* হেডার */
+header {
+    background: #004d99;
+    color: white;
+    padding: 15px 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.apply-btn {
+    background: #ff6600;
+    padding: 8px 15px;
+    border-radius: 5px;
+    color: white;
+}
+
+.apply-btn:hover {
+    background: #cc5200;
+}
+
+/* হিরো সেকশন */
+.hero {
+    padding: 50px;
+    background: linear-gradient(to right, #0073e6, #66ccff);
+    color: white;
+}
+
+.hero h2 {
+    font-size: 32px;
+    margin: 10px 0;
+}
+
+.hero p {
+    font-size: 18px;
+}
+
+.hero .apply-btn {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 20px;
+    padding: 12px 20px;
+}
+
+/* আবেদন ফর্ম */
 .form-container {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 25px;
-    border-radius: 12px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
     width: 50%;
     margin: auto;
-    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    margin-top: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
 }
 
-h2 {
-    font-size: 24px;
-    margin-bottom: 15px;
-    color: #00ffcc;
-}
-
-/* ======== ইনপুট এবং সিলেক্ট বক্স ======== */
 input, select, textarea {
     width: 90%;
-    padding: 12px;
-    margin: 12px 0;
-    border: none;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
 }
 
-input::placeholder, textarea::placeholder {
-    color: #ddd;
-}
-
-/* ======== বাটন ডিজাইন ======== */
 button {
-    background: #00ffcc;
-    color: #0f2027;
-    padding: 12px 20px;
+    background: #28a745;
+    color: white;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     font-size: 18px;
-    font-weight: bold;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
-    background: #00cc99;
+    background: #218838;
 }
 
-/* ======== রেস্পন্সিভ ডিজাইন (মোবাইলের জন্য) ======== */
-@media (max-width: 768px) {
-    .form-container {
-        width: 90%;
-        padding: 20px;
-    }
-    input, select, textarea {
-        width: 100%;
-    }
+/* ফুটার */
+footer {
+    background: #004d99;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
 }
