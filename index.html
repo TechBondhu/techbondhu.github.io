@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="bn">
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>আমার প্রফেশনাল ওয়েবসাইট</title>
@@ -12,7 +12,7 @@
             box-sizing: border-box;
             scroll-behavior: smooth;
         }
-        
+
         body {
             font-family: 'Poppins', sans-serif;
             color: #333;
@@ -20,16 +20,18 @@
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
         }
 
-       <header>
-  <nav>
-    <ul>
-      <li><a href="#home">হোম</a></li>
-      <li><a href="#about">আমাদের সম্পর্কে</a></li>
-      <li><a href="#services">সেবা</a></li>
-      <li><a href="#contact">যোগাযোগ</a></li>
-    </ul>
-  </nav>
-</header>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10%;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
         header h1 {
             font-size: 1.8rem;
