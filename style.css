@@ -314,3 +314,28 @@ button:hover {
 .contact-form button:hover {
     background-color: #45a049;
 }
+/* 🔻 ফুটার সেকশন স্টাইল 🔻 */
+.footer-section {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.footer-section p {
+    margin: 10px 0;
+    font-size: 1rem;
+}
+
+.footer-section .social-links a {
+    margin: 0 10px;
+    color: #f5f5f5;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.footer-section .social-links a:hover {
+    color: #4CAF50;
+}
+
