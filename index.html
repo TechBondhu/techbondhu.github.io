@@ -19,6 +19,25 @@
             line-height: 1.6;
             background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
         }
+<script>
+    const applyBtn = document.getElementById("applyBtn");
+    const formPopupBg = document.getElementById("formPopupBg");
+    const closeBtn = document.getElementById("closeForm");
+
+    applyBtn.addEventListener("click", () => {
+        formPopupBg.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+        formPopupBg.style.display = "none";
+    });
+
+    window.addEventListener("click", (e) => {
+        if (e.target === formPopupBg) {
+            formPopupBg.style.display = "none";
+        }
+    });
+</script>
 
         header {
             display: flex;
