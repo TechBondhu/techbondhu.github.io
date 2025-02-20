@@ -427,4 +427,19 @@ button:hover {
         transform: translateY(0);
     }
 }
+/* 📱 মোবাইল ডিভাইসের জন্য Hero Section ঠিক করা */
+@media (max-width: 768px) {
+    .hero-section {
+        height: 70vh; /* মোবাইল ভিউতে কম উচ্চতা */
+        padding-top: 60px;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-content p {
+        font-size: 1.2rem;
+    }
+}
 
