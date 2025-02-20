@@ -4,75 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ভর্তি আবেদন ফর্ম</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f3f4f6;
-            text-align: center;
-            padding: 50px;
-        }
-        .form-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 50%;
-            margin: auto;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        input, select, textarea {
-            width: 90%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="form-container">
         <h2>📝 ভর্তি আবেদন ফর্ম</h2>
-        <form onsubmit="submitForm(event)">
-            <input type="text" placeholder="আপনার নাম" required><br>
-            <input type="email" placeholder="ইমেইল" required><br>
-            <input type="text" placeholder="মোবাইল নম্বর" required><br>
-            <input type="text" placeholder="পিতার নাম" required><br>
-            <input type="text" placeholder="মাতার নাম" required><br>
-            <input type="date" required><br>
-            <input type="number" placeholder="SSC GPA" step="0.01" required><br>
-            <input type="number" placeholder="HSC GPA" step="0.01" required><br>
-            <input type="file" accept="image/*" required><br>
-            <select required>
-                <option value="">বিভাগ নির্বাচন করুন</option>
+        <form id="admissionForm">
+            <input type="text" name="name" placeholder="👤 আপনার নাম" required>
+            <input type="email" name="email" placeholder="📧 ইমেইল" required>
+            <input type="text" name="phone" placeholder="📱 মোবাইল নম্বর" required>
+            <input type="text" name="father_name" placeholder="👨‍👦 পিতার নাম" required>
+            <input type="text" name="mother_name" placeholder="👩‍👦 মাতার নাম" required>
+            <input type="date" name="dob" required>
+            <input type="number" name="ssc_gpa" placeholder="🎓 SSC GPA" step="0.01" required>
+            <input type="number" name="hsc_gpa" placeholder="🎓 HSC GPA" step="0.01" required>
+            <input type="file" name="photo" accept="image/*" required>
+            <select name="department" required>
+                <option value="">📚 বিভাগ নির্বাচন করুন</option>
                 <option value="science">বিজ্ঞান</option>
                 <option value="commerce">ব্যবসায় শিক্ষা</option>
                 <option value="arts">মানবিক</option>
-            </select><br>
-            <textarea rows="4" placeholder="অতিরিক্ত মন্তব্য (যদি থাকে)"></textarea><br>
-            <button type="submit">✅ আবেদন করুন</button>
+            </select>
+            <textarea name="comments" rows="4" placeholder="✍️ অতিরিক্ত মন্তব্য"></textarea>
+            <button type="submit">✅ আবেদন জমা দিন</button>
         </form>
     </div>
 
     <script>
-        function submitForm(event) {
+        document.getElementById("admissionForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            alert('✅ আপনার আবেদন সফলভাবে জমা দেওয়া হয়েছে!');
-        }
+            alert("✅ আপনার আবেদন সফলভাবে জমা দেওয়া হয়েছে!");
+        });
     </script>
 
 </body>
 </html>
- 
