@@ -467,23 +467,6 @@ button:hover {
         top: 10px;
         right: 15px;
     }
-/* 📱 মোবাইলে ফরম ঠিক করার CSS 📱 */
-@media (max-width: 768px) {
-    .form-popup {
-        width: 90% !important;  /* মোবাইলে পুরো স্ক্রিনের 90% অংশ নেবে */
-        padding: 20px;
-        font-size: 1rem;
-    }
-
-    .form-popup input,
-    .form-popup textarea {
-        font-size: 1rem;
-        padding: 12px;
-    }
-
-    .form-popup button {
-        font-size: 1rem;
-        padding: 12px;
-    }
+ 
 }
 
