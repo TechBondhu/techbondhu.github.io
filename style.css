@@ -1,41 +1,71 @@
-/* পুরো ওয়েবসাইটের ব্যাকগ্রাউন্ড ও ফন্ট সেটিংস */
+/* বেসিক স্টাইল */
 body {
-    background-image: url('https://source.unsplash.com/1600x900/?nature,water'); /* ব্যাকগ্রাউন্ড ইমেজ */
-    background-size: cover;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
     font-family: 'Arial', sans-serif;
+    color: #fff;
     text-align: center;
     padding: 50px;
-    color: white;
-}
-
-/* হেডার ডিজাইন */
-header {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    border-radius: 10px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: background-color 0.5s ease;
 }
 
 h1 {
-    font-size: 40px;
+    color: #ffdd57;
+    font-size: 3rem;
+    animation: fadeIn 2s ease-in-out;
 }
 
-/* টেক্সট ডিজাইন */
 p {
-    font-size: 22px;
+    font-size: 1.5rem;
+    line-height: 1.6;
+    animation: fadeIn 3s ease-in-out;
 }
 
-/* বাটনের ডিজাইন */
-.btn {
-    display: inline-block;
-    background: #ff5722;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 20px;
+/* বাটন স্টাইলিং */
+button {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    background-color: #ffdd57;
+    color: #4b0082;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s;
     margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.btn:hover {
-    background: #e64a19;
+button:hover {
+    background-color: #ffcc00;
+    transform: scale(1.1);
+}
+
+/* ফেইড-ইন অ্যানিমেশন */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* রেসপনসিভ ডিজাইন */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    p {
+        font-size: 1.2rem;
+    }
+
+    button {
+        width: 100%;
+    }
 }
