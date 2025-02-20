@@ -42,6 +42,26 @@ nav {
     font-size: 1.2rem;
     transition: background-color 0.3s;
 }
+/* 💎 আমাদের সম্পর্কে সেকশন স্টাইল 💎 */
+.about-section {
+    background-color: #f5f5f5;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.about-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.about-section p {
+    font-size: 1.2rem;
+    color: #555;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 0 auto;
+}
 
 .cta-button:hover {
     background-color: #ffcc00;
