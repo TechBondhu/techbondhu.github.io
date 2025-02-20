@@ -1,5 +1,5 @@
- body {
-    background-color: lightblue; /* পরিবর্তন করা রং */
+body {
+    background-color: lightblue !important; /* ব্যাকগ্রাউন্ড পরিবর্তন */
     font-family: Arial, sans-serif;
     text-align: center;
     padding: 50px;
@@ -7,10 +7,10 @@
 
 h1 {
     color: darkblue;
+    font-size: 36px;
 }
 
 p {
     color: darkgreen;
-    font-size: 18px;
+    font-size: 20px;
 }
-
