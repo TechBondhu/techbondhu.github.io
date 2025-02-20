@@ -167,3 +167,27 @@
     </script>
 </body>
 </html>
+document.addEventListener("DOMContentLoaded", function () {
+    function adjustFormForMobile() {
+        let form = document.querySelector(".form-popup");
+        if (!form) return;
+
+        if (window.innerWidth <= 768) {
+            form.style.width = "90%";
+            form.style.padding = "20px";
+            form.style.borderRadius = "10px";
+
+            let inputs = form.querySelectorAll("input, textarea, button");
+            inputs.forEach(input => {
+                input.style.width = "100%";
+                input.style.fontSize = "1rem";
+                input.style.padding = "12px";
+                input.style.marginBottom = "10px";
+            });
+        }
+    }
+
+    adjustFormForMobile();
+    window.addEventListener("resize", adjustFormForMobile);
+});
+
