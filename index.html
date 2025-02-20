@@ -74,7 +74,7 @@
             color: #555;
         }
 
-        .hero button, .apply-btn {
+        .hero button {
             padding: 15px 30px;
             border-radius: 30px;
             border: none;
@@ -85,42 +85,7 @@
             transition: background-color 0.3s;
         }
 
-        .hero button:hover, .apply-btn:hover {
-            background-color: #45a049;
-        }
-
-        .application-form {
-            display: none;
-            background-color: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .application-form input,
-        .application-form select,
-        .application-form textarea {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-        }
-
-        .application-form button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .application-form button:hover {
+        .hero button:hover {
             background-color: #45a049;
         }
 
@@ -150,7 +115,6 @@
     </style>
 </head>
 <body>
-
     <header>
         <h1>🌟 শিক্ষার্থীদের ভর্তি পোর্টাল 🌟</h1>
         <nav>
@@ -163,35 +127,7 @@
     <section id="home" class="hero">
         <h2>👋 স্বাগতম আমাদের ভর্তি পোর্টালে!</h2>
         <p>আপনার ভর্তি আবেদন এখনই সম্পন্ন করুন সহজে এবং দ্রুত। 🌐✨</p>
-        <button class="apply-btn" onclick="document.getElementById('application').scrollIntoView({ behavior: 'smooth' });">এখনই আবেদন করুন 📝</button>
-    </section>
-
-    <section id="application">
-        <h2>📝 ভর্তি আবেদন ফর্ম</h2>
-        <form class="application-form">
-            <input type="text" placeholder="আপনার পুরো নাম" required>
-            <input type="email" placeholder="ইমেইল ঠিকানা" required>
-            <input type="text" placeholder="মোবাইল নম্বর" required>
-            <input type="text" placeholder="ঠিকানা" required>
-            <select required>
-                <option value="">বিভাগ নির্বাচন করুন</option>
-                <option value="science">বিজ্ঞান</option>
-                <option value="commerce">ব্যবসায় শিক্ষা</option>
-                <option value="arts">মানবিক</option>
-            </select>
-            <textarea rows="5" placeholder="অতিরিক্ত মন্তব্য (যদি থাকে)"></textarea>
-            <button type="submit">আবেদন জমা দিন 🚀</button>
-        </form>
-    </section>
-
-    <section id="contact">
-        <h2>📩 আমাদের সাথে যোগাযোগ করুন</h2>
-        <form class="contact-form">
-            <input type="text" placeholder="আপনার নাম" required>
-            <input type="email" placeholder="আপনার ইমেইল" required>
-            <textarea rows="5" placeholder="আপনার বার্তা" required></textarea>
-            <button type="submit">বার্তা পাঠান 🚀</button>
-        </form>
+        <button onclick="openApplicationForm()">এখনই আবেদন করুন 📝</button>
     </section>
 
     <footer>
@@ -204,11 +140,9 @@
     </footer>
 
     <script>
-        document.querySelector(".application-form").addEventListener("submit", function(event) {
-            event.preventDefault();
-            alert("✅ আপনার আবেদন সফলভাবে জমা দেওয়া হয়েছে!");
-        });
+        function openApplicationForm() {
+            window.open("application_form.html", "_blank");
+        }
     </script>
-
 </body>
 </html>
