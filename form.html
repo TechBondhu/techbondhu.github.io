@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভর্তি আবেদন ফর্ম</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>📝 ভর্তি আবেদন ফর্ম</h2>
+        <form onsubmit="submitForm(event)">
+            <input type="text" placeholder="আপনার নাম" required>
+            <input type="email" placeholder="ইমেইল" required>
+            <input type="text" placeholder="মোবাইল নম্বর" required>
+            <input type="text" placeholder="পিতার নাম" required>
+            <input type="text" placeholder="মাতার নাম" required>
+            <input type="date" required>
+            <input type="number" placeholder="SSC GPA" step="0.01" required>
+            <input type="number" placeholder="HSC GPA" step="0.01" required>
+            <input type="file" accept="image/*" required>
+            <select required>
+                <option value="">বিভাগ নির্বাচন করুন</option>
+                <option value="science">বিজ্ঞান</option>
+                <option value="commerce">ব্যবসায় শিক্ষা</option>
+                <option value="arts">মানবিক</option>
+            </select>
+            <textarea rows="4" placeholder="অতিরিক্ত মন্তব্য (যদি থাকে)"></textarea>
+            <button type="submit">✅ আবেদন করুন</button>
+        </form>
+    </div>
+
+    <script>
+        function submitForm(event) {
+            event.preventDefault();
+            alert('✅ আপনার আবেদন সফলভাবে জমা দেওয়া হয়েছে!');
+        }
+    </script>
+
+</body>
+</html>
