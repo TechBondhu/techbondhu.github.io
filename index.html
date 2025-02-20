@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>আমার প্রফেশনাল ওয়েবসাইট</title>
+    <title>শিক্ষার্থীদের ভর্তি আবেদন পোর্টাল</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         * {
@@ -75,7 +75,7 @@
             color: #555;
         }
 
-        .hero button {
+        .hero button, .apply-btn {
             padding: 15px 30px;
             border-radius: 30px;
             border: none;
@@ -86,30 +86,21 @@
             transition: background-color 0.3s;
         }
 
-        .hero button:hover {
+        .hero button:hover, .apply-btn:hover {
             background-color: #45a049;
         }
 
-        .projects {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
+        .application-form {
+            display: none;
             background-color: white;
-            padding: 20px;
-            border-radius: 15px;
+            padding: 30px;
+            border-radius: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
         }
 
-        .project-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .contact-form input,
-        .contact-form textarea {
+        .application-form input,
+        .application-form select,
+        .application-form textarea {
             width: 100%;
             padding: 15px;
             margin: 10px 0;
@@ -118,7 +109,7 @@
             font-size: 1rem;
         }
 
-        .contact-form button {
+        .application-form button {
             width: 100%;
             padding: 15px;
             border: none;
@@ -130,7 +121,7 @@
             transition: background-color 0.3s;
         }
 
-        .contact-form button:hover {
+        .application-form button:hover {
             background-color: #45a049;
         }
 
@@ -162,36 +153,40 @@
 <body>
 
     <header>
-        <h1>🌟 টেকবন্ধু 🌟</h1>
+        <h1>🌟 শিক্ষার্থীদের ভর্তি পোর্টাল 🌟</h1>
         <nav>
             <a href="#home">হোম</a>
-            <a href="#projects">প্রজেক্ট</a>
+            <a href="#application">আবেদন করুন</a>
             <a href="#contact">যোগাযোগ</a>
         </nav>
     </header>
 
     <section id="home" class="hero">
-        <h2>👋 হ্যালো, ভর্তি আবেদনে আপনাকে স্বাগতম  </h2>
-        <p> আবেদন করুন স্বল্প সময় ,স্বল্প খরচে ! 🌐✨</p>
-        <button>আমার কাজ দেখুন 🚀</button>
+        <h2>👋 স্বাগতম আমাদের ভর্তি পোর্টালে!</h2>
+        <p>আপনার ভর্তি আবেদন এখনই সম্পন্ন করুন সহজে এবং দ্রুত। 🌐✨</p>
+        <button class="apply-btn" onclick="document.getElementById('application').scrollIntoView({ behavior: 'smooth' });">এখনই আবেদন করুন 📝</button>
     </section>
 
-    <section id="projects">
-        <h2>💼 আমার প্রজেক্টসমূহ</h2>
-        <div class="projects">
-            <div class="project-card">
-                <h3>📱 প্রজেক্ট ১: প্রতিক্রিয়াশীল ওয়েবসাইট</h3>
-                <p>সম্পূর্ণ মোবাইল-বান্ধব ওয়েবসাইট যা সব ধরনের ডিভাইসে কাজ করে।</p>
-            </div>
-            <div class="project-card">
-                <h3>🛒 প্রজেক্ট ২: ই-কমার্স সাইট</h3>
-                <p>একটি সুন্দর এবং কার্যকরী ই-কমার্স ওয়েবসাইট যা ব্যবহারকারী অভিজ্ঞতাকে উন্নত করে।</p>
-            </div>
-        </div>
+    <section id="application">
+        <h2>📝 ভর্তি আবেদন ফর্ম</h2>
+        <form class="application-form">
+            <input type="text" placeholder="আপনার পুরো নাম" required>
+            <input type="email" placeholder="ইমেইল ঠিকানা" required>
+            <input type="text" placeholder="মোবাইল নম্বর" required>
+            <input type="text" placeholder="ঠিকানা" required>
+            <select required>
+                <option value="">বিভাগ নির্বাচন করুন</option>
+                <option value="science">বিজ্ঞান</option>
+                <option value="commerce">ব্যবসায় শিক্ষা</option>
+                <option value="arts">মানবিক</option>
+            </select>
+            <textarea rows="5" placeholder="অতিরিক্ত মন্তব্য (যদি থাকে)"></textarea>
+            <button type="submit">আবেদন জমা দিন 🚀</button>
+        </form>
     </section>
 
     <section id="contact">
-        <h2>📩 যোগাযোগ করুন</h2>
+        <h2>📩 আমাদের সাথে যোগাযোগ করুন</h2>
         <form class="contact-form">
             <input type="text" placeholder="আপনার নাম" required>
             <input type="email" placeholder="আপনার ইমেইল" required>
@@ -201,13 +196,20 @@
     </section>
 
     <footer>
-        <p>© 2024 | সর্বস্বত্ব সংরক্ষিত | 🌟 আপনার ওয়েবসাইট 🌟</p>
+        <p>© 2025 | সর্বস্বত্ব সংরক্ষিত | 🌟 শিক্ষার্থীদের ভর্তি পোর্টাল 🌟</p>
         <div>
             <a href="#">🌐 ফেসবুক</a>
             <a href="#">🐦 টুইটার</a>
             <a href="#">📸 ইনস্টাগ্রাম</a>
         </div>
     </footer>
+
+    <script>
+        document.querySelector(".application-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            alert("✅ আপনার আবেদন সফলভাবে জমা দেওয়া হয়েছে!");
+        });
+    </script>
 
 </body>
 </html>
