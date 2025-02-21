@@ -9,21 +9,99 @@
 <body>
     <div class="form-container">
         <h2>📄 ভর্তি আবেদন ফরম</h2>
-        <form action="submit_form.php" method="POST">
+        <form action="submit_form.php" method="POST" enctype="multipart/form-data">
+
+            <!-- 🟢 ব্যক্তিগত তথ্য -->
             <label for="name">👤 পূর্ণ নাম:</label>
             <input type="text" id="name" name="name" required>
+
+            <label for="father_name">👨‍👧 পিতার নাম:</label>
+            <input type="text" id="father_name" name="father_name" required>
+
+            <label for="mother_name">👩‍👧 মাতার নাম:</label>
+            <input type="text" id="mother_name" name="mother_name" required>
 
             <label for="dob">📅 জন্ম তারিখ:</label>
             <input type="date" id="dob" name="dob" required>
 
+            <label for="gender">⚧ লিঙ্গ:</label>
+            <select id="gender" name="gender" required>
+                <option value="পুরুষ">পুরুষ</option>
+                <option value="মহিলা">মহিলা</option>
+                <option value="অন্যান্য">অন্যান্য</option>
+            </select>
+
+            <label for="blood_group">🩸 রক্তের গ্রুপ:</label>
+            <select id="blood_group" name="blood_group">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+            </select>
+
+            <!-- 🟢 যোগাযোগের তথ্য -->
             <label for="email">📧 ইমেইল:</label>
             <input type="email" id="email" name="email" required>
 
             <label for="phone">📞 মোবাইল নাম্বার:</label>
             <input type="tel" id="phone" name="phone" required>
 
-            <label for="address">🏠 ঠিকানা:</label>
-            <textarea id="address" name="address" rows="3" required></textarea>
+            <label for="address">🏠 বর্তমান ঠিকানা:</label>
+            <textarea id="address" name="address" rows="2" required></textarea>
+
+            <label for="permanent_address">🏠 স্থায়ী ঠিকানা:</label>
+            <textarea id="permanent_address" name="permanent_address" rows="2" required></textarea>
+
+            <!-- 🟢 একাডেমিক তথ্য -->
+            <label for="school">🏫 পূর্ববর্তী শিক্ষাপ্রতিষ্ঠান:</label>
+            <input type="text" id="school" name="school" required>
+
+            <label for="exam_name">📜 পরীক্ষার নাম:</label>
+            <select id="exam_name" name="exam_name" required>
+                <option value="SSC">SSC</option>
+                <option value="HSC">HSC</option>
+                <option value="Diploma">Diploma</option>
+            </select>
+
+            <label for="roll">🎫 রোল নম্বর:</label>
+            <input type="number" id="roll" name="roll" required>
+
+            <label for="reg">📜 রেজিস্ট্রেশন নম্বর:</label>
+            <input type="text" id="reg" name="reg" required>
+
+            <label for="board">🏢 বোর্ড:</label>
+            <select id="board" name="board" required>
+                <option value="ঢাকা">ঢাকা</option>
+                <option value="চট্টগ্রাম">চট্টগ্রাম</option>
+                <option value="রাজশাহী">রাজশাহী</option>
+                <option value="কুমিল্লা">কুমিল্লা</option>
+                <option value="যশোর">যশোর</option>
+                <option value="সিলেট">সিলেট</option>
+                <option value="বরিশাল">বরিশাল</option>
+                <option value="দিনাজপুর">দিনাজপুর</option>
+                <option value="ময়মনসিংহ">ময়মনসিংহ</option>
+            </select>
+
+            <label for="gpa">📊 প্রাপ্ত জিপিএ:</label>
+            <input type="text" id="gpa" name="gpa" required>
+
+            <!-- 🟢 অভিভাবকের তথ্য -->
+            <label for="guardian_phone">👨‍👩‍👧 অভিভাবকের মোবাইল নাম্বার:</label>
+            <input type="tel" id="guardian_phone" name="guardian_phone" required>
+
+            <label for="guardian_job">💼 অভিভাবকের পেশা:</label>
+            <input type="text" id="guardian_job" name="guardian_job" required>
+
+            <!-- 🟢 ছবি এবং স্বাক্ষর আপলোড -->
+            <label for="photo">📸 ছবি আপলোড:</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+
+            <label for="signature">✍ স্বাক্ষর আপলোড:</label>
+            <input type="file" id="signature" name="signature" accept="image/*" required>
 
             <button type="submit" class="submit-btn">✅ আবেদন করুন</button>
         </form>
