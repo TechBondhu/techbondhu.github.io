@@ -301,8 +301,7 @@ form textarea {
         font-size: 16px;
     }
 }
-
-/* ন্যাভবার ঠিক করা */
+/* নেভবার ঠিক করা */
 header {
     display: flex;
     justify-content: space-between;
@@ -310,6 +309,7 @@ header {
     background-color: #0056b3;
     padding: 15px 50px;
     color: white;
+    flex-wrap: wrap;
 }
 
 header .logo {
@@ -321,6 +321,8 @@ nav ul {
     list-style: none;
     display: flex;
     gap: 20px;
+    margin: 0;
+    padding: 0;
 }
 
 nav ul li a {
@@ -335,35 +337,15 @@ nav ul li a {
     background-color: #f8f9fa;
     border-radius: 10px;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 50px auto; /* উপরে-নিচে গ্যাপ */
 }
 
 .hero h1 {
     font-size: 32px;
-    color: black;
-}
+    color: black
 
-.hero p {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-/* About, Admission & Contact ঠিক করা */
-section {
-    text-align: center;
-    padding: 40px 20px;
-    max-width: 800px;
-    margin: auto;
-}
-
-/* Contact Box */
-footer {
-    background-color: black;
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-footer p {
-    margin: 5px 0;
-}
+ 
+ 
+ 
+  
+ 
