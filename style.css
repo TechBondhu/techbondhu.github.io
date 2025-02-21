@@ -172,5 +172,8 @@ header {
 .apply-btn:active {
     transform: scale(0.95);
 }
+.hero h1 {
+    color: black; /* টেক্সট কালো হবে */
+}
 
  
