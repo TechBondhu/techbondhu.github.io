@@ -199,4 +199,20 @@ input, textarea {
         padding: 10px;
     }
 }
+/* ============ ফেইড-ইন (Fade-in) অ্যানিমেশন ============ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* অ্যানিমেশন অ্যাপ্লাই করা */
+.hero, .form-container, section, footer {
+    animation: fadeIn 1s ease-in-out;
+}
 
