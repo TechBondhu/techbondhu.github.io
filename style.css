@@ -1,307 +1,4 @@
-/* Google Font */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Noto Sans Bengali', sans-serif;
-}
-
-body {
-    background-color: #f4f4f4;
-    color: #333;
-    text-align: center;
-}
-
-/* হেডার ডিজাইন */
-header {
-    background-color: #007BFF;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-header .logo {
-    font-size: 24px;
-    font-weight: bold;
-}
-
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-}
-
-.apply-btn {
-    background-color: #28a745;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-/* হিরো সেকশন */
-.hero {
-    background: url('https://source.unsplash.com/1600x900/?university,students') center/cover;
-    color: white;
-    padding: 60px 20px;
-}
-
-.hero h1 {
-    font-size: 40px;
-    font-weight: bold;
-}
-
-.hero p {
-    font-size: 18px;
-    margin: 10px 0;
-}
-
-/* সেকশন ডিজাইন */
-section {
-    padding: 50px 20px;
-}
-
-/* ফুটার ডিজাইন */
-footer {
-    background-color: #333;
-    color: white;
-    padding: 20px;
-}
-
-/* রেসপন্সিভ ডিজাইন (মোবাইলের জন্য) */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    nav ul {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .hero h1 {
-        font-size: 30px;
-    }
-}
-/* এনিমেশন শুরু */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* হেডার এনিমেশন */
-header {
-    animation: fadeIn 1s ease-in-out;
-}
-
-/* হিরো সেকশনের এনিমেশন */
-.hero h1 {
-    animation: slideUp 1.2s ease-in-out;
-}
-
-.hero p {
-    animation: slideUp 1.5s ease-in-out;
-}
-
-/* বাটন এনিমেশন */
-.apply-btn {
-    transition: 0.3s;
-}
-
-.apply-btn:hover {
-    background-color: #218838;
-    transform: scale(1.1);
-}
-
-/* স্ক্রল করলে এলিমেন্ট ফেইড ইন হবে */
-.scroll-animation {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease-in-out;
-}
-
-.scroll-animation.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-.apply-btn {
-    background-color: #28a745;
-    color: white;
-    padding: 12px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.apply-btn:hover {
-    background-color: #218838;
-    transform: scale(1.1);
-}
-
-.apply-btn:active {
-    transform: scale(0.95);
-}
-
-}
-
-.hero h1 {
-    color: black; /* টেক্সট কালো হবে */
-}
-.hero p {
-    color: black; /* টেক্সট কালো হবে */
-}
-.hero h1 {
-    margin-bottom: 10px; /* h1 এর নিচে ফাঁকা */
-}
-
-.hero p {
-    margin-bottom: 20px; /* p এর নিচে ফাঁকা */
-}
-
-.apply-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    margin-top: 10px; /* বোতামের উপরে ফাঁকা */
-}
-@media (max-width: 768px) {
-    .hero h1 {
-        margin-bottom: 15px; /* মোবাইলে h1 এর নিচে বেশি ফাঁকা */
-    }
-
-    .hero p {
-        margin-bottom: 25px; /* মোবাইলে p এর নিচে বেশি ফাঁকা */
-    }
-
-    .apply-btn {
-        margin-top: 15px; /* মোবাইলে বোতামের উপরে বেশি ফাঁকা */
-    }
-}
-.hero {
-    background-color: #f0f0f0; /* হালকা ধূসর ব্যাকগ্রাউন্ড */
-    padding: 20px;
-    text-align: center;
-}
-
-.hero h1 {
-    color: black !important; /* নিশ্চিতভাবে কালো রঙ হবে */
-}
-
-.hero p {
-    color: black !important; /* নিশ্চিতভাবে কালো রঙ হবে */
-}
-
-/* বেসিক স্টাইল */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-/* ফর্মের ডিজাইন */
-.form-container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    max-width: 400px; /* মোবাইল ও ল্যাপটপের জন্য ব্যালান্স */
-    text-align: center;
-}
-
-h2 {
-    margin-bottom: 20px;
-    color: #333;
-}
-
-/* ইনপুট ফিল্ড ডিজাইন */
-form label {
-    display: block;
-    text-align: left;
-    font-weight: bold;
-    margin-top: 10px;
-}
-
-form input,
-form textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-/* সাবমিট বোতাম */
-.submit-btn {
-    width: 100%;
-    background: #28a745;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 18px;
-    margin-top: 15px;
-    cursor: pointer;
-}
-
-.submit-btn:hover {
-    background: #218838;
-}
-
-/* মোবাইল রেসপন্সিভ ডিজাইন */
-@media (max-width: 600px) {
-    .form-container {
-        width: 95%;
-        padding: 15px;
-    }
-
-    form input,
-    form textarea {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .submit-btn {
-        font-size: 16px;
-    }
-}
-/* নেভবার ঠিক করা */
+/* ============ ন্যাভবার (হেডার) ============ */
 header {
     display: flex;
     justify-content: space-between;
@@ -325,26 +22,116 @@ nav ul {
     padding: 0;
 }
 
+nav ul li {
+    display: inline;
+}
+
 nav ul li a {
     color: white;
     text-decoration: none;
+    font-size: 18px;
 }
 
-/* Hero Section ঠিক করা */
+/* ============ হিরো সেকশন ============ */
 .hero {
     text-align: center;
-    padding: 50px 20px;
+    padding: 60px 20px;
     background-color: #f8f9fa;
     border-radius: 10px;
     max-width: 600px;
-    margin: 50px auto; /* উপরে-নিচে গ্যাপ */
+    margin: 50px auto;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .hero h1 {
     font-size: 32px;
-    color: black
+    color: black;
+    margin-bottom: 15px;
+}
 
- 
+.hero p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.apply-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: green;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.apply-btn:hover {
+    background-color: darkgreen;
+}
+
+/* ============ সেকশন স্টাইল ============ */
+section {
+    text-align: center;
+    padding: 50px 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+section h2 {
+    font-size: 26px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+section p, section ul {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* ============ ভর্তি তথ্য ============ */
+#admission ul {
+    list-style: none;
+    padding: 0;
+}
+
+#admission ul li {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* ============ ফুটার (যোগাযোগ) ============ */
+footer {
+    background-color: black;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* ============ রেসপন্সিভ ডিজাইন ============ */
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .hero {
+        max-width: 90%;
+    }
+
+    section {
+        max-width: 95%;
+    }
+}
+
  
  
   
