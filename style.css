@@ -1,51 +1,92 @@
-/* ভর্তি ফরমের স্টাইল */
+/* ======== সাধারণ স্টাইল ======== */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
     margin: 0;
     padding: 0;
+    background: #f3f4f6;
+    text-align: center;
 }
 
-.form-container {
-    width: 40%;
-    margin: 50px auto;
-    background: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+/* ======== Header ======== */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
+    color: white;
+    padding: 15px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.apply-btn {
+    background: #f39c12;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.apply-btn:hover {
+    background: #e67e22;
+}
+
+/* ======== Hero Section ======== */
+.hero {
+    background: url('hero-image.jpg') no-repeat center center/cover;
+    padding: 100px 20px;
+    color: white;
+}
+
+.hero h1 {
+    font-size: 36px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* ======== অন্যান্য সেকশন ======== */
+section {
+    padding: 50px 20px;
 }
 
 h2 {
-    text-align: center;
-    color: #333;
+    font-size: 28px;
+    color: #34495e;
 }
 
-label {
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
+p {
+    font-size: 18px;
+    color: #555;
 }
 
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.submit-btn {
-    width: 100%;
-    background: #28a745;
+/* ======== Footer ======== */
+footer {
+    background: #2c3e50;
     color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 15px;
+    padding: 20px;
 }
 
-.submit-btn:hover {
-    background: #218838;
-}
