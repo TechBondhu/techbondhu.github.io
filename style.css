@@ -9,7 +9,7 @@ body {
 
 /* হেডার */
 header {
-    background: #004d99;
+    background: #FFD700;
     color: white;
     padding: 15px 0;
     text-align: center;
@@ -45,7 +45,7 @@ nav ul li a {
 /* হিরো সেকশন */
 .hero {
     padding: 50px;
-    background: linear-gradient(to right, #0073e6, #66ccff);
+    background: linear-gradient(to right, #FFD700, #66ccff);
     color: white;
 }
 
