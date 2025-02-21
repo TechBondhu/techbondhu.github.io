@@ -95,4 +95,63 @@ footer {
         font-size: 30px;
     }
 }
+/* এনিমেশন শুরু */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* হেডার এনিমেশন */
+header {
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* হিরো সেকশনের এনিমেশন */
+.hero h1 {
+    animation: slideUp 1.2s ease-in-out;
+}
+
+.hero p {
+    animation: slideUp 1.5s ease-in-out;
+}
+
+/* বাটন এনিমেশন */
+.apply-btn {
+    transition: 0.3s;
+}
+
+.apply-btn:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+}
+
+/* স্ক্রল করলে এলিমেন্ট ফেইড ইন হবে */
+.scroll-animation {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-in-out;
+}
+
+.scroll-animation.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
  
