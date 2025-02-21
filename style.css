@@ -181,4 +181,17 @@ header {
 .hero p {
     color: black; /* টেক্সট কালো হবে */
 }
+.hero h1 {
+    margin-bottom: 10px; /* h1 এর নিচে ফাঁকা */
+}
+
+.hero p {
+    margin-bottom: 20px; /* p এর নিচে ফাঁকা */
+}
+
+.apply-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px; /* বোতামের উপরে ফাঁকা */
+}
 
