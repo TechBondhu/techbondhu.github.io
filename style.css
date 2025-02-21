@@ -1,27 +1,35 @@
-/* সাধারণ স্টাইল */
+/* ======== সাধারণ স্টাইল ======== */
 body {
     font-family: Arial, sans-serif;
-    background: #f0f8ff;
     margin: 0;
     padding: 0;
+    background: #f3f4f6;
     text-align: center;
 }
 
-/* হেডার */
+/* ======== Header ======== */
 header {
-    background: #FFD700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2c3e50;
     color: white;
-    padding: 15px 0;
-    text-align: center;
+    padding: 15px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
 }
 
 nav ul {
     list-style: none;
+    margin: 0;
     padding: 0;
+    display: flex;
 }
 
 nav ul li {
-    display: inline;
     margin: 0 15px;
 }
 
@@ -32,77 +40,52 @@ nav ul li a {
 }
 
 .apply-btn {
-    background: #ff6600;
-    padding: 8px 15px;
+    background: #f39c12;
+    padding: 10px 15px;
     border-radius: 5px;
+    text-decoration: none;
     color: white;
+    font-weight: bold;
 }
 
 .apply-btn:hover {
-    background: #cc5200;
+    background: #e67e22;
 }
 
-/* হিরো সেকশন */
+/* ======== Hero Section ======== */
 .hero {
-    padding: 50px;
-    background: linear-gradient(to right, #FFD700, #66ccff);
+    background: url('hero-image.jpg') no-repeat center center/cover;
+    padding: 100px 20px;
     color: white;
 }
 
-.hero h2 {
-    font-size: 32px;
-    margin: 10px 0;
+.hero h1 {
+    font-size: 36px;
 }
 
 .hero p {
     font-size: 18px;
+    margin-bottom: 20px;
 }
 
-.hero .apply-btn {
-    display: inline-block;
-    margin-top: 20px;
-    font-size: 20px;
-    padding: 12px 20px;
+/* ======== অন্যান্য সেকশন ======== */
+section {
+    padding: 50px 20px;
 }
 
-/* আবেদন ফর্ম */
-.form-container {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 50%;
-    margin: auto;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
+h2 {
+    font-size: 28px;
+    color: #34495e;
 }
 
-input, select, textarea {
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-button {
-    background: #28a745;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
+p {
     font-size: 18px;
-    cursor: pointer;
+    color: #555;
 }
 
-button:hover {
-    background: #218838;
-}
-
-/* ফুটার */
+/* ======== Footer ======== */
 footer {
-    background: #004d99;
+    background: #2c3e50;
     color: white;
-    padding: 10px;
-    margin-top: 20px;
+    padding: 20px;
 }
