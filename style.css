@@ -207,4 +207,18 @@ header {
         margin-top: 15px; /* মোবাইলে বোতামের উপরে বেশি ফাঁকা */
     }
 }
+.hero {
+    background-color: #007bff; /* নীল ব্যাকগ্রাউন্ড */
+    color: white; /* পুরো সেকশনের টেক্সট সাদা */
+    padding: 40px;
+    text-align: center;
+}
+
+.hero h1 {
+    color: yellow; /* হেডিং টেক্সট হলুদ হবে, যাতে স্পষ্ট দেখা যায় */
+}
+
+.hero p {
+    color: white; /* প্যারাগ্রাফ টেক্সট সাদা থাকবে */
+}
 
