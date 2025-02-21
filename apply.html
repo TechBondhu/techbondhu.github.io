@@ -1,1 +1,32 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভর্তি আবেদন ফরম</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>📄 ভর্তি আবেদন ফরম</h2>
+        <form action="submit_form.php" method="POST">
+            <label for="name">👤 পূর্ণ নাম:</label>
+            <input type="text" id="name" name="name" required>
 
+            <label for="dob">📅 জন্ম তারিখ:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="email">📧 ইমেইল:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">📞 মোবাইল নাম্বার:</label>
+            <input type="tel" id="phone" name="phone" required>
+
+            <label for="address">🏠 ঠিকানা:</label>
+            <textarea id="address" name="address" rows="3" required></textarea>
+
+            <button type="submit" class="submit-btn">✅ আবেদন করুন</button>
+        </form>
+    </div>
+</body>
+</html>
