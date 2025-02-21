@@ -215,4 +215,26 @@ input, textarea {
 .hero, .form-container, section, footer {
     animation: fadeIn 1s ease-in-out;
 }
+/* 📱 মোবাইলে ফর্ম ঠিকমতো ফিট করার জন্য */
+@media (max-width: 768px) {
+    .form-container {
+        max-width: 90%;
+        padding: 10px;
+    }
 
+    label {
+        font-size: 14px;
+    }
+
+    input, textarea {
+        font-size: 14px;
+        padding: 8px;
+        width: 100%;
+    }
+
+    .submit-btn {
+        font-size: 14px;
+        padding: 8px;
+        width: 100%;
+    }
+}
