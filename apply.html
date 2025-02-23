@@ -207,6 +207,48 @@
     });
 </script>
 
+import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+document.querySelector("form").addEventListener("submit", function (event) {
+    event.preventDefault(); // ডিফল্ট ফর্ম সাবমিশন বন্ধ করা
+
+    const database = getDatabase();
+
+    // ফর্মের ইনপুট ভ্যালু নেওয়া
+    const studentData = {
+        name: document.getElementById("name").value,
+        father_name: document.getElementById("father_name").value,
+        mother_name: document.getElementById("mother_name").value,
+        dob: document.getElementById("dob").value,
+        gender: document.getElementById("gender").value,
+        blood_group: document.getElementById("blood_group").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        address: document.getElementById("address").value,
+        permanent_address: document.getElementById("permanent_address").value,
+        school: document.getElementById("school").value,
+        exam_name: document.getElementById("exam_name").value,
+        roll: document.getElementById("roll").value,
+        reg: document.getElementById("reg").value,
+        board: document.getElementById("board").value,
+        gpa: document.getElementById("gpa").value,
+        guardian_phone: document.getElementById("guardian_phone").value,
+        guardian_job: document.getElementById("guardian_job").value,
+    };
+
+    // Firebase-এ ডাটা সংরক্ষণ করা
+    const newRef = push(ref(database, "students")); // students নামে নতুন রেকর্ড তৈরি করা
+    set(newRef, studentData)
+        .then(() => {
+            alert("✅ আবেদন সফলভাবে জমা হয়েছে!");
+        })
+        .catch((error) => {
+            alert("❌ ত্রুটি হয়েছে: " + error.message);
+        });
+
+    // ফর্ম রিসেট করা
+    document.querySelector("form").reset();
+});
 
 </body>
 </html>
