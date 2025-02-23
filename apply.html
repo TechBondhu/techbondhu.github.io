@@ -128,7 +128,85 @@
     const database = getDatabase(app);
 
     console.log("✅ Firebase Database Connected!");
+<script type="module">
+    // Firebase SDK ইম্পোর্ট করা
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
+        authDomain: "admissionformdb.firebaseapp.com",
+        databaseURL: "https://admissionformdb-default-rtdb.firebaseio.com/",
+        projectId: "admissionformdb",
+        storageBucket: "admissionformdb.appspot.com",
+        messagingSenderId: "398052082157",
+        appId: "1:398052082157:web:0bc02d66cbdf55dd2567e4",
+        measurementId: "G-9B2QZBB5BE"
+    };
+
+    // Firebase ইনিশিয়ালাইজ করা
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    console.log("✅ Firebase Database Connected!");
+
+    // 📌 ফর্ম সাবমিট ইভেন্ট হ্যান্ডলার
+    document.querySelector("form").addEventListener("submit", function(event) {
+        event.preventDefault(); // ফর্ম রিলোড বন্ধ করা
+
+        // ইনপুট ফিল্ড থেকে ডাটা সংগ্রহ করা
+        const name = document.getElementById("name").value;
+        const father_name = document.getElementById("father_name").value;
+        const mother_name = document.getElementById("mother_name").value;
+        const dob = document.getElementById("dob").value;
+        const gender = document.getElementById("gender").value;
+        const blood_group = document.getElementById("blood_group").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const address = document.getElementById("address").value;
+        const permanent_address = document.getElementById("permanent_address").value;
+        const school = document.getElementById("school").value;
+        const exam_name = document.getElementById("exam_name").value;
+        const roll = document.getElementById("roll").value;
+        const reg = document.getElementById("reg").value;
+        const board = document.getElementById("board").value;
+        const gpa = document.getElementById("gpa").value;
+        const guardian_phone = document.getElementById("guardian_phone").value;
+        const guardian_job = document.getElementById("guardian_job").value;
+
+        // 🔥 Firebase-এ ডাটা পাঠানো
+        const admissionRef = ref(database, "admissions");
+        const newAdmissionRef = push(admissionRef);
+
+        set(newAdmissionRef, {
+            name: name,
+            father_name: father_name,
+            mother_name: mother_name,
+            dob: dob,
+            gender: gender,
+            blood_group: blood_group,
+            email: email,
+            phone: phone,
+            address: address,
+            permanent_address: permanent_address,
+            school: school,
+            exam_name: exam_name,
+            roll: roll,
+            reg: reg,
+            board: board,
+            gpa: gpa,
+            guardian_phone: guardian_phone,
+            guardian_job: guardian_job,
+        }).then(() => {
+            alert("✅ আবেদন সফলভাবে জমা হয়েছে!");
+            document.querySelector("form").reset(); // ফর্ম রিসেট করা
+        }).catch((error) => {
+            alert("❌ আবেদন জমা দিতে সমস্যা হয়েছে: " + error.message);
+        });
+    });
 </script>
+
 
 </body>
 </html>
