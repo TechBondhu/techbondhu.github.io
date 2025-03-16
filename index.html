@@ -91,6 +91,73 @@
     const analytics = getAnalytics(app);
     console.log("Firebase Connected!");
 </script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>🤖 চ্যাটবট</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; }
+    #chatbox { border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: auto; }
+    .message { margin: 5px 0; padding: 5px; border-radius: 5px; }
+    .user { background: #d1e7dd; text-align: right; }
+    .bot { background: #f8d7da; text-align: left; }
+  </style>
+</head>
+<body>
+
+  <h2>🤖 চ্যাটবট</h2>
+  <div id="chatbox">
+    <div class="message bot">হ্যালো! আপনি কথা বলতে পারেন অথবা ছবি আপলোড করতে পারেন।</div>
+  </div>
+
+  <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." onkeypress="handleKey(event)">
+  <input type="file" id="upload" accept="image/*">
+
+  <script>
+    function addMessage(text, sender) {
+      const chatbox = document.getElementById('chatbox');
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+      msgDiv.textContent = text;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter") {
+        const input = document.getElementById('userInput');
+        if (input.value.trim()) {
+          addMessage(input.value, "user");
+          setTimeout(() => addMessage("🤖 বট: আমি বুঝতে পারছি!", "bot"), 1000);
+          input.value = "";
+        }
+      }
+    }
+
+    document.getElementById('upload').addEventListener('change', function () {
+      addMessage("📷 ছবি আপলোড করা হয়েছে! OCR প্রসেস শুরু হচ্ছে...", "user");
+
+      // এখানে OCR সিস্টেমের API কল হবে
+      fetch("http://localhost:5000/ocr", {
+        method: "POST",
+        body: new FormData(document.querySelector("input[type='file']"))
+      })
+      .then(response => response.json())
+      .then(data => {
+        addMessage("📝 OCR টেক্সট:\n" + data.text, "bot");
+      })
+      .catch(error => {
+        addMessage("❌ OCR করতে সমস্যা হয়েছে!", "bot");
+      });
+    });
+
+  </script>
+
+</body>
+</html>
+
+
 
 </body>
 </html>
