@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ফর্মবন্ধু</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+  <title>ফর্মবন্ধু</title> 
   <style>
     * {
       margin: 0;
@@ -76,19 +75,17 @@
       border-top: 1px solid #444;
     }
 
-    .input-area input, .input-area button, .input-area label {
-      font-size: 16px;
-      font-weight: bold;
-    }
-
     .input-area input {
       flex: 1;
       padding: 12px 16px;
       border: none;
       border-radius: 20px;
+      font-size: 16px;
+      margin-right: 10px;
       outline: none;
       background-color: #3a3a55;
       color: #fff;
+      font-weight: bold;
     }
 
     .input-area button {
@@ -98,52 +95,39 @@
       padding: 12px 20px;
       border-radius: 20px;
       cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
     }
 
     .input-area button:hover {
       background-color: #1e7e34;
     }
 
-    #upload {
-      display: none;
+    .chat-container::-webkit-scrollbar {
+      width: 8px;
     }
 
-    label {
-      background-color: #ff9800;
-      padding: 10px;
-      border-radius: 20px;
-      cursor: pointer;
-      margin-left: 10px;
-      color: white;
-    }
-
-    #loader {
-      display: none;
-      color: #00ffcc;
-      text-align: center;
-      padding: 10px;
+    .chat-container::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
 
-  <header>ফর্মবন্ধুতে আপনাকে স্বাগতম !</header> 
-  <div class="chat-container" id="chat"></div>
+  <header>ফর্মবন্ধুতে আপনাকে স্বাগতম !
+</header> 
+
   <div class="chat-container" id="chat">
     <div class="message bot">আসসালামু আলাইকুম ! কিসের আবেদন করতে চান আমাকে শুধু বলুন,</div> 
   </div>
+
   <div class="input-area">
     <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
     <button onclick="sendMessage()">পাঠান</button>
-    <label for="upload">📤 ছবি আপলোড করুন</label>
-    <input type="file" id="upload" accept="image/*" onchange="doOCR()" />
   </div>
 
-  <div id="loader">⏳ স্ক্যানিং হচ্ছে, অপেক্ষা করুন...</div>
-
   <script>
-    let chatHistory = [];
-
     function sendMessage() {
       const input = document.getElementById("userInput");
       const chat = document.getElementById("chat");
@@ -151,32 +135,20 @@
 
       if (text === "") return;
 
-      chatHistory.push({ user: text });
-
       const userMessage = document.createElement("div");
       userMessage.className = "message user";
-      userMessage.textContent = `🧑 আপনি: ${text}`;
+      userMessage.innerHTML = `<strong>🧑 আপনি:</strong> ${text}`;
       chat.appendChild(userMessage);
-      
+
       const botMessage = document.createElement("div");
       botMessage.className = "message bot";
-      botMessage.textContent = "🤖 টাইপ করছে...";
+      botMessage.innerHTML = `<strong>ফর্মবন্ধু:</strong> "${text}" প্রশ্নটি আমি পেয়েছি। দয়া করে অপেক্ষা করুন, আমি উত্তর দিচ্ছি...`;
       chat.appendChild(botMessage);
+
       input.value = "";
       chat.scrollTop = chat.scrollHeight;
-      
-      setTimeout(() => {
-        botMessage.textContent = `🤖 ফর্মবন্ধু: "${text}" প্রশ্নটি পেয়েছি, অনুগ্রহ করে অপেক্ষা করুন।`;
-        chatHistory.push({ bot: botMessage.textContent });
-      }, 1500);
-    }
-
-    function doOCR() {
-      document.getElementById("loader").style.display = "block";
-      setTimeout(() => {
-        document.getElementById("loader").style.display = "none";
-      }, 2000);
     }
   </script>
+
 </body>
 </html>
