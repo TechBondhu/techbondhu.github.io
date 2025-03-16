@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>চ্যাটবট সহায়তা</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 600px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    #chatbox {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      background: #fafafa;
+    }
+
+    .message {
+      margin: 10px 0;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: inline-block;
+      max-width: 80%;
+    }
+
+    .user {
+      background: #d1e7dd;
+      text-align: right;
+      align-self: flex-end;
+      float: right;
+    }
+
+    .bot {
+      background: #f8d7da;
+      text-align: left;
+      float: left;
+    }
+
+    input[type="text"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <h2 style="text-align:center;">🤖 আবেদন সহায়ক চ্যাটবট</h2>
+    <div id="chatbox">
+      <div class="message bot">👋 হ্যালো! ছবি আপলোড করুন বা কিছু লিখুন।</div>
+    </div>
+
+    <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." onkeypress="handleKey(event)">
+    <input type="file" id="upload" accept="image/*">
+
+  </div>
+
+  <script>
+    function addMessage(text, sender) {
+      const chatbox = document.getElementById('chatbox');
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", sender);
+      msgDiv.innerText = text;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function handleKey(event) {
+      if (event.key === "Enter") {
+        const input = document.getElementById('userInput');
+        if (input.value.trim()) {
+          addMessage(input.value, "user");
+          setTimeout(() => addMessage("🤖 বট: আমি বুঝতে পারছি!", "bot"), 1000);
+          input.value = "";
+        }
+      }
+    }
+
+    document.getElementById('upload').addEventListener('change', async function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      addMessage("📤 ছবি আপলোড হয়েছে, OCR প্রসেস হচ্ছে...", "user");
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/ocr", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+      if (result.text) {
+        addMessage("📝 OCR টেক্সট:\n" + result.text, "bot");
+      } else {
+        addMessage("❌ OCR করতে সমস্যা হয়েছে!", "bot");
+      }
+    });
+  </script>
+
+</body>
+</html>
