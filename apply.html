@@ -1,388 +1,189 @@
 <!DOCTYPE html>
-<html lang="bn">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ফর্মবন্ধু</title> 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', 'Noto Sans Bengali', sans-serif;
-      background-color: #1f1f2e;
-      color: #ffffff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header {
-      background-color: #29293d;
-      padding: 15px;
-      font-size: 22px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 1px solid #444;
-      color: #00ffcc;
-      letter-spacing: 1px;
-      width: 100%;
-    }
-
-    .chat-container {
-      flex: 1;
-      width: 100%;
-      max-width: 600px;
-      overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      scroll-behavior: smooth;
-    }
-
-    .message {
-      max-width: 85%;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 16px;
-      line-height: 1.5;
-      font-weight: 500;
-      white-space: pre-wrap;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .user {
-      align-self: flex-end;
-      background-color: #006eff;
-      color: #fff;
-      font-weight: bold;
-      border-bottom-right-radius: 0;
-    }
-
-    .bot {
-      align-self: flex-start;
-      background-color: #2f2f44;
-      color: #e3e3e3;
-      font-weight: bold;
-      border-bottom-left-radius: 0;
-    }
-
-    .input-area {
-      display: flex;
-      width: 100%;
-      max-width: 600px;
-      padding: 10px;
-      background-color: #29293d;
-      border-top: 1px solid #444;
-    }
-
-    .input-area input {
-      flex: 1;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 16px;
-      font-size: 15px;
-      outline: none;
-      background-color: #3a3a55;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .input-area button {
-      background-color: #28a745;
-      border: none;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: bold;
-      margin-left: 8px;
-    }
-
-    .input-area button:hover {
-      background-color: #1e7e34;
-    }
-
-    .image-upload {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .chat-container::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .chat-container::-webkit-scrollbar-thumb {
-      background: #555;
-      border-radius: 8px;
-    }
-
-  </style>
-</head>
-<body>
-
-<header>ফর্মবন্ধুতে আপনাকে স্বাগতম !</header>
-
-<div class="chat-container" id="chat">
-  <div class="message bot">আসসালামু আলাইকুম ! কিসের আবেদন করতে চান আমাকে শুধু বলুন,</div> 
-</div>
-
-<div class="input-area">
-  <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
-  <button onclick="sendMessage()">পাঠান</button>
-</div>
-
-<!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>চ্যাট বট - উন্নত ফিচার সহ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatGPT Style Chat App</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: white;
       display: flex;
-      font-family: 'Segoe UI', 'Noto Sans Bengali', sans-serif;
       height: 100vh;
-      background-color: #1f1f2e;
-      color: #fff;
+      overflow: hidden;
     }
-    .sidebar {
-      width: 250px;
-      background-color: #29293d;
-      padding: 20px;
-      overflow-y: auto;
-      border-right: 1px solid #444;
-    }
-    .sidebar h2 {
-      font-size: 18px;
-      margin-bottom: 15px;
-      color: #00ffcc;
-      text-align: center;
-    }
-    .chat-history {
+
+    /* Sidebar Container */
+    .sidebar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 10px;
+      flex-direction: row;
+      z-index: 1000;
     }
-    .chat-item {
+
+    /* Toggle Button */
+    #sidebar-toggle {
+      background-color: #444;
+      color: white;
       padding: 10px;
-      background-color: #3a3a55;
-      border-radius: 8px;
       cursor: pointer;
-      font-size: 15px;
-      transition: background 0.2s;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
       font-weight: bold;
+      border-radius: 0 5px 5px 0;
     }
-    .chat-item:hover {
-      background-color: #4f4f7a;
+
+    /* Sidebar Styles */
+    #sidebar {
+      width: 250px;
+      background-color: #1e1e2f;
+      color: white;
+      padding: 20px;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+      box-shadow: 2px 0 5px rgba(0,0,0,0.3);
     }
+
+    #sidebar.open {
+      transform: translateX(0);
+    }
+
+    #sidebar h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    #chat-history-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #chat-history-list li {
+      padding: 10px;
+      background-color: #333;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #chat-history-list li:hover {
+      background-color: #555;
+    }
+
+    /* Main Chat Area */
     .main {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    header {
-      background-color: #29293d;
-      padding: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 1px solid #444;
-      color: #00ffcc;
-    }
-    .chat-container {
-      flex: 1;
+      margin-left: 40px;
       padding: 20px;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 16px;
     }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+
     .message {
-      max-width: 70%;
-      padding: 15px;
-      border-radius: 15px;
-      font-size: 16px;
-      font-weight: 500;
-      white-space: pre-wrap;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      position: relative;
+      background-color: #2b2b3d;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      max-width: 80%;
+      animation: typingFade 0.3s ease-in-out;
     }
-    .user {
-      align-self: flex-end;
-      background-color: #006eff;
-      color: white;
-      border-bottom-right-radius: 0;
+
+    @keyframes typingFade {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .bot {
-      align-self: flex-start;
-      background-color: #2f2f44;
-      color: #e3e3e3;
-      border-bottom-left-radius: 0;
-    }
-    .typing {
-      font-style: italic;
-      opacity: 0.7;
-    }
+
     .input-area {
       display: flex;
-      padding: 15px;
-      background-color: #29293d;
-      border-top: 1px solid #444;
+      gap: 10px;
     }
+
     .input-area input {
       flex: 1;
-      padding: 12px 16px;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      margin-right: 10px;
-      background-color: #3a3a55;
-      color: white;
-      font-weight: bold;
-    }
-    .input-area button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 20px;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .input-area button:hover {
-      background-color: #1e7e34;
-    }
-    .action-buttons {
-      text-align: center;
       padding: 10px;
+      border-radius: 8px;
+      border: none;
     }
-    .action-buttons button {
-      margin: 5px;
-      padding: 8px 12px;
+
+    .input-area button {
+      padding: 10px 20px;
+      background-color: #00aaff;
+      color: white;
       border: none;
       border-radius: 8px;
-      background-color: #444;
-      color: #fff;
       cursor: pointer;
-      font-weight: bold;
     }
-    .action-buttons button:hover {
-      background-color: #666;
+
+    .input-area button:hover {
+      background-color: #0088cc;
     }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>📂 চ্যাট হিস্টোরি</h2>
-    <div class="chat-history" id="historyList"></div>
-    <div class="action-buttons">
-      <button onclick="deleteChat()">🗑️ মুছুন</button>
-      <button onclick="exportChat()">📤 PDF</button>
+
+  <div class="sidebar-container">
+    <div id="sidebar-toggle">☰</div>
+    <div id="sidebar">
+      <h3>📜 পূর্ববর্তী চ্যাট</h3>
+      <ul id="chat-history-list">
+        <li>চ্যাট ১</li>
+        <li>চ্যাট ২</li>
+        <li>চ্যাট ৩</li>
+      </ul>
     </div>
   </div>
+
   <div class="main">
-    <header>🤖 উন্নত চ্যাটবট</header>
-    <div class="chat-container" id="chat"></div>
+    <div class="chat-box" id="chat-box">
+      <div class="message">স্বাগতম! কীভাবে সাহায্য করতে পারি?</div>
+    </div>
     <div class="input-area">
-      <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
+      <input type="text" id="user-input" placeholder="আপনার বার্তা লিখুন...">
       <button onclick="sendMessage()">পাঠান</button>
     </div>
   </div>
 
   <script>
-    let chatHistory = JSON.parse(localStorage.getItem("chatSessions")) || {};
-    let currentChatId = Date.now().toString();
-    let currentChat = [];
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("sidebar-toggle");
 
-    const chat = document.getElementById("chat");
-    const historyList = document.getElementById("historyList");
-
-    function renderChat(messages) {
-      chat.innerHTML = "";
-      messages.forEach(msg => {
-        const msgEl = document.createElement("div");
-        msgEl.className = `message ${msg.sender}`;
-        msgEl.innerHTML = `<strong>${msg.sender === "user" ? "🧑 আপনি:" : "🤖 বট:"}</strong> ${msg.text}`;
-        chat.appendChild(msgEl);
-      });
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    function updateSidebar() {
-      historyList.innerHTML = "";
-      Object.keys(chatHistory).forEach(id => {
-        const item = document.createElement("div");
-        item.className = "chat-item";
-        item.textContent = `চ্যাট #${id.slice(-4)}`;
-        item.onclick = () => {
-          currentChatId = id;
-          currentChat = chatHistory[id];
-          renderChat(currentChat);
-        };
-        historyList.appendChild(item);
-      });
-    }
+    toggleBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
 
     function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value.trim();
-      if (!text) return;
+      const input = document.getElementById("user-input");
+      const msg = input.value.trim();
+      if (!msg) return;
 
-      const userMsg = { sender: "user", text };
-      currentChat.push(userMsg);
-      renderChat(currentChat);
+      const box = document.getElementById("chat-box");
+      const div = document.createElement("div");
+      div.className = "message";
+      div.innerText = msg;
+      box.appendChild(div);
+
       input.value = "";
-
-      const typingEl = document.createElement("div");
-      typingEl.className = "message bot typing";
-      typingEl.textContent = "🤖 বট টাইপ করছে...";
-      chat.appendChild(typingEl);
-      chat.scrollTop = chat.scrollHeight;
-
-      setTimeout(() => {
-        chat.removeChild(typingEl);
-        const botReply = { sender: "bot", text: `"${text}" প্রশ্নটি আমি পেয়েছি। ধন্যবাদ!` };
-        currentChat.push(botReply);
-        chatHistory[currentChatId] = currentChat;
-        localStorage.setItem("chatSessions", JSON.stringify(chatHistory));
-        renderChat(currentChat);
-        updateSidebar();
-      }, 1000);
+      box.scrollTop = box.scrollHeight;
     }
-
-    function deleteChat() {
-      if (confirm("আপনি কি এই চ্যাট ডিলিট করতে চান?")) {
-        delete chatHistory[currentChatId];
-        localStorage.setItem("chatSessions", JSON.stringify(chatHistory));
-        currentChat = [];
-        currentChatId = Date.now().toString();
-        renderChat(currentChat);
-        updateSidebar();
-      }
-    }
-
-    function exportChat() {
-      const text = currentChat.map(m => `${m.sender === 'user' ? 'আপনি' : 'বট'}: ${m.text}`).join("\n\n");
-      const blob = new Blob([text], { type: "application/pdf" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "chat-export.pdf";
-      link.click();
-    }
-
-    updateSidebar();
-    renderChat(currentChat);
   </script>
+
 </body>
 </html>
