@@ -110,6 +110,13 @@
       background-color: #1e7e34;
     }
 
+    .image-upload {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     .chat-container::-webkit-scrollbar {
       width: 6px;
     }
@@ -119,57 +126,6 @@
       border-radius: 8px;
     }
 
-    /* 🏠 Sidebar */
-    .sidebar {
-      width: 250px;
-      background: rgba(41, 41, 61, 0.95);
-      color: white;
-      padding: 20px;
-      overflow-y: auto;
-      transition: all 0.4s ease-in-out;
-      border-radius: 10px;
-    }
-    .sidebar h2 {
-      font-size: 20px;
-      border-bottom: 2px solid #00ffcc;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .chat-list {
-      list-style: none;
-      padding: 0;
-    }
-    .chat-list li {
-      padding: 12px;
-      background: #3a3a55;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.3s ease-in-out, background 0.3s;
-    }
-    .chat-list li:hover {
-      background: #006eff;
-      transform: scale(1.05);
-    }
-
-    /* ✨ Clear Chat Button */
-    .clear-btn {
-      background-color: #ff4444;
-      color: white;
-      font-size: 16px;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s;
-      display: block;
-      margin: 10px auto;
-    }
-    .clear-btn:hover {
-      background-color: #cc0000;
-    }
   </style>
 </head>
 <body>
@@ -183,6 +139,11 @@
 <div class="input-area">
   <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
   <button onclick="sendMessage()">পাঠান</button>
+</div>
+
+<!-- 📷 Image Upload -->
+<div class="image-upload">
+  <input type="file" id="imageInput" accept="image/*">
 </div>
 
 <!-- 🗑️ Clear Chat Button -->
@@ -219,6 +180,12 @@
       localStorage.removeItem("chatHistory");
       document.getElementById("chat").innerHTML = "";
       alert("✅ চ্যাট মুছে ফেলা হয়েছে!");
+    }
+  });
+
+  document.getElementById("userInput").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
     }
   });
 </script>
