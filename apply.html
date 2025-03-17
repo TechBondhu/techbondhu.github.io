@@ -1,102 +1,11 @@
- <!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ফর্মবন্ধু</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; }
-        .chat-container { display: flex; height: 100vh; }
-        .sidebar { width: 250px; background-color: #1e1e2f; color: white; padding: 10px; overflow-y: auto; transition: transform 0.3s ease; }
-        .sidebar h3 { margin-top: 50px; }
-        #chatHistoryList { list-style: none; padding: 0; }
-        #chatHistoryList li { background-color: #2e2e4f; padding: 10px; margin: 5px 0; border-radius: 5px; position: relative; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .menu-icon { cursor: pointer; font-size: 18px; }
-        .options-menu { position: absolute; right: 10px; top: 35px; background-color: #444; border-radius: 5px; display: none; flex-direction: column; }
-        .options-menu button { background: none; color: white; border: none; padding: 5px 10px; text-align: left; cursor: pointer; width: 100%; }
-        #chatHistoryList li:hover .options-menu { display: flex; }
-        #newChatBtn {
-  background-color: #19c37d; /* ChatGPT-এর মতো সবুজ রঙ */
-  border: none;
-  padding: 12px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-#sendBtn svg {
-  width: 24px;
-  height: 24px;
-}
-
-#sendBtn:hover {
-  background-color: #15a76d; /* হোভার করলে গাঢ় সবুজ */
-  transform: scale(1.1);
-}
-
-#sendBtn:active {
-  transform: scale(0.9);
-}
-
-        .toggle-btn { position: absolute; left: 10px; top: 10px; font-size: 25px; cursor: pointer; }
-        .main-chat { flex: 1; display: flex; flex-direction: column; background-color: #ffffff; border-left: 1px solid #ddd; }
-        .chat-header { padding: 15px; background-color: #ececec; display: flex; justify-content: space-between; align-items: center; }
-        .chat-box { flex: 1; padding: 15px; overflow-y: auto; }
-        .chat-message { padding: 10px; border-radius: 10px; margin-bottom: 10px; max-width: 80%; font-weight: bold; white-space: pre-wrap; word-wrap: break-word; }
-        .user { background-color: #d1e7dd; align-self: flex-end; text-align: right; }
-        .bot { background-color: #f8d7da; align-self: flex-start; }
-        .chat-input { display: flex; padding: 10px; background-color: #ececec; }
-        .chat-input input { flex: 1; padding: 10px; border: none; border-radius: 20px; font-size: 16px; }
-        .chat-input button { padding: 10px 15px; margin-left: 10px; border: none; background-color: #5a5af3; color: white; border-radius: 20px; cursor: pointer; }
-        .sidebar.closed { transform: translateX(-100%); }
-        @media (max-width: 768px) {
-            .chat-container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; }
-            .main-chat { height: 100%; }
-        }
-    </style>
-</head>
-<body>
-    <div class="chat-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="toggle-btn" id="toggleSidebar">☰</div>
-            <h3> পুরাতন চ্যাট</h3>
-            <button id="newChatBtn"> নতুন চ্যাট</button>
-            <ul id="chatHistoryList"></ul>
-        </div>
-        <!-- Main Chat Area -->
-        <div class="main-chat">
-            <div class="chat-header">
-                <h2> ফর্মবন্ধু</h2>
-            </div>
-            <div class="chat-box" id="chatBox"></div>
-            <div class="chat-input">
-                <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." />
-<button id="sendBtn">
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 2L11 13"></path>
-    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-  </svg>
-</button>
-            </div>
-        </div>
-    </div>
-    <script>
+<script>
         const chatBox = document.getElementById("chatBox");
         const userInput = document.getElementById("userInput");
         const sendBtn = document.getElementById("sendBtn");
         const chatHistoryList = document.getElementById("chatHistoryList");
         const toggleSidebar = document.getElementById("toggleSidebar");
-        const newChatBtn = document.getElementById("newChatBtn");
         const sidebar = document.getElementById("sidebar");
-
         let chatHistory = [];
-        let activeChatIndex = null;
 
         function addMessage(sender, message) {
             const msg = document.createElement("div");
@@ -115,46 +24,17 @@
             chatHistoryList.innerHTML = "";
             chatHistory.forEach((chat, index) => {
                 const li = document.createElement("li");
-                li.innerHTML = ${chat.user.slice(0, 20)}...
-                    <div class="menu-icon">⋮</div>
-                    <div class="options-menu">
-                        <button onclick="deleteChat(${index})"> মুছুন</button>
-                        <button onclick="exportChat(${index})"> সেভ</button>
-                    </div>;
-                li.addEventListener("click", (e) => {
-                    if (!e.target.closest(".options-menu")) {
-                        loadChat(index);
-                    }
-                });
+                li.textContent = chat.user.slice(0, 20) + "...";
+                li.addEventListener("click", () => loadChat(index));
                 chatHistoryList.appendChild(li);
             });
         }
 
         function loadChat(index) {
-            activeChatIndex = index;
             chatBox.innerHTML = "";
             const chat = chatHistory[index];
             addMessage("user", chat.user);
             addMessage("bot", chat.bot);
-        }
-
-        function deleteChat(index) {
-            chatHistory.splice(index, 1);
-            if (activeChatIndex === index) {
-                chatBox.innerHTML = "";
-                activeChatIndex = null;
-            }
-            saveHistory();
-        }
-
-        function exportChat(index) {
-            const chat = chatHistory[index];
-            const content = User: ${chat.user}\nBot: ${chat.bot};
-            const blob = new Blob([content], { type: "text/plain" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "chat.txt";
-            link.click();
         }
 
         sendBtn.addEventListener("click", () => {
@@ -162,25 +42,31 @@
             if (!message) return;
             addMessage("user", message);
             userInput.value = "";
-            const botReply = " আমি আপনার কথা বুঝেছি: " + message;
+            const botReply = "আমি আপনার কথা বুঝেছি: " + message;
             setTimeout(() => {
                 addMessage("bot", botReply);
-                if (activeChatIndex !== null) {
-                    chatHistory[activeChatIndex] = { user: message, bot: botReply };
-                } else {
-                    chatHistory.push({ user: message, bot: botReply });
-                    activeChatIndex = chatHistory.length - 1;
-                }
+                chatHistory.push({ user: message, bot: botReply });
                 saveHistory();
             }, 600);
         });
 
-        toggleSidebar.addEventListener("click", () => { sidebar.classList.toggle("closed"); });
-        newChatBtn.addEventListener("click", () => { chatBox.innerHTML = ""; activeChatIndex = null; });
+        // Enter কী চাপলে মেসেজ পাঠানো
+        userInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                sendBtn.click();
+            }
+        });
+
+        toggleSidebar.addEventListener("click", () => {
+            sidebar.classList.toggle("closed");
+        });
 
         window.addEventListener("load", () => {
             const stored = localStorage.getItem("chatHistory");
-            if (stored) { chatHistory = JSON.parse(stored); updateSidebar(); }
+            if (stored) {
+                chatHistory = JSON.parse(stored);
+                updateSidebar();
+            }
         });
     </script>
 </body>
