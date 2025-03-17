@@ -145,22 +145,20 @@ body {
     </div>
   </div>
 <script>
- document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
     const messagesDiv = document.getElementById('messages');
     const typingDiv = document.getElementById('typing');
-    const chatList = document.getElementById('chatList'); // চ্যাট লিস্ট সাইডবার
-    const chatToggleBtn = document.getElementById('chatToggleBtn'); // চ্যাট টগল বাটন
-    const chatSidebar = document.getElementById('chatSidebar'); // চ্যাট হিস্টোরি প্যানেল
-// চ্যাটবট শুরুতেই স্বাগতম জানাবে
+
+    // চ্যাটবট শুরুতেই স্বাগতম জানাবে
     setTimeout(() => {
-        typeMessage(" স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
+        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
     }, 500);
 
     // দ্বিতীয় মেসেজ দেখাবে
     setTimeout(() => {
-        typeMessage(" এখন কি আপনি আবেদন করতে চান?", false);
+        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
     }, 2000);
 
       // Function to add a message
@@ -213,70 +211,13 @@ function showTypingEffect() {
       // Event listener for Send button click
       sendBtn.addEventListener('click', sendMessage);
 
-
- // Event listener for Enter key press
+      // Event listener for Enter key press
       userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
           sendMessage();
         }
-    let activeChat = "default"; // ডিফল্ট চ্যাট
-    let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || {}; // লোকাল স্টোরেজ থেকে ডাটা লোড
-
-    /** ✅ চ্যাট হিস্টোরি লোড করার ফাংশন */
-    function loadChatHistory() {
-        chatList.innerHTML = '';
-        Object.keys(chatHistory).forEach(chatId => {
-            const chatItem = document.createElement('div');
-            chatItem.classList.add('chat-item');
-            chatItem.innerText = chatId;
-            chatItem.addEventListener('click', () => switchChat(chatId));
-            chatList.appendChild(chatItem);
-        });
-    }
-
-    /** ✅ চ্যাট পরিবর্তন ফাংশন */
-    function switchChat(chatId) {
-        activeChat = chatId;
-        messagesDiv.innerHTML = ''; // আগের মেসেজ ক্লিয়ার
-        chatHistory[activeChat].forEach(msg => {
-            addMessage(msg.text, msg.isUser, false);
-        });
-        toggleChatSidebar(); // ক্লিক করলে সাইডবার বন্ধ হবে
-    }
-
-    /** ✅ মেসেজ লোকাল স্টোরেজে সংরক্ষণ */
-    function saveMessage(text, isUser) {
-        if (!chatHistory[activeChat]) chatHistory[activeChat] = [];
-        chatHistory[activeChat].push({ text, isUser });
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-    }
-
-    /** ✅ নতুন মেসেজ দেখানোর ফাংশন */
-    function addMessage(message, isUserMessage, save = true) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUserMessage ? 'user-message' : 'bot-message');
-        messageDiv.innerText = message;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        if (save) saveMessage(message, isUserMessage);
-    }
-
-    /** ✅ চ্যাট হিস্টোরি টগল */
-    function toggleChatSidebar() {
-        chatSidebar.classList.toggle('active');
-    }
-
-    /** ✅ ইভেন্ট লিসেনার */
-    chatToggleBtn.addEventListener('click', toggleChatSidebar);
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
+      });
     });
-
-    /** ✅ চ্যাট হিস্টোরি লোড (সবশেষে কল করা হলো) */
-    loadChatHistory();
-});
-</script>
+  </script>
 </body>
-</html>
-
+</html>  
