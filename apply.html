@@ -96,9 +96,12 @@ body {
   align-self: flex-start; /* বাম পাশে রাখবে */
   text-align: left;
 }
+/* টাইপিং ইফেক্ট নিচে রাখবে */
 .typing {
- font-style: italic;
- color: #999;
+  align-self: flex-start;
+  font-style: italic;
+  color: #999;
+  order: 1; /* সবসময় নিচে থাকবে */
 }
 .message {
  max-width: 70%;
