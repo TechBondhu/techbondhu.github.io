@@ -1,200 +1,221 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>চ্যাট অ্যাপ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Bot</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      display: flex;
-      height: 100vh;
-      font-family: sans-serif;
-      background-color: #343541;
-      color: white;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    .hamburger {
-      position: absolute;
-      top: 15px;
-      left: 15px;
-      z-index: 101;
-      cursor: pointer;
-      background: white;
-      padding: 8px 10px;
-      border-radius: 4px;
-    }
+  /* সুন্দর ব্যাকগ্রাউন্ড এবং ফন্ট */
+body {
+  font-family: "Poppins", sans-serif; /* সুন্দর ফন্ট */
+  font-weight: bold; /* বোল্ড ফন্ট */
+  background-color: #343541; /* ChatGPT-এর মতো ডার্ক ব্যাকগ্রাউন্ড */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    .hamburger div {
-      width: 25px;
-      height: 3px;
-      background: black;
-      margin: 4px 0;
-    }
+/* চ্যাটবক্স ডিজাইন */
+.chat-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff; /* সাদা রঙ */  
+  color: #000000; /* টেক্সট কালো */
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-    .sidebar {
-      width: 250px;
-      background: #f1f1f1;
-      padding: 10px;
-      overflow-y: auto;
-      transition: left 0.3s ease;
-    }
+/* মেসেজ কন্টেইনার (উপর থেকে নিচে আসবে) */
+.messages {
+  display: flex;
+  flex-direction: column; /* নতুন মেসেজ উপরে থাকবে, ক্রমশ নিচে যাবে */
+  gap: 10px;
+  padding: 10px;
+  overflow-y: auto;
+}
+    
+/* ইনপুট এরিয়া সবসময় নিচে থাকবে */
+.input-area {
+  padding: 10px;
+  background-color: #ffffff; /* সাদা ব্যাকগ্রাউন্ড */
+  display: flex;
+  gap: 10px;
+  position: sticky;
+  bottom: 0;
+}
 
-    .chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      background: #ffffff;
-      color: black;
-      border-radius: 10px;
-      margin-left: 0;
-      width: 100%;
-    }
+#userInput {
+  flex-grow: 1;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #ffffff; /* সাদা */
+  color: #000000; /* কালো টেক্সট */
+  border: 1px solid #ccc; /* হালকা বর্ডার */
+}
+    /* চ্যাটবক্স (পুরো জায়গা নেবে) */
+.chat-box {
+  flex-grow: 1; /* বাকিটা জায়গা নিয়ে নেবে */
+  padding: 20px;
+  display: flex;
+  flex-direction: column-reverse; /* নতুন মেসেজ নিচে যাবে */
+  gap: 15px;
+  overflow-y: auto;
+}
 
-    .chat-history {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
+#sendBtn {
+  padding: 12px 20px;
+   background-color: #000000; /* কালো */
+  color: #ffffff; /* সাদা টেক্সট */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .message {
-      margin: 5px 0;
-      max-width: 70%;
-      padding: 10px;
-      border-radius: 10px;
-    }
+#sendBtn:hover {
+  background-color: #0e8a65;
+}
+/* ইউজারের মেসেজ (ডান পাশে থাকবে) */
+.user-message {
+  background-color: #e0e0e0; /* হালকা গ্রে */
+  color: #000000; /* কালো টেক্সট */
+  align-self: flex-end; /* ডান পাশে রাখবে */
+  text-align: right;
+}
 
-    .user {
-      text-align: right;
-      background-color: #e0e0e0;
-      color: black;
-      align-self: flex-end;
-    }
+/* বটের মেসেজ (বাম পাশে থাকবে) */
+.bot-message {
+  background-color: #f1f1f1; /* হালকা ধূসর */
+  color: #000000; /* কালো টেক্সট */
+  align-self: flex-start; /* বাম পাশে রাখবে */
+  text-align: left;
+}
+/* টাইপিং ইফেক্ট নিচে রাখবে */
+.typing {
+  align-self: flex-start;
+  font-style: italic;
+  color: #999;
+  order: 1; /* সবসময় নিচে থাকবে */
+}
+.message {
+ max-width: 70%;
+ padding: 10px;
+ border-radius: 10px;
+}
+    /* মোবাইলের জন্য রেসপনসিভ ডিজাইন */
+@media (max-width: 600px) {
+  .chat-container {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  .input-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-    .bot {
-      text-align: left;
-      background-color: #f1f1f1;
-      color: black;
-      align-self: flex-start;
-    }
+  #userInput {
+    width: 100%;
+  }
 
-    .input-area {
-      display: flex;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-      background-color: white;
-      padding: 10px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 8px;
-    }
-
-    button {
-      padding: 8px 12px;
-      cursor: pointer;
-      background-color: black;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-
-    button:hover {
-      background-color: #0e8a65;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        height: 100%;
-        z-index: 100;
-      }
-
-      .sidebar.show {
-        left: 0;
-      }
-
-      .chat-container {
-        margin-left: 0;
-      }
-    }
+  #sendBtn {
+    width: 100%;
+  }
   </style>
 </head>
 <body>
-  <!-- Hamburger Button -->
-  <div class="hamburger" id="hamburger">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <button id="newChatBtn">➕ নতুন চ্যাট</button>
-    <div id="chatList"></div>
-  </div>
-
-  <!-- Chat Area -->
   <div class="chat-container">
-    <div class="chat-history" id="chatHistory"></div>
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typing"></div>
+    </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message...">
       <button id="sendBtn">Send</button>
     </div>
   </div>
-
-  <script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
-      const sendBtn = document.getElementById('sendBtn');
-      const userInput = document.getElementById('userInput');
-      const messagesDiv = document.getElementById('chatHistory');
-      const sidebar = document.getElementById('sidebar');
-      const hamburger = document.getElementById('hamburger');
+    const sendBtn = document.getElementById('sendBtn');
+    const userInput = document.getElementById('userInput');
+    const messagesDiv = document.getElementById('messages');
+    const typingDiv = document.getElementById('typing');
 
+    // চ্যাটবট শুরুতেই স্বাগতম জানাবে
+    setTimeout(() => {
+        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
+    }, 500);
+
+    // দ্বিতীয় মেসেজ দেখাবে
+    setTimeout(() => {
+        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
+    }, 2000);
+
+      // Function to add a message
       function addMessage(message, isUser) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUser ? 'user' : 'bot');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
         messageDiv.innerText = message;
         messagesDiv.appendChild(messageDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      function getBotResponse(userMessage) {
+     // টাইপিং ইফেক্ট দেখানোর ফাংশন (এটি সবসময় নিচে রাখবে)
+function showTypingEffect() {
+  typingDiv.innerText = 'Bot is typing...';
+
+  // মেসেজের শেষে টাইপিং লেখা যোগ করবে
+  messagesDiv.appendChild(typingDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight; // অটো-স্ক্রল
+
+  setTimeout(() => {
+    typingDiv.innerText = ''; // 1.5 সেকেন্ড পর মুছে যাবে
+  }, 1500);
+}
+       // বটের রেসপন্স
+    function getBotResponse(userMessage) {
         const responses = [
-          'আমি আপনার জন্য কি করতে পারি?',
-          'আমি একটি চ্যাটবট।',
-          'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
-          'দুঃখিত, বুঝতে পারিনি।'
+            'আমি আপনার জন্য কি করতে পারি?',
+            'আমি একটি চ্যাটবট।',
+            'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
+            'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
         ];
         return responses[Math.floor(Math.random() * responses.length)];
-      }
-
+    }
+      
+      // Send message function
       function sendMessage() {
         const userMessage = userInput.value.trim();
         if (userMessage) {
-          addMessage(userMessage, true);
-          userInput.value = '';
+          addMessage(userMessage, true); // Display user's message
+          userInput.value = ''; // Clear the input field
+          showTypingEffect(); // Show typing effect
+
           setTimeout(() => {
-            addMessage(getBotResponse(userMessage), false);
-          }, 2000);
+            const botResponse = getBotResponse(userMessage); // Get bot's response
+            addMessage(botResponse, false); // Display bot's message
+          }, 2000); // Wait 2 seconds before bot's reply
         }
       }
 
+      // Event listener for Send button click
       sendBtn.addEventListener('click', sendMessage);
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-      });
 
-      // Toggle sidebar on hamburger click
-      hamburger.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
+      // Event listener for Enter key press
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
       });
     });
   </script>
