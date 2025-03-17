@@ -18,38 +18,43 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
     }
 
     header {
       background-color: #29293d;
-      padding: 20px;
-      font-size: 26px;
+      padding: 15px;
+      font-size: 22px;
       font-weight: bold;
       text-align: center;
       border-bottom: 1px solid #444;
       color: #00ffcc;
       letter-spacing: 1px;
+      width: 100%;
     }
 
     .chat-container {
       flex: 1;
+      width: 100%;
+      max-width: 600px;
       overflow-y: auto;
-      padding: 20px;
+      padding: 15px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       scroll-behavior: smooth;
     }
 
     .message {
-      max-width: 75%;
-      padding: 16px 20px;
-      border-radius: 18px;
-      font-size: 17px;
-      line-height: 1.6;
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 16px;
+      line-height: 1.5;
       font-weight: 500;
       white-space: pre-wrap;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .user {
@@ -70,18 +75,19 @@
 
     .input-area {
       display: flex;
-      padding: 15px;
+      width: 100%;
+      max-width: 600px;
+      padding: 10px;
       background-color: #29293d;
       border-top: 1px solid #444;
     }
 
     .input-area input {
       flex: 1;
-      padding: 12px 16px;
+      padding: 10px 14px;
       border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      margin-right: 10px;
+      border-radius: 16px;
+      font-size: 15px;
       outline: none;
       background-color: #3a3a55;
       color: #fff;
@@ -92,11 +98,12 @@
       background-color: #28a745;
       border: none;
       color: white;
-      padding: 12px 20px;
-      border-radius: 20px;
+      padding: 10px 16px;
+      border-radius: 16px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: bold;
+      margin-left: 8px;
     }
 
     .input-area button:hover {
@@ -104,23 +111,81 @@
     }
 
     .chat-container::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
     }
 
     .chat-container::-webkit-scrollbar-thumb {
       background: #555;
-      border-radius: 10px;
+      border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 18px;
+      }
+      .message {
+        font-size: 14px;
+        padding: 10px 14px;
+      }
+      .input-area input, .input-area button {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+/* 🌟 Sidebar Design */
+.sidebar {
+  width: 250px;
+  background-color: #29293d;
+  color: white;
+  padding: 20px;
+  overflow-y: auto;
+}
+.sidebar h2 {
+  font-size: 18px;
+  border-bottom: 2px solid #00ffcc;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.chat-list {
+  list-style: none;
+  padding: 0;
+}
+.chat-list li {
+  padding: 10px;
+  background: #3a3a55;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.chat-list li:hover {
+  background: #006eff;
+}
     }
   </style>
 </head>
 <body>
 
-  <header>ফর্মবন্ধুতে আপনাকে স্বাগতম !
+<header>ফর্মবন্ধুতে আপনাকে স্বাগতম !
 </header> 
 
+<!-- 📜 Sidebar for Chat History -->
+<div class="sidebar">
+  <h2>📜 পূর্ববর্তী চ্যাট</h2>
+  <ul id="chatHistoryList" class="chat-list"></ul>
+</div>
   <div class="chat-container" id="chat">
     <div class="message bot">আসসালামু আলাইকুম ! কিসের আবেদন করতে চান আমাকে শুধু বলুন,</div> 
   </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
+    <button onclick="sendMessage()">পাঠান</button>
+  </div>
+<input type="file" id="upload" accept="image/*">
+  <button onclick="doOCR()">📷 OCR করুন</button>
+  <p><strong>📄 OCR রেজাল্ট:</strong></p>
+  <pre id="output">...</pre>
 
   <div class="input-area">
     <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
@@ -139,16 +204,123 @@
       userMessage.className = "message user";
       userMessage.innerHTML = `<strong>🧑 আপনি:</strong> ${text}`;
       chat.appendChild(userMessage);
-
-      const botMessage = document.createElement("div");
-      botMessage.className = "message bot";
-      botMessage.innerHTML = `<strong>ফর্মবন্ধু:</strong> "${text}" প্রশ্নটি আমি পেয়েছি। দয়া করে অপেক্ষা করুন, আমি উত্তর দিচ্ছি...`;
-      chat.appendChild(botMessage);
-
       input.value = "";
       chat.scrollTop = chat.scrollHeight;
+      
+      const botMessage = document.createElement("div");
+      botMessage.className = "message bot typing";
+      botMessage.innerHTML = "ফর্মবন্ধু টাইপ করছে...";
+      chat.appendChild(botMessage);
+      
+      setTimeout(() => {
+        botMessage.classList.remove("typing");
+        botMessage.innerHTML = `<strong>ফর্মবন্ধু:</strong> "${text}" প্রশ্নটি আমি পেয়েছি। দয়া করে অপেক্ষা করুন, আমি উত্তর দিচ্ছি...`;
+      }, 2000);
+    }
+    
+    async function doOCR() {
+      const file = document.getElementById('upload').files[0];
+      const output = document.getElementById('output');
+
+      if (!file) return alert("⚠️ ছবি দিন");
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        output.textContent = "⏳ স্ক্যানিং হচ্ছে, অপেক্ষা করুন...";
+        try {
+          const { data: { text } } = await Tesseract.recognize(
+            reader.result,
+            'ben+eng',
+            {
+              logger: m => console.log(m)
+            }
+          );
+          output.textContent = text;
+        } catch (err) {
+          output.textContent = "❌ OCR করতে সমস্যা হয়েছে: " + err;
+        }
+      };
+      reader.readAsDataURL(file);
     }
   </script>
+  let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+  const chat = document.getElementById("chat");
+  const historyList = document.getElementById("chatHistory");
 
-</body>
-</html>
+  function loadChatHistory() {
+    historyList.innerHTML = "";
+    chatHistory.forEach((entry, index) => {
+      const li = document.createElement("li");
+      li.textContent = `চ্যাট ${index + 1}`;
+      li.onclick = () => loadChat(index);
+      historyList.appendChild(li);
+    });
+  }
+
+  function saveToHistory(sender, message) {
+    chatHistory.push({ sender, message });
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    loadChatHistory();
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("userInput");
+    const text = input.value.trim();
+    if (text === "") return;
+    
+    appendMessage("user", text);
+    input.value = "";
+    setTimeout(() => appendMessage("bot", `আপনার প্রশ্ন: "${text}" গ্রহণ করা হয়েছে।`), 1000);
+  }
+
+  function appendMessage(sender, text) {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `message ${sender}`;
+    msgDiv.textContent = text;
+    chat.appendChild(msgDiv);
+    chat.scrollTop = chat.scrollHeight;
+    saveToHistory(sender, text);
+  }
+
+  function loadChat(index) {
+    chat.innerHTML = "";
+    chatHistory[index].forEach(({ sender, message }) => {
+      appendMessage(sender, message);
+    });
+  }
+
+  loadChatHistory();
+</script>
+<!-- 🗑️ Clear Chat Button -->
+<button id="clearChatBtn" class="clear-btn">🗑️ চ্যাট মুছুন</button>
+
+<style>
+  .clear-btn {
+    background-color: #ff4444;
+    color: white;
+    font-size: 16px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    display: block;
+    margin: 10px auto;
+  }
+
+  .clear-btn:hover {
+    background-color: #cc0000;
+  }
+</style>
+
+<script>
+  document.getElementById("clearChatBtn").addEventListener("click", function () {
+    if (confirm("⚠️ আপনি কি নিশ্চিত যে সব চ্যাট মুছে ফেলতে চান?")) {
+      localStorage.removeItem("chatHistory"); // লোকাল স্টোরেজ ক্লিয়ার
+      document.getElementById("chat").innerHTML = ""; // চ্যাটবক্স খালি করা
+      document.getElementById("chatHistoryList").innerHTML = ""; // হিস্টোরি খালি করা
+      alert("✅ চ্যাট মুছে ফেলা হয়েছে!");
+    }
+  });
+</script>
