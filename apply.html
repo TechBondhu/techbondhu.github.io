@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat Bot</title>
+  <button id="hamburgerBtn">☰</button>
+  
+  <div class="sidebar">
+    <button id="newChatBtn">➕ নতুন চ্যাট</button>
+    <div id="chatList"></div>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-history" id="chatHistory"></div>
+    <div class="input-area">
+      <input type="text" id="chatInput" placeholder="মেসেজ লিখুন...">
+      <button id="sendBtn">পাঠান</button>
+    </div>
+  </div>
+  <script src="script.js"></script>
   <style>
     * {
       margin: 0;
@@ -22,7 +37,20 @@ body {
   align-items: center;
   height: 100vh;
 }
-
+.sidebar {
+  width: 250px;
+  background: #f1f1f1;
+  padding: 10px;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+}
+  .chat-history {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+    
 /* চ্যাটবক্স ডিজাইন */
 .chat-container {
   width: 100vw;
@@ -53,7 +81,44 @@ body {
   position: sticky;
   bottom: 0;
 }
+ input[type="text"] {
+  flex: 1;
+  padding: 8px;
+}
 
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.chat-item {
+  padding: 6px;
+  margin-bottom: 4px;
+  background: #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  z-index: 100;
+}
+
+.dots-menu:hover .dropdown-menu {
+  display: block;
+}
+
+#hamburgerBtn {
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 200;
+}
 #userInput {
   flex-grow: 1;
   padding: 12px;
@@ -130,6 +195,19 @@ body {
 
   #sendBtn {
     width: 100%;
+  }
+  .sidebar {
+    position: absolute;
+    left: -100%;
+    top: 0;
+    height: 100%;
+    z-index: 100;
+  }
+  .sidebar.show {
+    left: 0;
+  }
+  #hamburgerBtn {
+    display: block;
   }
   </style>
 </head>
@@ -216,6 +294,121 @@ function showTypingEffect() {
         if (e.key === 'Enter') {
           sendMessage();
         }
+        let currentChatTitle = "নতুন চ্যাট";
+
+function saveChatToLocalStorage(title, messages) {
+  const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || {};
+  chatHistory[title] = messages;
+  localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  renderChatList();
+}
+
+function loadChatFromLocalStorage(title) {
+  const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || {};
+  return chatHistory[title] || [];
+}
+
+function renderChatList() {
+  const chatListDiv = document.getElementById('chatList');
+  chatListDiv.innerHTML = '';
+  const chats = JSON.parse(localStorage.getItem('chatHistory')) || {};
+  Object.keys(chats).forEach(title => {
+    const item = document.createElement('div');
+    item.className = 'chat-item';
+    item.innerHTML = `
+      <span onclick="loadChat('${title}')">${title}</span>
+      <div class="dots-menu">
+        <button>⋮</button>
+        <div class="dropdown-menu">
+          <button onclick="renameChat('${title}')">Rename</button>
+          <button onclick="deleteChat('${title}')">Delete</button>
+          <button onclick="exportChat('${title}')">Save</button>
+        </div>
+      </div>
+    `;
+    chatListDiv.appendChild(item);
+  });
+}
+
+function loadChat(title) {
+  currentChatTitle = title;
+  const messages = loadChatFromLocalStorage(title);
+  renderMessages(messages);
+}
+
+function renderMessages(messages) {
+  const history = document.getElementById('chatHistory');
+  history.innerHTML = '';
+  messages.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'message ' + (m.isUser ? 'user' : 'bot');
+    div.textContent = m.message;
+    history.appendChild(div);
+  });
+}
+
+function addMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const history = loadChatFromLocalStorage(currentChatTitle);
+  history.push({ message: text, isUser: true });
+  history.push({ message: '🤖 এটি একটি বট উত্তর।', isUser: false });
+  saveChatToLocalStorage(currentChatTitle, history);
+  renderMessages(history);
+  input.value = '';
+}
+
+function deleteChat(title) {
+  const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || {};
+  delete chatHistory[title];
+  localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  renderChatList();
+  if (title === currentChatTitle) {
+    currentChatTitle = 'নতুন চ্যাট';
+    renderMessages([]);
+  }
+}
+
+function renameChat(oldTitle) {
+  const newTitle = prompt("নতুন নাম দিন:", oldTitle);
+  if (!newTitle || newTitle === oldTitle) return;
+  const chats = JSON.parse(localStorage.getItem('chatHistory')) || {};
+  chats[newTitle] = chats[oldTitle];
+  delete chats[oldTitle];
+  localStorage.setItem('chatHistory', JSON.stringify(chats));
+  if (currentChatTitle === oldTitle) currentChatTitle = newTitle;
+  renderChatList();
+}
+
+function exportChat(title) {
+  const data = JSON.stringify(loadChatFromLocalStorage(title), null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `${title}.json`;
+  link.click();
+}
+
+document.getElementById('sendBtn').addEventListener('click', addMessage);
+document.getElementById('chatInput').addEventListener('keypress', e => {
+  if (e.key === 'Enter') addMessage();
+});
+
+document.getElementById('newChatBtn').addEventListener('click', () => {
+  const title = `চ্যাট-${Date.now()}`;
+  currentChatTitle = title;
+  saveChatToLocalStorage(title, []);
+  renderMessages([]);
+});
+
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.querySelector('.sidebar').classList.toggle('show');
+});
+
+renderChatList();
+renderMessages(loadChatFromLocalStorage(currentChatTitle));
       });
     });
   </script>
