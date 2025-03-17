@@ -35,19 +35,23 @@ body {
 }
 
 /* মেসেজ ডিজাইন */
-.message {
-  max-width: 70%;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 16px;
+.messages {
+  display: flex;
+  flex-direction: column-reverse; /* সর্বশেষ মেসেজ নিচে দেখাবে */
+  gap: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1; /* চ্যাটবক্সের ভিতরে মেসেজ ফিট হবে */
 }
 
-/* ইনপুট এরিয়া */
+/* ইনপুট এরিয়া সবসময় নিচে থাকবে */
 .input-area {
   padding: 10px;
   background-color: #343541;
   display: flex;
   gap: 10px;
+  position: sticky;
+  bottom: 0;
 }
 
 #userInput {
@@ -58,6 +62,15 @@ body {
   font-size: 16px;
   background-color: #40414F;
   color: white;
+}
+    /* চ্যাটবক্স (পুরো জায়গা নেবে) */
+.chat-box {
+  flex-grow: 1; /* বাকিটা জায়গা নিয়ে নেবে */
+  padding: 20px;
+  display: flex;
+  flex-direction: column-reverse; /* নতুন মেসেজ নিচে যাবে */
+  gap: 15px;
+  overflow-y: auto;
 }
 
 #sendBtn {
