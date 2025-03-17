@@ -141,54 +141,248 @@
   <button onclick="sendMessage()">পাঠান</button>
 </div>
 
-<!-- 📷 Image Upload -->
-<div class="image-upload">
-  <input type="file" id="imageInput" accept="image/*">
-</div>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>চ্যাট বট - উন্নত ফিচার সহ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      display: flex;
+      font-family: 'Segoe UI', 'Noto Sans Bengali', sans-serif;
+      height: 100vh;
+      background-color: #1f1f2e;
+      color: #fff;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #29293d;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #444;
+    }
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #00ffcc;
+      text-align: center;
+    }
+    .chat-history {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chat-item {
+      padding: 10px;
+      background-color: #3a3a55;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background 0.2s;
+      font-weight: bold;
+    }
+    .chat-item:hover {
+      background-color: #4f4f7a;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background-color: #29293d;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #444;
+      color: #00ffcc;
+    }
+    .chat-container {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message {
+      max-width: 70%;
+      padding: 15px;
+      border-radius: 15px;
+      font-size: 16px;
+      font-weight: 500;
+      white-space: pre-wrap;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: #006eff;
+      color: white;
+      border-bottom-right-radius: 0;
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: #2f2f44;
+      color: #e3e3e3;
+      border-bottom-left-radius: 0;
+    }
+    .typing {
+      font-style: italic;
+      opacity: 0.7;
+    }
+    .input-area {
+      display: flex;
+      padding: 15px;
+      background-color: #29293d;
+      border-top: 1px solid #444;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      margin-right: 10px;
+      background-color: #3a3a55;
+      color: white;
+      font-weight: bold;
+    }
+    .input-area button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 20px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .input-area button:hover {
+      background-color: #1e7e34;
+    }
+    .action-buttons {
+      text-align: center;
+      padding: 10px;
+    }
+    .action-buttons button {
+      margin: 5px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #444;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .action-buttons button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>📂 চ্যাট হিস্টোরি</h2>
+    <div class="chat-history" id="historyList"></div>
+    <div class="action-buttons">
+      <button onclick="deleteChat()">🗑️ মুছুন</button>
+      <button onclick="exportChat()">📤 PDF</button>
+    </div>
+  </div>
+  <div class="main">
+    <header>🤖 উন্নত চ্যাটবট</header>
+    <div class="chat-container" id="chat"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="আপনার প্রশ্ন লিখুন..." />
+      <button onclick="sendMessage()">পাঠান</button>
+    </div>
+  </div>
 
-<!-- 🗑️ Clear Chat Button -->
-<button id="clearChatBtn" class="clear-btn">🗑️ চ্যাট মুছুন</button>
+  <script>
+    let chatHistory = JSON.parse(localStorage.getItem("chatSessions")) || {};
+    let currentChatId = Date.now().toString();
+    let currentChat = [];
 
-<script>
-  function sendMessage() {
-    const input = document.getElementById("userInput");
     const chat = document.getElementById("chat");
-    const text = input.value.trim();
+    const historyList = document.getElementById("historyList");
 
-    if (text === "") return;
-
-    const userMessage = document.createElement("div");
-    userMessage.className = "message user";
-    userMessage.innerHTML = `<strong>🧑 আপনি:</strong> ${text}`;
-    chat.appendChild(userMessage);
-    input.value = "";
-    chat.scrollTop = chat.scrollHeight;
-
-    const botMessage = document.createElement("div");
-    botMessage.className = "message bot typing";
-    botMessage.innerHTML = "ফর্মবন্ধু টাইপ করছে...";
-    chat.appendChild(botMessage);
-
-    setTimeout(() => {
-      botMessage.classList.remove("typing");
-      botMessage.innerHTML = `<strong>ফর্মবন্ধু:</strong> "${text}" প্রশ্নটি আমি পেয়েছি। দয়া করে অপেক্ষা করুন...`;
-    }, 2000);
-  }
-
-  document.getElementById("clearChatBtn").addEventListener("click", function () {
-    if (confirm("⚠️ আপনি কি নিশ্চিত যে সব চ্যাট মুছে ফেলতে চান?")) {
-      localStorage.removeItem("chatHistory");
-      document.getElementById("chat").innerHTML = "";
-      alert("✅ চ্যাট মুছে ফেলা হয়েছে!");
+    function renderChat(messages) {
+      chat.innerHTML = "";
+      messages.forEach(msg => {
+        const msgEl = document.createElement("div");
+        msgEl.className = `message ${msg.sender}`;
+        msgEl.innerHTML = `<strong>${msg.sender === "user" ? "🧑 আপনি:" : "🤖 বট:"}</strong> ${msg.text}`;
+        chat.appendChild(msgEl);
+      });
+      chat.scrollTop = chat.scrollHeight;
     }
-  });
 
-  document.getElementById("userInput").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-      sendMessage();
+    function updateSidebar() {
+      historyList.innerHTML = "";
+      Object.keys(chatHistory).forEach(id => {
+        const item = document.createElement("div");
+        item.className = "chat-item";
+        item.textContent = `চ্যাট #${id.slice(-4)}`;
+        item.onclick = () => {
+          currentChatId = id;
+          currentChat = chatHistory[id];
+          renderChat(currentChat);
+        };
+        historyList.appendChild(item);
+      });
     }
-  });
-</script>
 
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const userMsg = { sender: "user", text };
+      currentChat.push(userMsg);
+      renderChat(currentChat);
+      input.value = "";
+
+      const typingEl = document.createElement("div");
+      typingEl.className = "message bot typing";
+      typingEl.textContent = "🤖 বট টাইপ করছে...";
+      chat.appendChild(typingEl);
+      chat.scrollTop = chat.scrollHeight;
+
+      setTimeout(() => {
+        chat.removeChild(typingEl);
+        const botReply = { sender: "bot", text: `"${text}" প্রশ্নটি আমি পেয়েছি। ধন্যবাদ!` };
+        currentChat.push(botReply);
+        chatHistory[currentChatId] = currentChat;
+        localStorage.setItem("chatSessions", JSON.stringify(chatHistory));
+        renderChat(currentChat);
+        updateSidebar();
+      }, 1000);
+    }
+
+    function deleteChat() {
+      if (confirm("আপনি কি এই চ্যাট ডিলিট করতে চান?")) {
+        delete chatHistory[currentChatId];
+        localStorage.setItem("chatSessions", JSON.stringify(chatHistory));
+        currentChat = [];
+        currentChatId = Date.now().toString();
+        renderChat(currentChat);
+        updateSidebar();
+      }
+    }
+
+    function exportChat() {
+      const text = currentChat.map(m => `${m.sender === 'user' ? 'আপনি' : 'বট'}: ${m.text}`).join("\n\n");
+      const blob = new Blob([text], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "chat-export.pdf";
+      link.click();
+    }
+
+    updateSidebar();
+    renderChat(currentChat);
+  </script>
 </body>
 </html>
