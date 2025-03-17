@@ -73,7 +73,20 @@ body {
 #sendBtn:hover {
   background-color: #0e8a65;
 }
+* ইউজারের মেসেজ (ডান দিকে যাবে) */
+.user-message {
+  align-self: flex-end; /* ডান দিকে পাঠাবে */ 
+  text-align: right;
+  border-top-right-radius: 0;
+}
 
+/* বটের মেসেজ (বাম দিকে থাকবে) */
+.bot-message {
+ 
+  align-self: flex-start; /* বাম দিকে পাঠাবে */
+  text-align: left;
+  border-top-left-radius: 0;
+}
     .typing {
       font-style: italic;
       color: #999;
