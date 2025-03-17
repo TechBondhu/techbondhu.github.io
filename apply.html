@@ -3,214 +3,264 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>চ্যাটবট</title>
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="script.js"></script>
+  <title>ChatGPT Style Chatbot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    .chat-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #1e1e2f;
+      color: white;
+      padding: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar h3 {
+      margin-top: 50px;
+    }
+
+    #chatHistoryList {
+      list-style: none;
+      padding: 0;
+    }
+
+    #chatHistoryList li {
+      background-color: #2e2e4f;
+      padding: 10px;
+      margin: 5px 0;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #chatHistoryList li:hover {
+      background-color: #3f3f6f;
+    }
+
+    .toggle-btn {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .main-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #ffffff;
+      border-left: 1px solid #ddd;
+    }
+
+    .chat-header {
+      padding: 15px;
+      background-color: #ececec;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .chat-message {
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      max-width: 80%;
+      font-weight: bold;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background-color: #d1e7dd;
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .bot {
+      background-color: #f8d7da;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      background-color: #ececec;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+    }
+
+    .chat-input button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      border: none;
+      background-color: #5a5af3;
+      color: white;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .chat-actions button {
+      margin-left: 10px;
+      border: none;
+      background-color: #ff5c5c;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .sidebar.closed {
+      transform: translateX(-100%);
+    }
+  </style>
 </head>
 <body>
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-toggle" id="sidebarToggle">☰</div>
-    <div class="chat-history" id="chatHistory">
-      <h3>📜 পূর্ববর্তী চ্যাট</h3>
-      <ul id="historyList"></ul>
-    </div>
-  </div>
-
   <div class="chat-container">
-    <div class="chat-header">
-      <h1>🤖 চ্যাটবট ২০২৫</h1>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="toggle-btn" id="toggleSidebar">☰</div>
+      <h3>💬 পুরাতন চ্যাট</h3>
+      <ul id="chatHistoryList"></ul>
     </div>
 
-    <div class="chat-box" id="chatBox">
-      <!-- চ্যাট দেখাবে এখানে -->
-    </div>
+    <!-- Main Chat Area -->
+    <div class="main-chat">
+      <div class="chat-header">
+        <h2>🤖 এআই চ্যাটবট</h2>
+        <div class="chat-actions">
+          <button id="exportBtn">📤 Export</button>
+          <button id="deleteBtn">🗑️ Delete</button>
+        </div>
+      </div>
 
-    <div class="chat-input">
-      <input type="text" id="userInput" placeholder="মেসেজ টাইপ করুন..." />
-      <button onclick="sendMessage()">পাঠান</button>
+      <div class="chat-box" id="chatBox"></div>
+
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." />
+        <button id="sendBtn">📨</button>
+      </div>
     </div>
   </div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const deleteBtn = document.getElementById("deleteBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const chatHistoryList = document.getElementById("chatHistoryList");
+    const toggleSidebar = document.getElementById("toggleSidebar");
+    const sidebar = document.querySelector(".sidebar");
+
+    let chatHistory = [];
+
+    function addMessage(sender, message) {
+      const msg = document.createElement("div");
+      msg.classList.add("chat-message", sender);
+
+      if (sender === "bot") {
+        let i = 0;
+        const interval = setInterval(() => {
+          msg.textContent += message[i];
+          i++;
+          if (i >= message.length) clearInterval(interval);
+        }, 20);
+      } else {
+        msg.textContent = message;
+      }
+
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function saveHistory() {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+      updateSidebar();
+    }
+
+    function updateSidebar() {
+      chatHistoryList.innerHTML = "";
+      chatHistory.forEach((chat, index) => {
+        const li = document.createElement("li");
+        li.textContent = chat.user.slice(0, 20) + "...";
+        li.addEventListener("click", () => loadChat(index));
+        chatHistoryList.appendChild(li);
+      });
+    }
+
+    function loadChat(index) {
+      chatBox.innerHTML = "";
+      const chat = chatHistory[index];
+      addMessage("user", chat.user);
+      addMessage("bot", chat.bot);
+    }
+
+    function deleteChat() {
+      chatBox.innerHTML = "";
+      chatHistory = [];
+      localStorage.removeItem("chatHistory");
+      updateSidebar();
+    }
+
+    function exportPDF() {
+      const content = chatBox.innerText;
+      const blob = new Blob([content], { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "chat-history.pdf";
+      link.click();
+    }
+
+    sendBtn.addEventListener("click", () => {
+      const message = userInput.value.trim();
+      if (message) {
+        addMessage("user", message);
+        userInput.value = "";
+
+        setTimeout(() => {
+          const botReply = "🤖 আমি আপনার কথা বুঝেছি: " + message;
+          addMessage("bot", botReply);
+          chatHistory.push({ user: message, bot: botReply });
+          saveHistory();
+        }, 600);
+      }
+    });
+
+    deleteBtn.addEventListener("click", deleteChat);
+    exportBtn.addEventListener("click", exportPDF);
+
+    toggleSidebar.addEventListener("click", () => {
+      sidebar.classList.toggle("closed");
+    });
+
+    window.addEventListener("load", () => {
+      const stored = localStorage.getItem("chatHistory");
+      if (stored) {
+        chatHistory = JSON.parse(stored);
+        updateSidebar();
+      }
+    });
+  </script>
 </body>
 </html>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f4f4f4;
-  color: #333;
-  display: flex;
-}
-
-.sidebar {
-  width: 60px;
-  background: #202123;
-  height: 100vh;
-  transition: width 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  color: white;
-}
-
-.sidebar.open {
-  width: 250px;
-}
-
-.sidebar-toggle {
-  padding: 15px;
-  cursor: pointer;
-  background: #343541;
-  text-align: center;
-  font-size: 24px;
-}
-
-.chat-history {
-  padding: 15px;
-}
-
-.chat-history h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.chat-history ul {
-  list-style: none;
-}
-
-.chat-history ul li {
-  margin-bottom: 10px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  background: #343541;
-  color: white;
-  font-weight: bold;
-}
-
-.chat-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.chat-header {
-  background: #343541;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 24px;
-}
-
-.chat-box {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  background: #fff;
-}
-
-.chat-message {
-  margin-bottom: 15px;
-}
-
-.user {
-  font-weight: bold;
-  color: #1e90ff;
-}
-
-.bot {
-  font-weight: bold;
-  color: #10a37f;
-}
-
-.chat-input {
-  display: flex;
-  padding: 15px;
-  background: #f0f0f0;
-}
-
-.chat-input input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  margin-right: 10px;
-  font-size: 16px;
-}
-
-.chat-input button {
-  padding: 12px 20px;
-  background: #10a37f;
-  border: none;
-  color: white;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-}
-const sidebar = document.getElementById("sidebar");
-const sidebarToggle = document.getElementById("sidebarToggle");
-const chatBox = document.getElementById("chatBox");
-const userInput = document.getElementById("userInput");
-const historyList = document.getElementById("historyList");
-
-let chatHistory = JSON.parse(localStorage.getItem("chatHistory")) || [];
-
-function renderHistory() {
-  historyList.innerHTML = "";
-  chatHistory.forEach((chat, index) => {
-    const li = document.createElement("li");
-    li.innerText = "চ্যাট #" + (index + 1);
-    li.addEventListener("click", () => {
-      chatBox.innerHTML = "";
-      chat.forEach((msg) => {
-        renderMessage(msg.sender, msg.text);
-      });
-    });
-    historyList.appendChild(li);
-  });
-}
-
-function renderMessage(sender, text) {
-  const msgDiv = document.createElement("div");
-  msgDiv.classList.add("chat-message");
-  msgDiv.innerHTML = `<span class="${sender}">${sender === "user" ? "🧑‍💻 আপনি" : "🤖 বট"}:</span> ${text}`;
-  chatBox.appendChild(msgDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function sendMessage() {
-  const text = userInput.value.trim();
-  if (!text) return;
-
-  renderMessage("user", text);
-  saveToHistory("user", text);
-
-  // Simulate bot reply with typing animation
-  setTimeout(() => {
-    const reply = "এটা বটের উত্তর!";
-    renderMessage("bot", reply);
-    saveToHistory("bot", reply);
-  }, 500);
-
-  userInput.value = "";
-}
-
-function saveToHistory(sender, text) {
-  if (!chatHistory.length || chatHistory[chatHistory.length - 1].finished) {
-    chatHistory.push([]);
-  }
-  chatHistory[chatHistory.length - 1].push({ sender, text });
-  localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-}
-
-sidebarToggle.addEventListener("click", () => {
-  sidebar.classList.toggle("open");
-});
-
-renderHistory();
-
-
