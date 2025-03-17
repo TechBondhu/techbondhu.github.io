@@ -1,107 +1,59 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>চ্যাট অ্যাপ</title>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     body {
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       height: 100vh;
-      font-family: "Poppins", sans-serif;
-      background-color: #343541;
     }
 
+    /* Sidebar */
     .sidebar {
-      width: 250px;
-      background: #f1f1f1;
-      padding: 15px;
-      overflow-y: auto;
+      width: 220px;
+      background-color: #2d2d30;
+      color: white;
+      padding: 20px;
     }
 
-    .main-chat {
+    .sidebar h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    /* Chat container */
+    .chat-container {
       flex: 1;
+      background-color: #f4f4f4;
       display: flex;
       flex-direction: column;
-      background-color: #ffffff;
-      color: #000000;
-      border-radius: 10px;
     }
 
     .chat-box {
-      flex-grow: 1;
+      flex: 1;
       padding: 20px;
-      display: flex;
-      flex-direction: column-reverse;
-      gap: 15px;
       overflow-y: auto;
-    }
-
-    .messages {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 10px;
-      overflow-y: auto;
-    }
-
-    .input-area {
-      padding: 10px;
-      background-color: #ffffff;
-      display: flex;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-    }
-
-    #userInput {
-      flex-grow: 1;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #ffffff;
-      color: #000000;
-      border: 1px solid #ccc;
-    }
-
-    #sendBtn {
-      padding: 12px 20px;
-      background-color: #000000;
-      color: #ffffff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #sendBtn:hover {
-      background-color: #0e8a65;
-    }
-
-    .user-message {
-      background-color: #e0e0e0;
-      color: #000000;
-      align-self: flex-end;
-      text-align: right;
-    }
-
-    .bot-message {
-      background-color: #f1f1f1;
-      color: #000000;
-      align-self: flex-start;
-      text-align: left;
-    }
-
-    .typing {
-      align-self: flex-start;
-      font-style: italic;
-      color: #999;
-      order: 1;
     }
 
     .message {
@@ -110,43 +62,82 @@
       border-radius: 10px;
     }
 
-    @media (max-width: 600px) {
+    .user-message {
+      align-self: flex-end;
+      background-color: #d1ffd1;
+    }
+
+    .bot-message {
+      align-self: flex-start;
+      background-color: #ffffff;
+    }
+
+    .input-area {
+      display: flex;
+      padding: 15px;
+      background-color: #ddd;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      border-radius: 5px;
+    }
+
+    #sendBtn {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 16px;
+      background-color: #2d2d30;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #sendBtn:hover {
+      background-color: #444;
+    }
+
+    .typing {
+      font-style: italic;
+      color: #666;
+      font-size: 14px;
+    }
+
+    @media(max-width: 768px) {
       body {
         flex-direction: column;
       }
 
       .sidebar {
         width: 100%;
-        height: auto;
       }
 
-      .input-area {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      #userInput,
-      #sendBtn {
-        width: 100%;
+      .chat-container {
+        height: 100%;
       }
     }
   </style>
 </head>
 <body>
+
   <div class="sidebar">
-    <h3>📋 অপশন</h3>
+    <h2>📋 মেনু</h2>
     <ul>
-      <li>✅ নতুন চ্যাট</li>
-      <li>📁 পূর্বের বার্তা</li>
+      <li>➕ নতুন চ্যাট</li>
+      <li>📁 পুরানো বার্তা</li>
       <li>⚙️ সেটিংস</li>
-      <li>🔒 লগআউট</li>
+      <li>🔓 লগ আউট</li>
     </ul>
   </div>
 
-  <div class="main-chat">
-    <div class="chat-box">
-      <div class="messages" id="messages"></div>
-      <div class="typing" id="typing"></div>
+  <div class="chat-container">
+    <div class="chat-box" id="chatBox">
+      <!-- Messages will appear here -->
     </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message...">
@@ -155,75 +146,55 @@
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sendBtn = document.getElementById('sendBtn');
-      const userInput = document.getElementById('userInput');
-      const messagesDiv = document.getElementById('messages');
-      const typingDiv = document.getElementById('typing');
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
 
-      // শুরুতে স্বাগতম মেসেজ
+    function addMessage(text, isUser) {
+      const message = document.createElement("div");
+      message.classList.add("message");
+      message.classList.add(isUser ? "user-message" : "bot-message");
+      message.textContent = text;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function botReply(userMsg) {
+      const replies = {
+        "হ্যালো": "হ্যালো! আপনাকে স্বাগতম!",
+        "তুমি কে?": "আমি একটি চ্যাটবট। আমি সাহায্য করতে পারি।",
+        "ধন্যবাদ": "আপনাকেও ধন্যবাদ!",
+        "": "দয়া করে কিছু লিখুন।"
+      };
+
+      const reply = replies[userMsg.trim()] || "দুঃখিত, আমি বুঝিনি। আরেকবার বলুন।";
+      addMessage(reply, false);
+    }
+
+    function sendMessage() {
+      const msg = userInput.value.trim();
+      if (msg === "") return;
+      addMessage(msg, true);
+      userInput.value = "";
       setTimeout(() => {
-        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
-      }, 500);
-      setTimeout(() => {
-        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
-      }, 2000);
+        botReply(msg);
+      }, 800);
+    }
 
-      function addMessage(message, isUser) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-        messageDiv.innerText = message;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    sendBtn.addEventListener("click", sendMessage);
+    userInput.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
       }
-
-      function showTypingEffect() {
-        typingDiv.innerText = 'Bot is typing...';
-        messagesDiv.appendChild(typingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        setTimeout(() => {
-          typingDiv.innerText = '';
-        }, 1500);
-      }
-
-      function getBotResponse(userMessage) {
-        const responses = [
-          'আমি আপনার জন্য কি করতে পারি?',
-          'আমি একটি চ্যাটবট।',
-          'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
-          'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
-        ];
-        return responses[Math.floor(Math.random() * responses.length)];
-      }
-
-      function typeMessage(text, isUser) {
-        showTypingEffect();
-        setTimeout(() => {
-          addMessage(text, isUser);
-        }, 1500);
-      }
-
-      function sendMessage() {
-        const userMessage = userInput.value.trim();
-        if (userMessage) {
-          addMessage(userMessage, true);
-          userInput.value = '';
-          showTypingEffect();
-          setTimeout(() => {
-            const botResponse = getBotResponse(userMessage);
-            addMessage(botResponse, false);
-          }, 2000);
-        }
-      }
-
-      sendBtn.addEventListener('click', sendMessage);
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendMessage();
-        }
-      });
     });
+
+    // Initial welcome message
+    window.onload = () => {
+      setTimeout(() => {
+        addMessage("🤖 হ্যালো! আমি আপনার চ্যাট সহকারী।", false);
+      }, 500);
+    };
   </script>
+
 </body>
 </html>
