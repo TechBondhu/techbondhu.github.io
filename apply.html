@@ -1,192 +1,350 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ফর্মবন্ধু</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    <title>Advanced Chatbot</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-  body {
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #121212;
-            color: white;
-            padding: 20px;
+            background-color: #1e1e1e;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        body.light-mode {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
         .container {
-            max-width: 400px;
-            margin: auto;
-            padding: 20px;
-            background: #1e1e1e;
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            background-color: #2c2c2c;
             border-radius: 10px;
+            overflow: hidden;
+            transition: background-color 0.3s;
         }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
+
+        body.light-mode .container {
+            background-color: #fff;
         }
-        button {
-            padding: 10px 15px;
-            margin-top: 10px;
+
+        .sidebar {
+            width: 25%;
+            background-color: #252525;
+            padding: 20px;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+        }
+
+        body.light-mode .sidebar {
+            background-color: #f0f0f0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
             cursor: pointer;
-            background-color: #28a745;
-            color: white;
+            color: #fff;
+        }
+
+        body.light-mode #theme-toggle {
+            color: #333;
+        }
+
+        #chat-history {
+            list-style: none;
+        }
+
+        #chat-history li {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #444;
+            transition: background-color 0.3s;
+        }
+
+        body.light-mode #chat-history li {
+            border-bottom: 1px solid #ddd;
+        }
+
+        #chat-history li:hover {
+            background-color: #444;
+        }
+
+        body.light-mode #chat-history li:hover {
+            background-color: #ddd;
+        }
+
+        .chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            max-width: 70%;
+            animation: fadeIn 0.5s;
+        }
+
+        .user-message {
+            background-color: #007bff;
+            color: #fff;
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            background-color: #444;
+            color: #fff;
+            align-self: flex-start;
+        }
+
+        body.light-mode .bot-message {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 10px;
             border: none;
             border-radius: 5px;
+            background-color: #444;
+            color: #fff;
+            transition: background-color 0.3s, color 0.3s;
         }
-        #ocrResult {
-            margin-top: 15px;
-            padding: 10px;
-            background: #222;
+
+        body.light-mode #user-input {
+            background-color: #ddd;
+            color: #333;
+        }
+
+        #send-btn, #upload-btn {
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
-            white-space: pre-wrap;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-    </style>
-</head>
-<body>
-        
-        /* Sidebar */
-        .sidebar { width: 280px; background: #1e1e2f; padding: 15px; overflow-y: auto; }
-        .chat-history { list-style: none; padding: 0; }
-        .chat-history li { background: #29294b; padding: 10px; margin: 5px 0; border-radius: 5px; cursor: pointer; }
-        .chat-history li:hover { background: #363664; }
-        
-        /* Main Chat */
-        .chat-container { flex: 1; display: flex; flex-direction: column; }
-        .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
-        .chat-message { padding: 12px; border-radius: 10px; max-width: 80%; font-weight: bold; margin-bottom: 10px; }
-        .user { background: #19c37d; align-self: flex-end; color: white; text-align: right; }
-        .bot { background: #444; align-self: flex-start; color: white; }
-        
-        /* Chat Input */
-        .chat-input { display: flex; padding: 10px; background: #1e1e1e; }
-        .chat-input input { flex: 1; padding: 12px; border: none; border-radius: 20px; font-size: 16px; background: #333; color: white; }
-        .chat-input button { background: #19c37d; border: none; padding: 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .chat-input button:hover { background: #15a76d; }
 
-    
-        /* Responsive */
+        #send-btn:hover, #upload-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .ocr-processing {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; }
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 150px;
+            }
+
+            .chat-window {
+                height: calc(100% - 150px);
+            }
         }
     </style>
 </head>
-<body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>পুরাতন চ্যাট</h2>
-        <ul id="chatHistoryList" class="chat-history"></ul>
-        
-        <!-- OCR Section -->
-        <div class="ocr-container">
-            <h3>📷 OCR স্ক্যান</h3>
-            <input type="file" id="imageUpload">
-            <label for="imageUpload">ফাইল আপলোড করুন</label>
-            <p id="ocrStatus">⏳ অপেক্ষা করুন...</p>
-            <div id="ocrResult"></div>
+<body class="dark-mode">
+    <div class="container">
+        <!-- Sidebar for Chat History -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Chat History</h3>
+                <button id="theme-toggle">🌙</button>
+            </div>
+            <ul id="chat-history"></ul>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="chat-window">
+            <div id="chat-box"></div>
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Type a message...">
+                <button id="send-btn">Send</button>
+                <input type="file" id="file-upload" accept="image/*" style="display: none;">
+                <button id="upload-btn">📷 Upload Image</button>
+            </div>
         </div>
     </div>
 
-    <!-- Main Chat -->
-    <div class="chat-container">
-        <div class="chat-box" id="chatBox"></div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." />
-            <button id="sendBtn">🚀</button>
-        </div>
+    <!-- OCR Processing Message -->
+    <div id="ocr-processing" class="ocr-processing">
+        ⏳ Scanning image, please wait...
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.4/dist/tesseract.min.js"></script>
     <script>
-        const chatBox = document.getElementById("chatBox");
-        const userInput = document.getElementById("userInput");
-        const sendBtn = document.getElementById("sendBtn");
-        const chatHistoryList = document.getElementById("chatHistoryList");
+        // DOM Elements
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileUpload = document.getElementById('file-upload');
+        const chatHistory = document.getElementById('chat-history');
+        const ocrProcessing = document.getElementById('ocr-processing');
+        const themeToggle = document.getElementById('theme-toggle');
 
-        let chatHistory = [];
+        // Chat History
+        let chats = JSON.parse(localStorage.getItem('chats')) || [];
+        let currentChatIndex = null;
 
-        function addMessage(sender, message) {
-            const msg = document.createElement("div");
-            msg.classList.add("chat-message", sender);
-            msg.textContent = message;
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function saveHistory() {
-            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-            updateSidebar();
-        }
-
-        function updateSidebar() {
-            chatHistoryList.innerHTML = "";
-            chatHistory.forEach((chat, index) => {
-                const li = document.createElement("li");
-                li.textContent = chat.user.slice(0, 20) + "...";
-                li.addEventListener("click", () => loadChat(index));
-                chatHistoryList.appendChild(li);
+        // Load Chat History
+        function loadChatHistory() {
+            chatHistory.innerHTML = '';
+            chats.forEach((chat, index) => {
+                const li = document.createElement('li');
+                li.textContent = chat.name || Chat ${index + 1};
+                li.addEventListener('click', () => loadChat(index));
+                chatHistory.appendChild(li);
             });
         }
 
+        // Load a Specific Chat
         function loadChat(index) {
-            chatBox.innerHTML = "";
-            const chat = chatHistory[index];
-            addMessage("user", chat.user);
-            addMessage("bot", chat.bot);
+            currentChatIndex = index;
+            chatBox.innerHTML = '';
+            chats[index].messages.forEach(msg => {
+                addMessage(msg.sender, msg.text, false);
+            });
         }
 
-        sendBtn.addEventListener("click", () => {
-            const message = userInput.value.trim();
-            if (!message) return;
-            addMessage("user", message);
-            userInput.value = "";
+        // Save Chat to Local Storage
+        function saveChat() {
+            localStorage.setItem('chats', JSON.stringify(chats));
+        }
 
-            // "টাইপ করছে..." ইফেক্ট
-            const typingEffect = document.createElement("div");
-            typingEffect.classList.add("chat-message", "bot");
-            typingEffect.textContent = "টাইপ করছে...";
-            chatBox.appendChild(typingEffect);
+        // Add Message to Chat
+        function addMessage(sender, text, save = true) {
+            const message = document.createElement('div');
+            message.className = message ${sender}-message;
+            message.textContent = text;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-            setTimeout(() => {
-                typingEffect.remove();
-                const botReply = "আমি বুঝেছি: " + message;
-                addMessage("bot", botReply);
-                chatHistory.push({ user: message, bot: botReply });
-                saveHistory();
-            }, 2000);
-        });
-
-        // Enter চাপলে মেসেজ পাঠাবে
-        userInput.addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                sendBtn.click();
+            if (save) {
+                if (!chats.length || currentChatIndex === null) {
+                    chats.push({ name: Chat ${chats.length + 1}, messages: [] });
+                    currentChatIndex = chats.length - 1;
+                }
+                chats[currentChatIndex].messages.push({ sender, text });
+                saveChat();
+                loadChatHistory();
             }
-        });
+        }
 
-        // OCR ফাংশনালিটি
-        document.getElementById("imageUpload").addEventListener("change", function (event) {
+        // Simulate Bot Response
+        function simulateBotResponse(userMessage) {
+            setTimeout(() => {
+                addMessage('bot', You said: "${userMessage}");
+            }, 2000);
+        }
+
+        // Upload Image for OCR
+        uploadBtn.addEventListener('click', () => fileUpload.click());
+
+        fileUpload.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (file) {
-                document.getElementById("ocrStatus").textContent = "⏳ স্ক্যানিং হচ্ছে...";
-                Tesseract.recognize(file, "eng+ben").then(({ data: { text } }) => {
-                    document.getElementById("ocrStatus").textContent = "✅ স্ক্যান সম্পন্ন!";
-                    document.getElementById("ocrResult").textContent = text;
-                }).catch(() => {
-                    document.getElementById("ocrStatus").textContent = "❌ OCR করতে সমস্যা হয়েছে";
-                });
+                ocrProcessing.style.display = 'block';
+                const result = await performOCR(file);
+                ocrProcessing.style.display = 'none';
+                if (result) {
+                    addMessage('user', [Image Text]: ${result});
+                    simulateBotResponse(You uploaded an image with text: "${result}");
+                } else {
+                    addMessage('bot', '❌ Failed to process the image.');
+                }
             }
         });
 
-        // লোকাল স্টোরেজ থেকে আগের চ্যাট লোড
-        window.addEventListener("load", () => {
-            const stored = localStorage.getItem("chatHistory");
-            if (stored) {
-                chatHistory = JSON.parse(stored);
-                updateSidebar();
+        // Perform OCR using Tesseract.js
+        async function performOCR(file) {
+            try {
+                const { data: { text } } = await Tesseract.recognize(file, 'eng+ben');
+                return text.trim();
+            } catch (error) {
+                console.error('OCR Error:', error);
+                return null;
+            }
+        }
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            themeToggle.textContent = document.body.classList.contains('light-mode') ? '🌞' : '🌙';
+        });
+
+        // Send Message
+        sendBtn.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                addMessage('user', message);
+                userInput.value = '';
+                simulateBotResponse(message);
             }
         });
+
+        // Initial Load
+        loadChatHistory();
     </script>
 </body>
 </html>
