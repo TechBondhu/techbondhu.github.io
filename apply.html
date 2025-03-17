@@ -157,14 +157,18 @@ body {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      // Show typing effect
-      function showTypingEffect() {
-        typingDiv.innerText = 'Bot is typing...';
-        setTimeout(() => {
-          typingDiv.innerText = '';
-        }, 1500);
-      }
+     // টাইপিং ইফেক্ট দেখানোর ফাংশন (এটি সবসময় নিচে রাখবে)
+function showTypingEffect() {
+  typingDiv.innerText = 'Bot is typing...';
 
+  // মেসেজের শেষে টাইপিং লেখা যোগ করবে
+  messagesDiv.appendChild(typingDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight; // অটো-স্ক্রল
+
+  setTimeout(() => {
+    typingDiv.innerText = ''; // 1.5 সেকেন্ড পর মুছে যাবে
+  }, 1500);
+}
       // Bot's response (simple)
       function getBotResponse(userMessage) {
         const responses = [
