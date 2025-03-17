@@ -147,10 +147,20 @@ body {
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const sendBtn = document.getElementById('sendBtn');
-      const userInput = document.getElementById('userInput');
-      const messagesDiv = document.getElementById('messages');
-      const typingDiv = document.getElementById('typing');
+    const sendBtn = document.getElementById('sendBtn');
+    const userInput = document.getElementById('userInput');
+    const messagesDiv = document.getElementById('messages');
+    const typingDiv = document.getElementById('typing');
+
+    // চ্যাটবট শুরুতেই স্বাগতম জানাবে
+    setTimeout(() => {
+        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
+    }, 500);
+
+    // দ্বিতীয় মেসেজ দেখাবে
+    setTimeout(() => {
+        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
+    }, 2000);
 
       // Function to add a message
       function addMessage(message, isUser) {
@@ -173,18 +183,17 @@ function showTypingEffect() {
     typingDiv.innerText = ''; // 1.5 সেকেন্ড পর মুছে যাবে
   }, 1500);
 }
-      // Bot's response (simple)
-      function getBotResponse(userMessage) {
+       // বটের রেসপন্স
+    function getBotResponse(userMessage) {
         const responses = [
-          'Hello! How can I help you?',
-          'I am a chatbot.',
-          'Let me know if you need assistance.',
-          'Can you please clarify that?',
-          'I don\'t understand, could you try again?'
+            'আমি আপনার জন্য কি করতে পারি?',
+            'আমি একটি চ্যাটবট।',
+            'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
+            'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
         ];
         return responses[Math.floor(Math.random() * responses.length)];
-      }
-
+    }
+      
       // Send message function
       function sendMessage() {
         const userMessage = userInput.value.trim();
