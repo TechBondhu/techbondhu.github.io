@@ -34,16 +34,15 @@ body {
   overflow: hidden;
 }
 
-/* মেসেজ ডিজাইন */
+/* মেসেজ কন্টেইনার (উপর থেকে নিচে আসবে) */
 .messages {
   display: flex;
-  flex-direction: column-reverse; /* সর্বশেষ মেসেজ নিচে দেখাবে */
+  flex-direction: column; /* নতুন মেসেজ উপরে থাকবে, ক্রমশ নিচে যাবে */
   gap: 10px;
   padding: 10px;
   overflow-y: auto;
-  flex-grow: 1; /* চ্যাটবক্সের ভিতরে মেসেজ ফিট হবে */
 }
-
+    
 /* ইনপুট এরিয়া সবসময় নিচে থাকবে */
 .input-area {
   padding: 10px;
@@ -86,18 +85,16 @@ body {
 #sendBtn:hover {
   background-color: #0e8a65;
 }
-* ইউজারের মেসেজ (ডান দিকে যাবে) */
+/* ইউজারের মেসেজ (ডান পাশে থাকবে) */
 .user-message {
-  align-self: flex-end; /* ডান দিকে পাঠাবে */ 
+  align-self: flex-end; /* ডান পাশে রাখবে */
   text-align: right;
-  border-top-right-radius: 0;
 }
 
-/* বটের মেসেজ (বাম দিকে থাকবে) */
+/* বটের মেসেজ (বাম পাশে থাকবে) */
 .bot-message {
-  align-self: flex-start; /* বাম দিকে পাঠাবে */
+  align-self: flex-start; /* বাম পাশে রাখবে */
   text-align: left;
-  border-top-left-radius: 0;
 }
     .typing {
       font-style: italic;
