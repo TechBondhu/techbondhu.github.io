@@ -1,10 +1,77 @@
-<script>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ফর্মবন্ধু</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+        body { background-color: #121212; color: white; display: flex; height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: 280px; background: #1e1e2f; padding: 15px; overflow-y: auto; }
+        .chat-history { list-style: none; padding: 0; }
+        .chat-history li { background: #29294b; padding: 10px; margin: 5px 0; border-radius: 5px; cursor: pointer; }
+        .chat-history li:hover { background: #363664; }
+        
+        /* Main Chat */
+        .chat-container { flex: 1; display: flex; flex-direction: column; }
+        .chat-box { flex: 1; padding: 20px; overflow-y: auto; }
+        .chat-message { padding: 12px; border-radius: 10px; max-width: 80%; font-weight: bold; margin-bottom: 10px; }
+        .user { background: #19c37d; align-self: flex-end; color: white; text-align: right; }
+        .bot { background: #444; align-self: flex-start; color: white; }
+        
+        /* Chat Input */
+        .chat-input { display: flex; padding: 10px; background: #1e1e1e; }
+        .chat-input input { flex: 1; padding: 12px; border: none; border-radius: 20px; font-size: 16px; background: #333; color: white; }
+        .chat-input button { background: #19c37d; border: none; padding: 12px; border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .chat-input button:hover { background: #15a76d; }
+
+        /* OCR Section */
+        .ocr-container { padding: 15px; background: #222; text-align: center; }
+        #ocrResult { background: #29294b; padding: 10px; border-radius: 5px; margin-top: 10px; }
+        input[type="file"] { display: none; }
+        label { background: #19c37d; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>পুরাতন চ্যাট</h2>
+        <ul id="chatHistoryList" class="chat-history"></ul>
+        
+        <!-- OCR Section -->
+        <div class="ocr-container">
+            <h3>📷 OCR স্ক্যান</h3>
+            <input type="file" id="imageUpload">
+            <label for="imageUpload">ফাইল আপলোড করুন</label>
+            <p id="ocrStatus">⏳ অপেক্ষা করুন...</p>
+            <div id="ocrResult"></div>
+        </div>
+    </div>
+
+    <!-- Main Chat -->
+    <div class="chat-container">
+        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." />
+            <button id="sendBtn">🚀</button>
+        </div>
+    </div>
+
+    <script>
         const chatBox = document.getElementById("chatBox");
         const userInput = document.getElementById("userInput");
         const sendBtn = document.getElementById("sendBtn");
         const chatHistoryList = document.getElementById("chatHistoryList");
-        const toggleSidebar = document.getElementById("toggleSidebar");
-        const sidebar = document.getElementById("sidebar");
+
         let chatHistory = [];
 
         function addMessage(sender, message) {
@@ -42,25 +109,44 @@
             if (!message) return;
             addMessage("user", message);
             userInput.value = "";
-            const botReply = "আমি আপনার কথা বুঝেছি: " + message;
+
+            // "টাইপ করছে..." ইফেক্ট
+            const typingEffect = document.createElement("div");
+            typingEffect.classList.add("chat-message", "bot");
+            typingEffect.textContent = "টাইপ করছে...";
+            chatBox.appendChild(typingEffect);
+
             setTimeout(() => {
+                typingEffect.remove();
+                const botReply = "আমি বুঝেছি: " + message;
                 addMessage("bot", botReply);
                 chatHistory.push({ user: message, bot: botReply });
                 saveHistory();
-            }, 600);
+            }, 2000);
         });
 
-        // Enter কী চাপলে মেসেজ পাঠানো
+        // Enter চাপলে মেসেজ পাঠাবে
         userInput.addEventListener("keypress", function (event) {
             if (event.key === "Enter") {
                 sendBtn.click();
             }
         });
 
-        toggleSidebar.addEventListener("click", () => {
-            sidebar.classList.toggle("closed");
+        // OCR ফাংশনালিটি
+        document.getElementById("imageUpload").addEventListener("change", function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById("ocrStatus").textContent = "⏳ স্ক্যানিং হচ্ছে...";
+                Tesseract.recognize(file, "eng+ben").then(({ data: { text } }) => {
+                    document.getElementById("ocrStatus").textContent = "✅ স্ক্যান সম্পন্ন!";
+                    document.getElementById("ocrResult").textContent = text;
+                }).catch(() => {
+                    document.getElementById("ocrStatus").textContent = "❌ OCR করতে সমস্যা হয়েছে";
+                });
+            }
         });
 
+        // লোকাল স্টোরেজ থেকে আগের চ্যাট লোড
         window.addEventListener("load", () => {
             const stored = localStorage.getItem("chatHistory");
             if (stored) {
