@@ -4,14 +4,102 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chat Bot</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 400px;
+      height: 500px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+    }
+
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .input-area {
+      padding: 10px;
+      background-color: #f5f5f5;
+      display: flex;
+      gap: 10px;
+    }
+
+    #userInput {
+      flex-grow: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    #sendBtn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #sendBtn:hover {
+      background-color: #45a049;
+    }
+
+    .typing {
+      font-style: italic;
+      color: #999;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .user-message {
+      background-color: #e0f7fa;
+      align-self: flex-end;
+    }
+
+    .bot-message {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+    }
+  </style>
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-box">
-      <div class="messages" id="messages">
-        <!-- User and bot messages will appear here -->
-      </div>
+      <div class="messages" id="messages"></div>
       <div class="typing" id="typing"></div>
     </div>
     <div class="input-area">
@@ -20,160 +108,67 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sendBtn = document.getElementById('sendBtn');
+      const userInput = document.getElementById('userInput');
+      const messagesDiv = document.getElementById('messages');
+      const typingDiv = document.getElementById('typing');
+
+      // Function to add a message
+      function addMessage(message, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+        messageDiv.innerText = message;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      // Show typing effect
+      function showTypingEffect() {
+        typingDiv.innerText = 'Bot is typing...';
+        setTimeout(() => {
+          typingDiv.innerText = '';
+        }, 1500);
+      }
+
+      // Bot's response (simple)
+      function getBotResponse(userMessage) {
+        const responses = [
+          'Hello! How can I help you?',
+          'I am a chatbot.',
+          'Let me know if you need assistance.',
+          'Can you please clarify that?',
+          'I don\'t understand, could you try again?'
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+
+      // Send message function
+      function sendMessage() {
+        const userMessage = userInput.value.trim();
+        if (userMessage) {
+          addMessage(userMessage, true); // Display user's message
+          userInput.value = ''; // Clear the input field
+          showTypingEffect(); // Show typing effect
+
+          setTimeout(() => {
+            const botResponse = getBotResponse(userMessage); // Get bot's response
+            addMessage(botResponse, false); // Display bot's message
+          }, 2000); // Wait 2 seconds before bot's reply
+        }
+      }
+
+      // Event listener for Send button click
+      sendBtn.addEventListener('click', sendMessage);
+
+      // Event listener for Enter key press
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.chat-container {
-  width: 400px;
-  height: 500px;
-  background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.chat-box {
-  flex-grow: 1;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  overflow-y: auto;
-}
-
-.messages {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.input-area {
-  padding: 10px;
-  background-color: #f5f5f5;
-  display: flex;
-  gap: 10px;
-}
-
-#userInput {
-  width: 80%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-#sendBtn {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-#sendBtn:hover {
-  background-color: #45a049;
-}
-
-#sendBtn:active {
-  background-color: #4CAF50;
-}
-
-.typing {
-  font-style: italic;
-  color: #999;
-}
-
-.message {
-  max-width: 70%;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.user-message {
-  background-color: #e0f7fa;
-  align-self: flex-end;
-}
-
-.bot-message {
-  background-color: #f1f1f1;
-  align-self: flex-start;
-}
-const sendBtn = document.getElementById('sendBtn');
-const userInput = document.getElementById('userInput');
-const messagesDiv = document.getElementById('messages');
-const typingDiv = document.getElementById('typing');
-
-// Function to simulate typing effect
-function typeMessage(message, isUserMessage) {
-  const messageDiv = document.createElement('div');
-  messageDiv.classList.add(isUserMessage ? 'user-message' : 'bot-message');
-  messageDiv.innerText = message;
-  messagesDiv.appendChild(messageDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-// Show typing effect
-function showTypingEffect() {
-  typingDiv.innerText = 'Bot is typing...';
-  setTimeout(() => {
-    typingDiv.innerText = '';
-  }, 1500);
-}
-
-// Bot's response (simple)
-function getBotResponse(userMessage) {
-  const responses = [
-    'Hello! How can I help you?',
-    'I am a chatbot.',
-    'Let me know if you need assistance.',
-    'Can you please clarify that?',
-    'I don\'t understand, could you try again?'
-  ];
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-}
-
-// Send message function
-function sendMessage() {
-  const userMessage = userInput.value.trim();
-  if (userMessage) {
-    typeMessage(userMessage, true); // Display user's message
-    userInput.value = ''; // Clear the input field
-    showTypingEffect(); // Show typing effect
-    
-    setTimeout(() => {
-      const botResponse = getBotResponse(userMessage); // Get bot's response
-      typeMessage(botResponse, false); // Display bot's message
-    }, 2000); // Wait 2 seconds before bot's reply
-  }
-}
-
-// Event listener for Send button click
-sendBtn.addEventListener('click', sendMessage);
-
-// Event listener for Enter key press
-userInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') {
-    sendMessage();
-  }
-});
-
-
