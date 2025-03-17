@@ -1,229 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formbondhu</title>
-    <style>
-        /* জেনারেল স্টাইল */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #e0e0e0;
-        }
-
-        /* চ্যাট কন্টেইনার */
-        .chat-container {
-            width: 90%;
-            max-width: 500px;
-            background-color: #2d2d2d;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 90vh;
-            max-height: 700px;
-        }
-
-        /* চ্যাট হেডার */
-        .chat-header {
-            background-color: #1f1f1f;
-            color: #ffffff;
-            padding: 15px;
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            border-bottom: 1px solid #444;
-        }
-
-        /* চ্যাট বক্স */
-        .chat-box {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        /* চ্যাট ইনপুট */
-        .chat-input {
-            display: flex;
-            padding: 10px;
-            background-color: #1f1f1f;
-            border-top: 1px solid #444;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            background-color: #333;
-            color: #e0e0e0;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .chat-input input::placeholder {
-            color: #888;
-        }
-
-        .chat-input button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 14px;
-        }
-
-        .chat-input button:hover {
-            background-color: #0056b3;
-        }
-
-        /* মেসেজ স্টাইল */
-        .message {
-            max-width: 80%;
-            padding: 10px;
-            border-radius: 10px;
-            word-wrap: break-word;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background-color: #444;
-            color: #e0e0e0;
-        }
-
-        /* টাইপিং এনিমেশন */
-        .typing-indicator {
-            display: inline-block;
-            padding: 10px;
-            background-color: #444;
-            color: #e0e0e0;
-            border-radius: 10px;
-            font-style: italic;
-        }
-
-        /* স্ক্রলবার স্টাইল */
-        .chat-box::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-box::-webkit-scrollbar-track {
-            background: #2d2d2d;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-        }
-
-        .chat-box::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* মোবাইল রেসপন্সিভ */
-        @media (max-width: 600px) {
-            .chat-container {
-                width: 100%;
-                height: 100vh;
-                border-radius: 0;
-            }
-
-            .chat-header {
-                font-size: 16px;
-            }
-
-            .chat-input input {
-                font-size: 12px;
-            }
-
-            .chat-input button {
-                font-size: 12px;
-                padding: 8px 12px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Bot</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>চ্যাটবট</h2>
-        </div>
-        <div class="chat-box" id="chat-box">
-            <!-- চ্যাট মেসেজ এখানে দেখাবে -->
-            <div class="message bot">
-                <p>হ্যালো! আমি আপনার সাহায্য করতে পারি।</p>
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="আপনার মেসেজ লিখুন..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">পাঠান</button>
-        </div>
+  <div class="chat-container">
+    <div class="chat-box">
+      <div class="messages" id="messages">
+        <!-- User and bot messages will appear here -->
+      </div>
+      <div class="typing" id="typing"></div>
     </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
 
-    <script>
-        // মেসেজ পাঠানোর ফাংশন
-        function sendMessage() {
-            const userInput = document.getElementById('user-input');
-            const chatBox = document.getElementById('chat-box');
-
-            if (userInput.value.trim() === '') {
-                return;
-            }
-
-            // ইউজারের মেসেজ দেখানো
-            const userMessage = document.createElement('div');
-            userMessage.classList.add('message', 'user');
-            userMessage.innerHTML = <p>${userInput.value}</p>;
-            chatBox.appendChild(userMessage);
-
-            // বটের টাইপিং ইফেক্ট দেখানো
-            const botTyping = document.createElement('div');
-            botTyping.classList.add('message', 'bot', 'typing-indicator');
-            botTyping.innerHTML = <p>টাইপিং...</p>;
-            chatBox.appendChild(botTyping);
-
-            // ইনপুট ফিল্ড ক্লিয়ার করা
-            userInput.value = '';
-
-            // চ্যাট বক্স স্ক্রল ডাউন করা
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // বটের রেসপন্স (এখানে আপনি আপনার বট লজিক যোগ করতে পারেন)
-            setTimeout(() => {
-                chatBox.removeChild(botTyping); // টাইপিং ইন্ডিকেটর সরানো
-                const botMessage = document.createElement('div');
-                botMessage.classList.add('message', 'bot');
-                botMessage.innerHTML = <p>আপনি লিখেছেন: ${userInput.value}</p>;
-                chatBox.appendChild(botMessage);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1500); // 1.5 সেকেন্ড পরে রেসপন্স দেখানো
-        }
-
-        // Enter কী প্রেস করলে মেসেজ পাঠানো
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.chat-container {
+  width: 400px;
+  height: 500px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-box {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-area {
+  padding: 10px;
+  background-color: #f5f5f5;
+  display: flex;
+  gap: 10px;
+}
+
+#userInput {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#sendBtn {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background-color: #45a049;
+}
+
+#sendBtn:active {
+  background-color: #4CAF50;
+}
+
+.typing {
+  font-style: italic;
+  color: #999;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.user-message {
+  background-color: #e0f7fa;
+  align-self: flex-end;
+}
+
+.bot-message {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+const sendBtn = document.getElementById('sendBtn');
+const userInput = document.getElementById('userInput');
+const messagesDiv = document.getElementById('messages');
+const typingDiv = document.getElementById('typing');
+
+// Function to simulate typing effect
+function typeMessage(message, isUserMessage) {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add(isUserMessage ? 'user-message' : 'bot-message');
+  messageDiv.innerText = message;
+  messagesDiv.appendChild(messageDiv);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Show typing effect
+function showTypingEffect() {
+  typingDiv.innerText = 'Bot is typing...';
+  setTimeout(() => {
+    typingDiv.innerText = '';
+  }, 1500);
+}
+
+// Bot's response (simple)
+function getBotResponse(userMessage) {
+  const responses = [
+    'Hello! How can I help you?',
+    'I am a chatbot.',
+    'Let me know if you need assistance.',
+    'Can you please clarify that?',
+    'I don\'t understand, could you try again?'
+  ];
+  
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+// Send message function
+function sendMessage() {
+  const userMessage = userInput.value.trim();
+  if (userMessage) {
+    typeMessage(userMessage, true); // Display user's message
+    userInput.value = ''; // Clear the input field
+    showTypingEffect(); // Show typing effect
+    
+    setTimeout(() => {
+      const botResponse = getBotResponse(userMessage); // Get bot's response
+      typeMessage(botResponse, false); // Display bot's message
+    }, 2000); // Wait 2 seconds before bot's reply
+  }
+}
+
+// Event listener for Send button click
+sendBtn.addEventListener('click', sendMessage);
+
+// Event listener for Enter key press
+userInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    sendMessage();
+  }
+});
+
+
