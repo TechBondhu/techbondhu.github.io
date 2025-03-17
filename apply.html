@@ -11,66 +11,82 @@
       box-sizing: border-box;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+  /* সুন্দর ব্যাকগ্রাউন্ড এবং ফন্ট */
+body {
+  font-family: "Poppins", sans-serif; /* সুন্দর ফন্ট */
+  font-weight: bold; /* বোল্ড ফন্ট */
+  background-color: #343541; /* ChatGPT-এর মতো ডার্ক ব্যাকগ্রাউন্ড */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
 
-    .chat-container {
-  width: 100vw; /* পুরো স্ক্রিনের প্রস্থ নেবে */
-  height: 100vh; /* পুরো স্ক্রিনের উচ্চতা নেবে */
-  background-color: #fff;
+/* চ্যাটবক্স ডিজাইন */
+.chat-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #444654; /* ChatGPT-এর মতো চ্যাটবক্স কালার */
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.chat-box {
-  flex-grow: 1; /* চ্যাটবক্স পুরো জায়গা নেবে */
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  overflow-y: auto;
+/* মেসেজ ডিজাইন */
+.message {
+  max-width: 70%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
 }
 
-    .messages {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+/* ইউজারের মেসেজ */
+.user-message {
+  background-color: #10a37f; /* ChatGPT-এর মতো গ্রিন */
+  color: white;
+  align-self: flex-end;
+}
 
-    .input-area {
+/* বটের মেসেজ */
+.bot-message {
+  background-color: #444654; /* ChatGPT-এর মতো ডার্ক */
+  color: white;
+  align-self: flex-start;
+}
+
+/* ইনপুট এরিয়া */
+.input-area {
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: #343541;
   display: flex;
   gap: 10px;
 }
 
 #userInput {
   flex-grow: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 12px;
+  border: 1px solid #555;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 16px;
+  background-color: #40414F;
+  color: white;
 }
 
 #sendBtn {
-  padding: 10px 20px;
-  background-color: #4CAF50;
+  padding: 12px 20px;
+  background-color: #10a37f; /* গ্রিন */
   border: none;
   color: white;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
 }
 
-    #sendBtn:hover {
-      background-color: #45a049;
-    }
+#sendBtn:hover {
+  background-color: #0e8a65;
+}
 
     .typing {
       font-style: italic;
