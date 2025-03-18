@@ -216,173 +216,124 @@
     </div>
   </div>
 
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    let chatHistory = JSON.parse(localStorage.getItem('chats')) || {};
-    let currentChatId = null;
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let chatHistory = JSON.parse(localStorage.getItem('chats')) || {};
+      let currentChatId = null;
 
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const sidebar = document.getElementById('sidebar');
-    const newChatBtn = document.getElementById('newChatBtn');
-    const chatList = document.getElementById('chatList');
-    const messagesDiv = document.getElementById('messages');
-    const sendBtn = document.getElementById('sendBtn');
-    const userInput = document.getElementById('userInput');
-    const typingDiv = document.getElementById('typing');
-    
-  / মেনু টগল করা (এখন সঠিকভাবে কাজ করবে)
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const sidebar = document.getElementById('sidebar');
+      const newChatBtn = document.getElementById('newChatBtn');
+      const chatList = document.getElementById('chatList');
+      const messagesDiv = document.getElementById('messages');
+      const sendBtn = document.getElementById('sendBtn');
+      const userInput = document.getElementById('userInput');
+      const typingDiv = document.getElementById('typing');
+
       hamburgerBtn.addEventListener('click', () => {
         sidebar.classList.toggle('show');
-
-        // সাইডবার ওপেন হলে বাটন নিচে নামাবে
-        if (sidebar.classList.contains('show')) {
-          hamburgerBtn.style.top = "15px";
-        } else {
-          hamburgerBtn.style.top = "10px";
-        }
-});
-
-
-    // নতুন চ্যাট তৈরি করা
-    newChatBtn.addEventListener('click', () => {
-      const id = Date.now();
-      chatHistory[id] = { title: `নতুন চ্যাট ${Object.keys(chatHistory).length + 1}`, messages: [] };
-      currentChatId = id;
-      saveChats();
-      renderChatList();
-      clearMessages(); // আগের মেসেজ মুছবে
-    });
-
-    // চ্যাট লিস্ট রেন্ডার করা
-    function renderChatList() {
-      chatList.innerHTML = '';
-      Object.entries(chatHistory).forEach(([id, chat]) => {
-        const chatTitle = document.createElement('div');
-        chatTitle.className = 'chat-title';
-
-        const title = document.createElement('span');
-        title.textContent = chat.title;
-        title.addEventListener('click', () => {
-          currentChatId = id;
-          renderMessages();
-        });
-
-        const options = document.createElement('div');
-        options.className = 'options';
-        options.textContent = '⋮';
-        options.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showOptions(id, chatTitle, chat.title);
-        });
-
-        chatTitle.appendChild(title);
-        chatTitle.appendChild(options);
-        chatList.appendChild(chatTitle);
-      });
-    }
-
-    // মেসেজ রেন্ডার করা
-    function renderMessages() {
-      messagesDiv.innerHTML = '';
-      if (!currentChatId) return;
-      
-      const chat = chatHistory[currentChatId];
-      chat.messages.forEach(msg => {
-        addMessage(msg.text, msg.sender === 'user');
       });
 
-      // টাইপিং ইফেক্ট দেখানো
-      showTypingEffect();
-    }
-// অটো-স্ক্রল ফাংশন
-function scrollToBottom() {
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-// মেসেজ যোগ করার ফাংশন (আপডেটেড)
-function addMessage(message, isUser) {
-  const messageDiv = document.createElement('div');
-  messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-  messageDiv.innerText = message;
-  messagesDiv.appendChild(messageDiv);
-  scrollToBottom(); // প্রতিবার নতুন মেসেজ আসলে স্ক্রল নিচে যাবে
-}
-
-    // মেসেজ যোগ করা
-    function addMessage(message, isUser) {
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-      messageDiv.innerText = message;
-      messagesDiv.appendChild(messageDiv);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    // বটের টাইপিং ইফেক্ট দেখানো
-    function showTypingEffect() {
-      typingDiv.innerText = '🤖 Bot is typing...';
-      setTimeout(() => {
-        typingDiv.innerText = '';
-      }, 1500);
-    }
-
-    // বটের রেসপন্স তৈরি করা
-    function getBotResponse(userMessage) {
-      const responses = [
-        'আমি আপনার জন্য কি করতে পারি?',
-        'আমি একটি চ্যাটবট।',
-        'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
-        'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
-    }
-
-    // লোকাল স্টোরেজে চ্যাট সংরক্ষণ করা
-    function saveChats() {
-      localStorage.setItem('chats', JSON.stringify(chatHistory));
-    }
-
-    // চ্যাট ডিলিট করা
-    function showOptions(chatId, chatTitleElement, chatName) {
-      const shouldDelete = confirm(`চ্যাট "${chatName}" মুছে ফেলতে চান?`);
-      if (shouldDelete) {
-        delete chatHistory[chatId];
-        if (currentChatId === chatId) {
-          currentChatId = null;
-          clearMessages();
-        }
+      newChatBtn.addEventListener('click', () => {
+        const id = Date.now();
+        chatHistory[id] = { title: `নতুন চ্যাট ${Object.keys(chatHistory).length + 1}`, messages: [] };
+        currentChatId = id;
         saveChats();
         renderChatList();
+        renderMessages();
+      });
+
+      function renderMessages() {
+        messagesDiv.innerHTML = '';
+        if (!currentChatId) return;
+        const chat = chatHistory[currentChatId];
+        chat.messages.forEach(msg => {
+          addMessage(msg.text, msg.sender === 'user');
+        });
       }
-    }
 
-    // আগের মেসেজ ক্লিয়ার করা
-    function clearMessages() {
-      messagesDiv.innerHTML = '';
-      typingDiv.innerText = '';
-    }
+      function renderChatList() {
+        chatList.innerHTML = '';
+        Object.entries(chatHistory).forEach(([id, chat]) => {
+          const chatTitle = document.createElement('div');
+          chatTitle.className = 'chat-title';
 
-    // সেন্ড বাটনে ক্লিক করলে বটের উত্তর দেওয়া
-    sendBtn.addEventListener('click', () => {
-      const text = userInput.value.trim();
-      if (!text || !currentChatId) return;
+          const title = document.createElement('span');
+          title.textContent = chat.title;
+          title.addEventListener('click', () => {
+            currentChatId = id;
+            renderMessages();
+          });
 
-      chatHistory[currentChatId].messages.push({ sender: 'user', text });
-      addMessage(text, true);
-      userInput.value = '';
-      saveChats();
+          const options = document.createElement('div');
+          options.className = 'options';
+          options.textContent = '⋮';
+          options.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showOptions(id, chatTitle, chat.title);
+          });
 
-      showTypingEffect();
+          chatTitle.appendChild(title);
+          chatTitle.appendChild(options);
+          chatList.appendChild(chatTitle);
+        });
+      }
 
-      setTimeout(() => {
-        const reply = getBotResponse(text); // বটের রেসপন্স ঠিক করা
-        chatHistory[currentChatId].messages.push({ sender: 'bot', text: reply });
-        addMessage(reply, false);
+      function addMessage(message, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+        messageDiv.innerText = message;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      function showTypingEffect() {
+        typingDiv.innerText = '🤖 Bot is typing...';
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        setTimeout(() => {
+          typingDiv.innerText = '';
+        }, 1500);
+      }
+
+      function saveChats() {
+        localStorage.setItem('chats', JSON.stringify(chatHistory));
+      }
+
+      function showOptions(chatId, chatTitleElement, chatName) {
+        const shouldDelete = confirm(`চ্যাট "${chatName}" মুছে ফেলতে চান?`);
+        if (shouldDelete) {
+          delete chatHistory[chatId];
+          if (currentChatId === chatId) {
+            currentChatId = null;
+            messagesDiv.innerHTML = '';
+          }
+          saveChats();
+          renderChatList();
+        }
+      }
+
+      sendBtn.addEventListener('click', () => {
+        const text = userInput.value.trim();
+        if (!text || !currentChatId) return;
+
+        chatHistory[currentChatId].messages.push({ sender: 'user', text });
+        addMessage(text, true);
+        userInput.value = '';
         saveChats();
-      }, 1500);
-    });
 
-    renderChatList();
-  });
+        showTypingEffect();
+
+        setTimeout(() => {
+          const reply = `🤖 আপনি লিখেছেন: ${text}`;
+          chatHistory[currentChatId].messages.push({ sender: 'bot', text: reply });
+          addMessage(reply, false);
+          saveChats();
+        }, 1500);
+      });
+
+      renderChatList();
+    });
   </script>
 </body>
 </html>
