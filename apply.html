@@ -21,30 +21,30 @@
       overflow: hidden;
     }
 
-    #hamburgerBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 24px;
-      z-index: 10;
-      background: none;
-      border: none;
-      color: #000000;
-      cursor: pointer;
-    }
+   #hamburgerBtn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 24px;
+  z-index: 20; /* এটি সবকিছুর উপরে রাখবে */
+  background: none;
+  border: none;
+  color: white; /* কালো ব্যাকগ্রাউন্ডে দেখার জন্য */
+  cursor: pointer;
+}
 
-    .sidebar {
-      width: 250px;
-      background-color: #202123;
-      color: white;
-      padding: 10px;
-      display: flex;;
-      flex-direction: column; /* পরিবর্তন: ভেতরের এলিমেন্টগুলো কলামে রাখবে */
-      height: 100vh;
-      overflow-y: auto;
-      position: fixed;
-      z-index: 5;
-    }
+   .sidebar {
+  width: 250px;
+  background-color: #202123;
+  color: white;
+  padding: 20px; /* উপরে জায়গা রাখার জন্য */
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+  z-index: 10;
+}
 
     .sidebar.show {
       display: flex;
@@ -233,10 +233,13 @@
     const userInput = document.getElementById('userInput');
     const typingDiv = document.getElementById('typing');
 
-    // মেনু টগল করা
-    hamburgerBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
-    });
+    // যদি সাইডবার ওপেন হয়, তাহলে মেনুর অবস্থান সামান্য নিচে সরান
+  if (sidebar.classList.contains('show')) {
+    document.getElementById('hamburgerBtn').style.top = "15px";
+  } else {
+    document.getElementById('hamburgerBtn').style.top = "10px";
+  }
+});
 
     // নতুন চ্যাট তৈরি করা
     newChatBtn.addEventListener('click', () => {
