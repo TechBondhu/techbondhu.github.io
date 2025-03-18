@@ -70,19 +70,25 @@
       overflow-y: auto;
     }
 
-    #sendBtn, #uploadBtn {
-      padding: 12px 20px;
-      background-color: #000000;
-      color: #ffffff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+   #sendBtn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
 
-    #sendBtn:hover, #uploadBtn:hover {
-      background-color: #0e8a65;
-    }
+#sendBtn:hover {
+  background-color: #1a1a1a;
+}
 
     .user-message {
       background-color: #e0e0e0;
