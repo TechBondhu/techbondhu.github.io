@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chat Bot</title>
   <style>
     * {
@@ -45,10 +45,10 @@
       padding: 10px;
       background-color: #ffffff;
       display: flex;
-      align-items: center;
       gap: 10px;
       position: sticky;
       bottom: 0;
+      flex-wrap: wrap;
     }
 
     #userInput {
@@ -58,42 +58,6 @@
       background-color: #ffffff;
       color: #000000;
       border: 1px solid #ccc;
-      border-radius: 20px;
-      padding-left: 40px;
-    }
-
-    .upload-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-    }
-
-    .upload-icon input {
-      display: none;
-    }
-
-    #sendBtn {
-      padding: 10px 15px;
-      background-color: #000000;
-      color: #ffffff;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #sendBtn:hover {
-      background-color: #0e8a65;
-    }
-
-    #sendBtn::before {
-      content: '\u27A4';
-      font-size: 20px;
     }
 
     .chat-box {
@@ -105,10 +69,18 @@
       overflow-y: auto;
     }
 
-    .message {
-      max-width: 70%;
-      padding: 10px;
-      border-radius: 10px;
+    #sendBtn, #uploadBtn {
+      padding: 12px 20px;
+      background-color: #000000;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #sendBtn:hover, #uploadBtn:hover {
+      background-color: #0e8a65;
     }
 
     .user-message {
@@ -125,9 +97,38 @@
       text-align: left;
     }
 
-    .image-preview {
+    .typing {
+      align-self: flex-start;
+      font-style: italic;
+      color: #999;
+      order: 1;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .image-message {
       max-width: 200px;
       border-radius: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .input-area {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      #userInput, #sendBtn, #uploadBtn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -135,68 +136,113 @@
   <div class="chat-container">
     <div class="chat-box">
       <div class="messages" id="messages"></div>
+      <div class="typing" id="typing"></div>
     </div>
     <div class="input-area">
-      <label class="upload-icon">
-        📎
-        <input type="file" id="imageUpload" accept="image/*">
-      </label>
       <input type="text" id="userInput" placeholder="Type your message...">
-      <button id="sendBtn"></button>
+      <input type="file" id="imageInput" accept="image/*" style="display:none;">
+      <button id="sendBtn">Send</button>
+      <button id="uploadBtn">+</button>
     </div>
   </div>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const sendBtn = document.getElementById('sendBtn');
-    const userInput = document.getElementById('userInput');
-    const messagesDiv = document.getElementById('messages');
-    const imageUpload = document.getElementById('imageUpload');
-    let uploadedImage = null;
 
-    function addMessage(content, isUser, isImage = false) {
-      const messageDiv = document.createElement('div');
-      messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-      
-      if (isImage) {
-        const img = document.createElement('img');
-        img.src = content;
-        img.classList.add('image-preview');
-        messageDiv.appendChild(img);
-      } else {
-        messageDiv.innerText = content;
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sendBtn = document.getElementById('sendBtn');
+      const userInput = document.getElementById('userInput');
+      const messagesDiv = document.getElementById('messages');
+      const typingDiv = document.getElementById('typing');
+      const imageInput = document.getElementById('imageInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+
+      // শুরুতে বটের মেসেজ
+      setTimeout(() => {
+        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
+      }, 500);
+
+      setTimeout(() => {
+        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
+      }, 2000);
+
+      function addMessage(content, isUser, isImage = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+
+        if (isImage) {
+          const img = document.createElement('img');
+          img.src = content;
+          img.classList.add('image-message');
+          messageDiv.appendChild(img);
+        } else {
+          messageDiv.innerText = content;
+        }
+
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      messagesDiv.appendChild(messageDiv);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
+      function showTypingEffect() {
+        typingDiv.innerText = 'Bot is typing...';
+        messagesDiv.appendChild(typingDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    function sendMessage() {
-      const userMessage = userInput.value.trim();
-      if (userMessage || uploadedImage) {
-        if (userMessage) addMessage(userMessage, true);
-        if (uploadedImage) addMessage(uploadedImage, true, true);
-        userInput.value = '';
-        uploadedImage = null;
-        imageUpload.value = '';
+        setTimeout(() => {
+          typingDiv.innerText = '';
+        }, 1500);
       }
-    }
 
-    imageUpload.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          uploadedImage = e.target.result;
-        };
-        reader.readAsDataURL(file);
+      function getBotResponse(userMessage) {
+        const responses = [
+          'আমি আপনার জন্য কি করতে পারি?',
+          'আমি একটি চ্যাটবট।',
+          'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
+          'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
       }
+
+      function sendMessage() {
+        const userMessage = userInput.value.trim();
+        if (userMessage) {
+          addMessage(userMessage, true);
+          userInput.value = '';
+          showTypingEffect();
+
+          setTimeout(() => {
+            const botResponse = getBotResponse(userMessage);
+            addMessage(botResponse, false);
+          }, 2000);
+        }
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+
+      uploadBtn.addEventListener('click', () => {
+        imageInput.click();
+      });
+
+      imageInput.addEventListener('change', () => {
+        const file = imageInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const imageUrl = reader.result;
+            addMessage(imageUrl, true, true); // user image
+            showTypingEffect();
+            setTimeout(() => {
+              addMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', false);
+            }, 2000);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     });
-
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-  });
-</script>
+  </script>
 </body>
 </html>
