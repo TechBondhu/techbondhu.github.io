@@ -13,6 +13,7 @@
 
     body {
       font-family: "Poppins", sans-serif;
+      font-weight: bold;
       background-color: #343541;
       color: white;
       display: flex;
@@ -38,9 +39,8 @@
       gap: 10px;
       padding: 10px;
       overflow-y: auto;
-      flex-grow: 1;
     }
-    
+
     .input-area {
       padding: 10px;
       background-color: #ffffff;
@@ -55,28 +55,54 @@
       flex-grow: 1;
       padding: 12px;
       font-size: 16px;
+      background-color: #ffffff;
+      color: #000000;
       border: 1px solid #ccc;
-    }
-    
-    #sendBtn, #uploadBtn {
-      padding: 12px 16px;
-      background-color: #000000;
-      color: #ffffff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #sendBtn:hover, #uploadBtn:hover {
-      background-color: #0e8a65;
+      border-radius: 20px;
+      padding-left: 40px;
     }
 
     .upload-icon {
-      background: none;
-      border: none;
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
       cursor: pointer;
+    }
+
+    .upload-icon input {
+      display: none;
+    }
+
+    #sendBtn {
+      padding: 10px 15px;
+      background-color: #000000;
+      color: #ffffff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #sendBtn:hover {
+      background-color: #0e8a65;
+    }
+
+    #sendBtn::before {
+      content: '\u27A4';
       font-size: 20px;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 15px;
+      overflow-y: auto;
     }
 
     .message {
@@ -100,33 +126,37 @@
     }
 
     .image-preview {
-      max-width: 150px;
-      max-height: 150px;
+      max-width: 200px;
       border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <div class="messages" id="messages"></div>
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
+    </div>
     <div class="input-area">
-      <button class="upload-icon" onclick="document.getElementById('imageInput').click()">➕</button>
-      <input type="file" id="imageInput" accept="image/*" style="display: none;">
+      <label class="upload-icon">
+        📎
+        <input type="file" id="imageUpload" accept="image/*">
+      </label>
       <input type="text" id="userInput" placeholder="Type your message...">
-      <button id="sendBtn">Send</button>
+      <button id="sendBtn"></button>
     </div>
   </div>
-
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
     const messagesDiv = document.getElementById('messages');
-    const imageInput = document.getElementById('imageInput');
+    const imageUpload = document.getElementById('imageUpload');
+    let uploadedImage = null;
 
     function addMessage(content, isUser, isImage = false) {
       const messageDiv = document.createElement('div');
       messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+      
       if (isImage) {
         const img = document.createElement('img');
         img.src = content;
@@ -135,31 +165,36 @@
       } else {
         messageDiv.innerText = content;
       }
+
       messagesDiv.appendChild(messageDiv);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     function sendMessage() {
       const userMessage = userInput.value.trim();
-      if (userMessage) {
-        addMessage(userMessage, true);
+      if (userMessage || uploadedImage) {
+        if (userMessage) addMessage(userMessage, true);
+        if (uploadedImage) addMessage(uploadedImage, true, true);
         userInput.value = '';
-        setTimeout(() => addMessage('আমি আপনার জন্য কি করতে পারি?', false), 1000);
+        uploadedImage = null;
+        imageUpload.value = '';
       }
     }
+
+    imageUpload.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedImage = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
-    });
-
-    imageInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => addMessage(e.target.result, true, true);
-        reader.readAsDataURL(file);
-      }
     });
   });
 </script>
