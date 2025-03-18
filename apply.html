@@ -198,14 +198,11 @@
   <!-- হ্যামবার্গার বাটন -->
   <button id="hamburgerBtn">☰</button>
 
-  <!-- হ্যামবার্গার মেনু -->
-<div class="sidebar">
-  <div class="hamburger-menu" id="hamburgerBtn">☰ Menu</div>
-  <div class="new-chat-list">
+  <!-- সাইডবার -->
+  <div id="sidebar">
     <button id="newChatBtn">➕ নতুন চ্যাট</button>
     <div id="chatList"></div>
   </div>
-</div>
 
   <!-- চ্যাটবক্স -->
   <div class="chat-container">
@@ -233,15 +230,16 @@
     const userInput = document.getElementById('userInput');
     const typingDiv = document.getElementById('typing');
     
-    hamburgerBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('show');
+  / মেনু টগল করা (এখন সঠিকভাবে কাজ করবে)
+      hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
 
-  // যদি সাইডবার ওপেন হয়, তাহলে মেনুর অবস্থান সামান্য নিচে সরান
-  if (sidebar.classList.contains('show')) {
-    hamburgerBtn.style.top = "15px";
-  } else {
-    hamburgerBtn.style.top = "10px";
-  }
+        // সাইডবার ওপেন হলে বাটন নিচে নামাবে
+        if (sidebar.classList.contains('show')) {
+          hamburgerBtn.style.top = "15px";
+        } else {
+          hamburgerBtn.style.top = "10px";
+        }
 });
 
 
