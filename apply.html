@@ -233,6 +233,10 @@
     const userInput = document.getElementById('userInput');
     const typingDiv = document.getElementById('typing');
 
+  // মেনু টগল করা
+    hamburgerBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('show');
+    });
     // যদি সাইডবার ওপেন হয়, তাহলে মেনুর অবস্থান সামান্য নিচে সরান
   if (sidebar.classList.contains('show')) {
     document.getElementById('hamburgerBtn').style.top = "15px";
