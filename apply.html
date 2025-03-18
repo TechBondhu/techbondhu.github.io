@@ -82,19 +82,36 @@
       border-radius: 10px;
     }
 
-    .user-message {
-      background-color: #d1e7dd;
-      color: #000000;
-      align-self: flex-end;
-      text-align: right;
-    }
+    /* ইউজারের মেসেজ (ডান পাশে থাকবে) */
+.user-message {
+  background-color: #d1e7dd; /* হালকা সবুজ */
+  color: #000000; /* কালো টেক্সট */
+  align-self: flex-end; /* ডান পাশে রাখবে */
+  text-align: right;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
 
-    .bot-message {
-      background-color: #fff;
-      color: #000000;
-      align-self: flex-start;
-      text-align: left;
-    }
+/* বটের মেসেজ (বাম পাশে থাকবে) */
+.bot-message {
+  background-color: #ffffff; /* সাদা */
+  color: #000000; /* কালো টেক্সট */
+  align-self: flex-start; /* বাম পাশে রাখবে */
+  text-align: left;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+/* মেসেজ গ্যাপ ঠিক করা */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* মেসেজের মাঝে জায়গা রাখবে */
+  padding: 10px;
+  overflow-y: auto;
+}
 
     .typing {
       align-self: flex-start;
@@ -269,6 +286,19 @@
       // টাইপিং ইফেক্ট দেখানো
       showTypingEffect();
     }
+// অটো-স্ক্রল ফাংশন
+function scrollToBottom() {
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// মেসেজ যোগ করার ফাংশন (আপডেটেড)
+function addMessage(message, isUser) {
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+  messageDiv.innerText = message;
+  messagesDiv.appendChild(messageDiv);
+  scrollToBottom(); // প্রতিবার নতুন মেসেজ আসলে স্ক্রল নিচে যাবে
+}
 
     // মেসেজ যোগ করা
     function addMessage(message, isUser) {
