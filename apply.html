@@ -11,213 +11,157 @@
       box-sizing: border-box;
     }
 
-  /* সুন্দর ব্যাকগ্রাউন্ড এবং ফন্ট */
-body {
-  font-family: "Poppins", sans-serif; /* সুন্দর ফন্ট */
-  font-weight: bold; /* বোল্ড ফন্ট */
-  background-color: #343541; /* ChatGPT-এর মতো ডার্ক ব্যাকগ্রাউন্ড */
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #343541;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-/* চ্যাটবক্স ডিজাইন */
-.chat-container {
-  width: 100vw;
-  height: 100vh;
-  background-color: #ffffff; /* সাদা রঙ */  
-  color: #000000; /* টেক্সট কালো */
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+    .chat-container {
+      width: 100vw;
+      height: 100vh;
+      background-color: #ffffff;
+      color: #000000;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-/* মেসেজ কন্টেইনার (উপর থেকে নিচে আসবে) */
-.messages {
-  display: flex;
-  flex-direction: column; /* নতুন মেসেজ উপরে থাকবে, ক্রমশ নিচে যাবে */
-  gap: 10px;
-  padding: 10px;
-  overflow-y: auto;
-}
+    .messages {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
     
-/* ইনপুট এরিয়া সবসময় নিচে থাকবে */
-.input-area {
-  padding: 10px;
-  background-color: #ffffff; /* সাদা ব্যাকগ্রাউন্ড */
-  display: flex;
-  gap: 10px;
-  position: sticky;
-  bottom: 0;
-}
+    .input-area {
+      padding: 10px;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      bottom: 0;
+    }
 
-#userInput {
-  flex-grow: 1;
-  padding: 12px;
-  font-size: 16px;
-  background-color: #ffffff; /* সাদা */
-  color: #000000; /* কালো টেক্সট */
-  border: 1px solid #ccc; /* হালকা বর্ডার */
-}
-    /* চ্যাটবক্স (পুরো জায়গা নেবে) */
-.chat-box {
-  flex-grow: 1; /* বাকিটা জায়গা নিয়ে নেবে */
-  padding: 20px;
-  display: flex;
-  flex-direction: column-reverse; /* নতুন মেসেজ নিচে যাবে */
-  gap: 15px;
-  overflow-y: auto;
-}
+    #userInput {
+      flex-grow: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+    }
+    
+    #sendBtn, #uploadBtn {
+      padding: 12px 16px;
+      background-color: #000000;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-#sendBtn {
-  padding: 12px 20px;
-   background-color: #000000; /* কালো */
-  color: #ffffff; /* সাদা টেক্সট */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
+    #sendBtn:hover, #uploadBtn:hover {
+      background-color: #0e8a65;
+    }
 
-#sendBtn:hover {
-  background-color: #0e8a65;
-}
-/* ইউজারের মেসেজ (ডান পাশে থাকবে) */
-.user-message {
-  background-color: #e0e0e0; /* হালকা গ্রে */
-  color: #000000; /* কালো টেক্সট */
-  align-self: flex-end; /* ডান পাশে রাখবে */
-  text-align: right;
-}
+    .upload-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
 
-/* বটের মেসেজ (বাম পাশে থাকবে) */
-.bot-message {
-  background-color: #f1f1f1; /* হালকা ধূসর */
-  color: #000000; /* কালো টেক্সট */
-  align-self: flex-start; /* বাম পাশে রাখবে */
-  text-align: left;
-}
-/* টাইপিং ইফেক্ট নিচে রাখবে */
-.typing {
-  align-self: flex-start;
-  font-style: italic;
-  color: #999;
-  order: 1; /* সবসময় নিচে থাকবে */
-}
-.message {
- max-width: 70%;
- padding: 10px;
- border-radius: 10px;
-}
-    /* মোবাইলের জন্য রেসপনসিভ ডিজাইন */
-@media (max-width: 600px) {
-  .chat-container {
-    width: 100vw;
-    height: 100vh;
-  }
-  
-  .input-area {
-    flex-direction: column;
-    align-items: stretch;
-  }
+    .message {
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 10px;
+    }
 
-  #userInput {
-    width: 100%;
-  }
+    .user-message {
+      background-color: #e0e0e0;
+      color: #000000;
+      align-self: flex-end;
+      text-align: right;
+    }
 
-  #sendBtn {
-    width: 100%;
-  }
+    .bot-message {
+      background-color: #f1f1f1;
+      color: #000000;
+      align-self: flex-start;
+      text-align: left;
+    }
+
+    .image-preview {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-box">
-      <div class="messages" id="messages"></div>
-      <div class="typing" id="typing"></div>
-    </div>
+    <div class="messages" id="messages"></div>
     <div class="input-area">
+      <button class="upload-icon" onclick="document.getElementById('imageInput').click()">➕</button>
+      <input type="file" id="imageInput" accept="image/*" style="display: none;">
       <input type="text" id="userInput" placeholder="Type your message...">
       <button id="sendBtn">Send</button>
     </div>
   </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
     const messagesDiv = document.getElementById('messages');
-    const typingDiv = document.getElementById('typing');
+    const imageInput = document.getElementById('imageInput');
 
-    // চ্যাটবট শুরুতেই স্বাগতম জানাবে
-    setTimeout(() => {
-        typeMessage("🤖 স্বাগতম! কিভাবে সাহায্য করতে পারি?", false);
-    }, 500);
-
-    // দ্বিতীয় মেসেজ দেখাবে
-    setTimeout(() => {
-        typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
-    }, 2000);
-
-      // Function to add a message
-      function addMessage(message, isUser) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-        messageDiv.innerText = message;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    function addMessage(content, isUser, isImage = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+      if (isImage) {
+        const img = document.createElement('img');
+        img.src = content;
+        img.classList.add('image-preview');
+        messageDiv.appendChild(img);
+      } else {
+        messageDiv.innerText = content;
       }
-
-     // টাইপিং ইফেক্ট দেখানোর ফাংশন (এটি সবসময় নিচে রাখবে)
-function showTypingEffect() {
-  typingDiv.innerText = 'Bot is typing...';
-
-  // মেসেজের শেষে টাইপিং লেখা যোগ করবে
-  messagesDiv.appendChild(typingDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight; // অটো-স্ক্রল
-
-  setTimeout(() => {
-    typingDiv.innerText = ''; // 1.5 সেকেন্ড পর মুছে যাবে
-  }, 1500);
-}
-       // বটের রেসপন্স
-    function getBotResponse(userMessage) {
-        const responses = [
-            'আমি আপনার জন্য কি করতে পারি?',
-            'আমি একটি চ্যাটবট।',
-            'আপনার প্রশ্ন বলুন, আমি সাহায্য করবো।',
-            'দুঃখিত, বুঝতে পারিনি। আরেকবার বলুন।'
-        ];
-        return responses[Math.floor(Math.random() * responses.length)];
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
-      
-      // Send message function
-      function sendMessage() {
-        const userMessage = userInput.value.trim();
-        if (userMessage) {
-          addMessage(userMessage, true); // Display user's message
-          userInput.value = ''; // Clear the input field
-          showTypingEffect(); // Show typing effect
 
-          setTimeout(() => {
-            const botResponse = getBotResponse(userMessage); // Get bot's response
-            addMessage(botResponse, false); // Display bot's message
-          }, 2000); // Wait 2 seconds before bot's reply
-        }
+    function sendMessage() {
+      const userMessage = userInput.value.trim();
+      if (userMessage) {
+        addMessage(userMessage, true);
+        userInput.value = '';
+        setTimeout(() => addMessage('আমি আপনার জন্য কি করতে পারি?', false), 1000);
       }
+    }
 
-      // Event listener for Send button click
-      sendBtn.addEventListener('click', sendMessage);
-
-      // Event listener for Enter key press
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendMessage();
-        }
-      });
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
     });
-  </script>
+
+    imageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => addMessage(e.target.result, true, true);
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
 </body>
 </html>
