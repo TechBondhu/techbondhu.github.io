@@ -358,11 +358,14 @@ imageInput.addEventListener('change', () => {
     reader.readAsDataURL(file);
   }
 });
-        userInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendMessage();
-    }
-});
+        
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault(); // 🔥 Fix: Prevent default form submission
+          sendMessage();
+        }
+      });
+      
 function openModal(imageSrc) {
   const modal = document.getElementById("imageModal");
   const modalImg = document.getElementById("modalImg");
