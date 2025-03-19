@@ -151,7 +151,7 @@
   cursor: pointer;
 }
     .upload-icon {
-  width: 40px; /* বড় করা */
+ width: 40px; /* বড় করা */
   height: 40px; /* বড় করা */
   font-size: 20px; /* ভিতরের + সিম্বল ঠিক রাখা */
   display: flex;
@@ -160,6 +160,22 @@
   border-radius: 50%;
   background-color: black;
   color: white;
+  cursor: pointer;
+  position: relative;
+}
+    /* ড্রপ করা ফাইলের প্রিভিউ */
+.file-preview {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.file-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
   cursor: pointer;
 }
   @media (max-width: 600px) {
@@ -197,6 +213,15 @@
   <span class="close" onclick="closeModal()">&times;</span>
   <img class="modal-content" id="modalImg">
 </div>
+    <div class="input-area">
+    <div class="upload-container" id="dropZone">
+        <span class="upload-icon">+</span>
+        <input type="file" id="fileInput" multiple hidden>
+    </div>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendBtn">⬆</button>
+</div>
+
   </div>
 
   <script>
@@ -207,6 +232,9 @@
       const typingDiv = document.getElementById('typing');
       const imageInput = document.getElementById('imageInput');
       const uploadBtn = document.getElementById('uploadBtn');
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+     
 
       // শুরুতে বটের মেসেজ
       setTimeout(() => {
@@ -326,6 +354,58 @@ function addImageMessage(imageSrc) {
   messagesDiv.appendChild(messageDiv);
   messagesDiv.scrollTop = messagesDiv.scrollHeight; // স্ক্রল নিচে যাবে
 }
+ // ড্রপ জোনে ক্লিক করলে ফাইল আপলোড অপশন খুলবে
+    dropZone.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    // ড্রাগ করা হলে ব্যাকগ্রাউন্ড কালার চেঞ্জ হবে
+    dropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    // ড্রাগ ছাড়া হলে কালার আগের মতো হবে
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    // ড্রপ করা হলে ফাইল প্রসেস করবে
+    dropZone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        dropZone.classList.remove("dragover");
+
+        const files = event.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    // ম্যানুয়ালি ফাইল সিলেক্ট করলে
+    fileInput.addEventListener("change", (event) => {
+        handleFiles(event.target.files);
+    });
+
+    function handleFiles(files) {
+        for (const file of files) {
+            if (file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = document.createElement("img");
+                    img.src = event.target.result;
+                    img.classList.add("file-preview");
+
+                    // ক্লিক করলে ইমেজ বড় হবে
+                    img.addEventListener("click", () => {
+                        window.open(img.src);
+                    });
+
+                    messagesDiv.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
+            }
+        }
+    }
       });
     });
   </script>
