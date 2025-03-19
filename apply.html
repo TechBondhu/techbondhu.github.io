@@ -13,7 +13,7 @@
     }
 
     body {
-      font-family: "Segoe UI",  
+      font-family: "Segoe UI";
       font-weight: bold;
       background-color: #343541;
       color: white;
@@ -101,7 +101,7 @@
       flex-grow: 1;
       padding: 20px;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       gap: 15px;
       overflow-y: auto;
     }
@@ -286,26 +286,23 @@
       }, 2000);
 
     function addMessage(content, isUser, isImage = false) {
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
 
-    if (isImage) {
-        const img = document.createElement('img');
-        img.src = content;
-        img.classList.add('image-message');
-        messageDiv.appendChild(img);
-    } else {
-        messageDiv.innerText = content;
-    }
+        if (isImage) {
+          const img = document.createElement('img');
+          img.src = content;
+          img.classList.add('image-message');
+          messageDiv.appendChild(img);
+        } else {
+          messageDiv.innerText = content;
+        }
 
-    messagesDiv.appendChild(messageDiv);
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
 
-    // 🔥 স্ক্রলিং ঠিক করতে নিচের কোড যোগ করো
-    setTimeout(() => {
-        messageDiv.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-}
- function showTypingEffect() {
+      function showTypingEffect() {
         typingDiv.innerText = 'Bot is typing...';
         messagesDiv.appendChild(typingDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -314,8 +311,7 @@
         setTimeout(() => {
           typingDiv.innerText = '';
         }, 1500);
-      } 
-
+      }
       function getBotResponse(userMessage) {
         const responses = [
           'আমি আপনার জন্য কি করতে পারি?',
