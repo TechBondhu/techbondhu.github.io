@@ -386,9 +386,9 @@ function openModal(imageSrc) {
   modalImg.src = imageSrc;
 }
 
-// মডাল বন্ধ করার ফাংশন
 function closeModal() {
-  document.getElementById("imageModal").style.display = "none";
+    const modal = document.getElementById("imageModal");
+    modal.style.display = "none";
 }
 
 // চ্যাটবক্সে ইমেজ যুক্ত করা এবং ক্লিক ইভেন্ট যোগ করা
