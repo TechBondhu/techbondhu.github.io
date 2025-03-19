@@ -264,33 +264,45 @@
         typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
       }, 2000);
 
-      function addMessage(content, isUser, isImage = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+    function addMessage(content, isImage, isBot = false) {
+    let messageDiv = document.createElement("div");
+    messageDiv.classList.add("message");
 
-        if (isImage) {
-          const img = document.createElement('img');
-          img.src = content;
-          img.classList.add('image-message');
-          messageDiv.appendChild(img);
-        } else {
-          messageDiv.innerText = content;
-        }
+    if (isBot) {
+        messageDiv.classList.add("bot-message"); // বটের মেসেজ আলাদা ডিজাইন হবে
+    }
 
-        messagesDiv.appendChild(messageDiv);
+    if (isImage) {
+        const img = document.createElement("img");
+        img.src = content;
+        img.classList.add("image-message");
+        messageDiv.appendChild(img);
+    } else {
+        messageDiv.innerText = content;
+    }
+
+    messagesDiv.appendChild(messageDiv);
+
+    // নতুন মেসেজ যোগ হলে স্ক্রল স্বয়ংক্রিয়ভাবে নিচে নামবে
+    setTimeout(() => {
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
+    }, 100);
+}
 
-      function showTypingEffect() {
-        typingDiv.innerText = 'Bot is typing...';
-        messagesDiv.appendChild(typingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+function showTypingEffect() {
+    let typingDiv = document.createElement("div");
+    typingDiv.innerText = "Bot is typing...";
+    typingDiv.classList.add("typing-message");
 
+    messagesDiv.appendChild(typingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        setTimeout(() => {
-          typingDiv.innerText = '';
-        }, 1500);
-      }
+    setTimeout(() => {
+        messagesDiv.removeChild(typingDiv);
+        addMessage("Hello! How can I help you?", false, true); // বটের মেসেজ দেখাও
+    }, 1500);
+}
+
 
       function getBotResponse(userMessage) {
         const responses = [
