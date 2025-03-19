@@ -285,33 +285,23 @@
         typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
       }, 2000);
 
-    function addMessage(content, isUser, isImage = false) {
+    function addMessage(content, isUser) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-
-        if (isImage) {
-          const img = document.createElement('img');
-          img.src = content;
-          img.classList.add('image-message');
-          messageDiv.appendChild(img);
-        } else {
-          messageDiv.innerText = content;
-        }
-
+        messageDiv.innerText = content;
         messagesDiv.appendChild(messageDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
+    }
 
-      function showTypingEffect() {
+    function showTypingEffect() {
         typingDiv.innerText = 'Bot is typing...';
         messagesDiv.appendChild(typingDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-
         setTimeout(() => {
-          typingDiv.innerText = '';
+            typingDiv.innerText = '';
         }, 1500);
-      }
+    }
+      
       function getBotResponse(userMessage) {
         const responses = [
           'আমি আপনার জন্য কি করতে পারি?',
