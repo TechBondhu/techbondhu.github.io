@@ -33,6 +33,22 @@
       flex-direction: column;
       overflow: hidden;
     }
+    .header {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: left;
+      border-bottom: 2px solid #ddd;
+    }
+    .logo {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.8rem;
+    color: #fff;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
 
     .messages {
       display: flex;
@@ -224,7 +240,10 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-box">
+   <div class="header">Formbondhu</div>
+    <h1 class="logo">Formbondhu</h1>
+</header>
+  <div class="chat-box">
       <div class="messages" id="messages"></div>
       <div class="typing" id="typing"></div>
     </div>
@@ -377,6 +396,13 @@ function addImageMessage(imageSrc) {
   messagesDiv.appendChild(messageDiv);
   messagesDiv.scrollTop = messagesDiv.scrollHeight; // স্ক্রল নিচে যাবে
 }
+   document.querySelector('.logo').addEventListener('mouseover', () => {
+  document.querySelector('.logo').style.color = '#FFD700';
+  });
+
+  document.querySelector('.logo').addEventListener('mouseout', () => {
+   document.querySelector('.logo').style.color = '#fff';
+      });
  // ড্রপ জোনে ক্লিক করলে ফাইল আপলোড অপশন খুলবে
     dropZone.addEventListener("click", () => {
         fileInput.click();
