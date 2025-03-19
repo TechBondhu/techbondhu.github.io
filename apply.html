@@ -42,16 +42,31 @@
       overflow-y: auto;
     }
 
-    .input-area {
-      padding: 5px;
-      height: 50px
-      background-color: #ffffff;
-      display: flex;
-      gap: 10px;
-      position: sticky;
-      bottom: 0;
-      flex-wrap: wrap;
-    }
+   .input-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: #fff;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 700px;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ইনপুট ফিল্ড */
+.input-area input {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 20px;
+  outline: none;
+  font-size: 16px;
+}
 
     #userInput {
       flex-grow: 1;
@@ -151,8 +166,8 @@
   cursor: pointer;
 }
     .upload-icon {
- width: 40px; /* বড় করা */
-  height: 40px; /* বড় করা */
+ width: 45px; /* বড় করা */
+  height: 45px; /* বড় করা */
   font-size: 20px; /* ভিতরের + সিম্বল ঠিক রাখা */
   display: flex;
   justify-content: center;
@@ -163,6 +178,7 @@
   cursor: pointer;
   position: relative;
 }
+
     /* ড্রপ করা ফাইলের প্রিভিউ */
 .file-preview {
   margin-top: 10px;
