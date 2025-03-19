@@ -255,27 +255,36 @@
         typeMessage("📌 এখন কি আপনি আবেদন করতে চান?", false);
       }, 2000);
 
-      function addMessage(content, isUser, isImage = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-
-        if (isImage) {
-          const img = document.createElement('img');
-          img.src = content;
-          img.classList.add('image-message');
-          messageDiv.appendChild(img);
-        } else {
-          messageDiv.innerText = content;
-        }
-
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-
       function showTypingEffect() {
-        typingDiv.innerText = 'Bot is typing...';
-        messagesDiv.appendChild(typingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    let typingDiv = document.createElement("div");
+    typingDiv.innerText = "Bot is typing...";
+    typingDiv.classList.add("typing-message");
+
+    messagesDiv.appendChild(typingDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight; // স্ক্রল নিচে নামাও
+
+    setTimeout(() => {
+        messagesDiv.removeChild(typingDiv); // টাইপিং ইফেক্ট রিমুভ করো
+        addMessage("Hello! How can I help you?", false); // বটের উত্তর দেখাও
+    }, 1500);
+}
+
+function addMessage(content, isImage) {
+    let messageDiv = document.createElement("div");
+    messageDiv.classList.add("message");
+
+    if (isImage) {
+        const img = document.createElement("img");
+        img.src = content;
+        img.classList.add("image-message");
+        messageDiv.appendChild(img);
+    } else {
+        messageDiv.innerText = content;
+    }
+
+    messagesDiv.appendChild(messageDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight; // নতুন মেসেজ দেখানোর পর স্ক্রল নিচে নামবে
+}
 
         setTimeout(() => {
           typingDiv.innerText = '';
