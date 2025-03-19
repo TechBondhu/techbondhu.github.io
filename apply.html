@@ -246,28 +246,35 @@
   </style>
 </head>
 <body>
-  <div class="chat-container">
- <header>
-   <div class="header">Formbondhu</div>
- </header>
-  <div class="chat-box">
+  <<div class="chat-container">
+    <header>
+      <div class="header">Formbondhu</div>
+    </header>
+
+    <div class="chat-box">
       <div class="messages" id="messages"></div>
       <div class="typing" id="typing"></div>
     </div>
+
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message...">
+      <!-- শুধুমাত্র একটি ফাইল ইনপুট রাখা হয়েছে -->
       <input type="file" id="imageInput" accept="image/*" style="display:none;">
+      
       <button id="sendBtn">
-      <i class="fas fa-arrow-up"></i>
-    </button>
+        <i class="fas fa-arrow-up"></i>
+      </button>
       <button id="uploadBtn">+</button>
     </div>
+
+    <!-- ইমেজ প্রিভিউ মোডাল -->
     <div id="imageModal" class="modal">
-  <span class="close" onclick="closeModal()">&times;</span>
-  <img class="modal-content" id="modalImg">
-</div>
-  <div id="dropZone">ড্র্যাগ করে এখানে ছবি দিন অথবা ক্লিক করুন</div>
-<input type="file" id="imageInput" style="display: none;" />
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img class="modal-content" id="modalImg">
+    </div>
+
+    <!-- ড্র্যাগ-ড্রপ এরিয়া -->
+    <div id="dropZone">ড্র্যাগ করে এখানে ছবি দিন অথবা ক্লিক করুন</div>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
