@@ -452,6 +452,23 @@ function addImageMessage(imageSrc) {
             } else {
                 alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
              }  
+          async function sendMessage(message) {
+    const response = await fetch("http://localhost:5005/webhooks/rest/webhook", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: message })
+    });
+    const data = await response.json();
+    console.log("Bot Response:", data);
+    
+    // চ্যাটবটের UI-তে মেসেজ দেখানোর জন্য
+    let chatBox = document.getElementById("chat-box");
+    let botMessage = document.createElement("p");
+    botMessage.innerText = "Bot: " + (data.length > 0 ? data[0].text : "No response");
+    chatBox.appendChild(botMessage);
+              }
            }
         }
     }); 
