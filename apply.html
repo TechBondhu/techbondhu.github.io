@@ -268,7 +268,9 @@
 </div>
   <div id="dropZone"> </div>
 <input type="file" id="imageInput" style="display: none;" />
-
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+  <script>
+     const socket = io("http://localhost:5000"); // সার্ভার URL, যেখানে আপনার service.js চলছে
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const sendBtn = document.getElementById('sendBtn');
@@ -297,30 +299,7 @@ sendBtn.addEventListener('click', sendMessage);
 
             typingDiv.innerText = "Bot is typing...";
 
-            // 🔥 Rasa API-তে পাঠানোর জন্য fetch() ব্যবহার
-            fetch("http://localhost:5005/webhooks/rest/webhook", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ "sender": "user", "message": userMessage })
-            })
-            .then(response => response.json())
-            .then(data => {
-                typingDiv.innerText = "";
-                if (data.length > 0) {
-                    displayMessage(data[0].text, 'bot');
-                } else {
-                    displayMessage("No response from bot.", 'bot');
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                typingDiv.innerText = "";
-                displayMessage("Bot connection failed!", 'bot');
-            });
-        }
-
+        
         function displayMessage(message, sender) {
             let messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
