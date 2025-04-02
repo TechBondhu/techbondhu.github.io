@@ -290,16 +290,27 @@ sendBtn.addEventListener('click', sendMessage);
             }
         });
 
-        function sendMessage() {
-            let userMessage = userInput.value.trim();
-            if (userMessage === '') return;
+              function sendMessageToServer() {
+            const message = inputBox.value;
+            if (message.trim()) {
+                // ইউজার মেসেজ দেখানো
+                chatbox.innerHTML += `<div class="message user">${message}</div>`;
+                inputBox.value = ""; // ইনপুট ফিল্ড পরিষ্কার করা
+
+                // সার্ভারে মেসেজ পাঠানো
+                socket.emit("clientMessage", message);
 
             displayMessage(userMessage, 'user');
             userInput.value = '';
 
             typingDiv.innerText = "Bot is typing...";
 
-        
+           // সার্ভার থেকে রেসপন্স পাওয়ার পর সেটি UI-তে দেখানো
+        socket.on("serverMessage", (message) => {
+            // চ্যাটবটের উত্তর দেখানো
+            chatbox.innerHTML += `<div class="message bot">${message}</div>`;
+            chatbox.scrollTop = chatbox.scrollHeight; // স্ক্রল শেষে নিয়ে আসা
+              
         function displayMessage(message, sender) {
             let messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
