@@ -249,35 +249,32 @@
       }
    }
     </style>
-</head>
 <body>
-    <div class="chat-container">
-        <header>
-            <div class="header">Formbondhu</div>
-        </header>
-        <div class="chat-box">
-            <div class="messages" id="messages"></div>
-            <div class="typing" id="typing"></div>
-        </div>
-        <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type your message...">
-            <button id="sendBtn">
-                <i class="fas fa-arrow-up"></i> Send
-            </button>
-            <button id="uploadBtn">+</button>
-        </div>
-        <div id="imageModal" class="modal">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <img class="modal-content" id="modalImg">
-        </div>
-        <div id="dropZone">Drag and drop images here or click to upload</div>
-        <input type="file" id="imageInput" style="display: none;" />
+  <div class="chat-container">
+    <header>
+      <div class="header">Formbondhu</div>
+    </header>
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
+      <div class="typing" id="typing"></div>
     </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button id="sendBtn">
+        <i class="fas fa-arrow-up"></i> Send
+      </button>
+      <button id="uploadBtn">+</button>
+    </div>
+    <div id="imageModal" class="modal">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <img class="modal-content" id="modalImg">
+    </div>
+    <div id="dropZone">Drag and drop images here or click to upload</div>
+    <input type="file" id="imageInput" style="display: none;" />
+  </div>
 
-   <script>
-    // First Script: Custom Chat UI and Image Upload Handling
-    const socket = io("http://localhost:5000");
-
+  <script>
+    // Custom Chat UI and Image Upload Handling
     document.addEventListener('DOMContentLoaded', () => {
         const sendBtn = document.getElementById('sendBtn');
         const userInput = document.getElementById('userInput');
@@ -303,8 +300,12 @@
 
                 // Typing effect
                 typingDiv.innerText = "Bot is typing...";
-              
-                });
+
+                // Simulate bot response after message
+                setTimeout(() => {
+                    displayMessage('Bot response: ' + message, 'bot');
+                    typingDiv.innerText = ""; // Clear typing effect
+                }, 2000);
             }
         }
 
@@ -401,7 +402,7 @@
         }
     });
 
-    // Second Script: Rasa Webchat Integration
+    // Rasa Webchat Integration
     !(function () {
         let e = document.createElement("script");
         e.setAttribute("src", "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js"),
@@ -422,6 +423,6 @@
             );
         };
     })();
-</script>
-
-
+  </script>
+</body>
+</html>
