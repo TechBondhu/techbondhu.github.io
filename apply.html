@@ -1,429 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chat Bot</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: "Segoe UI";
-      font-weight: bold;
-      background-color: #343541;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .chat-container {
-      width: 100vw;
-      height: 100vh;
-      background-color: #ffffff;
-      color: #000000;
-      border-radius: 0 px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .header {
-      background-color: #ede8ec;
-      color: #666666;
-      padding: 10px 20px;
-      font-size: 24px;
-      font-weight: bold;
-      font-family: "Segoe UI"
-      text-align: left;
-      border-bottom: 2px solid #ddd;
-    }
-    .logo {
-    font-family: 'Arial', sans-serif;
-    font-size: 1.8rem;
-    color: #fff;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-    .messages {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 80%;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      overflow-y: auto;
-    }
-
-   .input-area {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  background: #fff;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-  width: 100%;
-  max-width: 700px;
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* ইনপুট ফিল্ড */
-.input-area input {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 20px;
-  outline: none;
-  font-size: 16px;
-}
-
-    #userInput {
-      flex-grow: 1;
-      padding: 12px;
-      font-size: 16px;
-      background-color: #ffffff;
-      color: #000000;
-      border: 1px solid #ccc;
-    }
-
-    .chat-box {
-      flex-grow: 1;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      overflow-y: auto;
-    }
-
-   #sendBtn {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background-color: #000000;
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
-}
-
-#sendBtn:hover {
-  background-color: #1a1a1a;
-}
-
-  .user-message {
-    background-color: #e0e0e0;   
-    color: #000000;  
-    padding: 10px 15px;   
-    border-radius: 10px;   
-    max-width: 60%;  
-    text-align: right;   
-    margin-left: auto; 
-    margin-right: 10px;   
-    display: block;
-    clear: both;
-}
-
-    .bot-message {
-      background-color: #f1f1f1;
-      color: #000000;
-      align-self: flex-start;
-      text-align: left;
-    }
-
-    .typing {
-      align-self: flex-start;
-      font-style: italic;
-      color: #999;
-      order: 1;
-    }
-
-    .message {
-      max-width: 70%;
-      padding: 10px;
-      border-radius: 0px;
-    }
- #messagesDiv {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    height: 400px;
-    padding: 10px;
-}
-    .image-message {
-      max-width: 200px;
-      border-radius: 10px;
-    }
-        #imageModal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            max-width: 80%;
-            max-height: 80%;
-        }
-
-        .close {
-            color: white;
-            font-size: 30px;
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            cursor: pointer;
-        }
-
-        #dropZone {
-            padding: 20px;
-            border: 2px dashed #ccc;
-            margin-top: 10px;
-            text-align: center;
-            cursor: pointer;
-        }
-   #uploadBtn {
-  width: 45px;  /* সঠিক সাইজ */
-  height: 45px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  background-color: black;
-  color: white;
-  font-size: 20px;
-  position: relative;
-  right: 5px;
-}
-
-    /* ড্রপ করা ফাইলের প্রিভিউ */
-.file-preview {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.file-preview img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 5px;
-  cursor: pointer;
-}
-  @media (max-width: 600px) {
-      .chat-container {
-        width: 100vw;
-        height: 100vh;
-      }
-
-      .input-area {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      #userInput, #sendBtn, #uploadBtn {
-        width: 100%;
-      }
-   }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Rasa Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #chat-container { width: 300px; margin: 20px auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+        #messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        .message { padding: 5px; border-radius: 5px; margin: 5px 0; }
+        .user-message { background: #007bff; color: white; text-align: right; }
+        .bot-message { background: #f1f1f1; text-align: left; }
+        #typing { font-style: italic; color: gray; }
+        #userInput { width: 80%; padding: 5px; }
+        #sendBtn { padding: 5px 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .image-message { max-width: 100px; margin: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-  <div class="chat-container">
-    <header>
-      <div class="header">Formbondhu</div>
-    </header>
-    <div class="chat-box">
-      <div class="messages" id="messages"></div>
-      <div class="typing" id="typing"></div>
+    <h1>Welcome to My Rasa Chatbot</h1>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="typing"></div>
+        <input type="text" id="userInput" placeholder="Type a message..." />
+        <button id="sendBtn">Send</button>
+        <input type="file" id="imageInput" style="display: none;">
+        <button id="uploadBtn">Upload Image</button>
     </div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your message...">
-      <button id="sendBtn">
-        <i class="fas fa-arrow-up"></i>  
-      </button>
-      <button id="uploadBtn">+</button>
-    </div>
-    <div id="imageModal" class="modal">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <img class="modal-content" id="modalImg">
-    </div>
-    <div id="dropZone">Drag and drop images here or click to upload</div>
-    <input type="file" id="imageInput" style="display: none;" />
-  </div>
 
-  <script>
-    // Custom Chat UI and Image Upload Handling
-    document.addEventListener('DOMContentLoaded', () => {
-        const sendBtn = document.getElementById('sendBtn');
-        const userInput = document.getElementById('userInput');
-        const messagesDiv = document.getElementById('messages');
-        const typingDiv = document.getElementById('typing');
-        const imageInput = document.getElementById('imageInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const dropZone = document.getElementById("dropZone");
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sendBtn = document.getElementById('sendBtn');
+            const userInput = document.getElementById('userInput');
+            const messagesDiv = document.getElementById('messages');
+            const typingDiv = document.getElementById('typing');
+            const imageInput = document.getElementById('imageInput');
+            const uploadBtn = document.getElementById('uploadBtn');
 
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', function (event) {
-            if (event.key === 'Enter') {
-                sendMessage();
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function (event) {
+                if (event.key === 'Enter') sendMessage();
+            });
+
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    displayMessage(message, 'user');
+                    userInput.value = '';
+                    typingDiv.innerText = "Bot is typing...";
+
+                    fetch("http://localhost:5005/webhooks/rest/webhook", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: message })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        typingDiv.innerText = "";
+                        data.forEach(botMsg => displayMessage(botMsg.text, 'bot'));
+                    })
+                    .catch(error => {
+                        typingDiv.innerText = "";
+                        displayMessage("Error connecting to bot!", 'bot');
+                    });
+                }
             }
-        });
 
-        function sendMessage() {
-            const message = userInput.value;
-            if (message.trim()) {
-                // Display user message
-                displayMessage(message, 'user');
-                userInput.value = ''; // Clear input field
-
-                // Typing effect
-                typingDiv.innerText = "Bot is typing...";
-
-                // Simulate bot response after message
-                setTimeout(() => {
-                    displayMessage('Bot response: ' + message, 'bot');
-                    typingDiv.innerText = ""; // Clear typing effect
-                }, 2000);
+            function displayMessage(message, sender) {
+                let messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+                messageDiv.innerText = message;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
-        }
 
-        function displayMessage(message, sender) {
-            let messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-            messageDiv.innerText = message;
-            messagesDiv.appendChild(messageDiv);
+            uploadBtn.addEventListener('click', () => imageInput.click());
 
-            // Scroll to the latest message
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // Image upload functionality
-        uploadBtn.addEventListener('click', () => {
-            imageInput.click();
-        });
-
-        imageInput.addEventListener('change', () => {
-            const file = imageInput.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const img = document.createElement('img');
-                    img.src = reader.result;
-                    img.className = 'image-message';
-                    img.onclick = () => openModal(img.src);
-                    messagesDiv.appendChild(img);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-                    // Bot's response after image
-                    setTimeout(() => {
-                        displayMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', 'bot');
-                    }, 2000);
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
-            }
-        });
-
-        function openModal(imageSrc) {
-            const modal = document.getElementById("imageModal");
-            const modalImg = document.getElementById("modalImg");
-            modal.style.display = "flex";
-            modalImg.src = imageSrc;
-        }
-
-        function closeModal() {
-            document.getElementById("imageModal").style.display = "none";
-        }
-
-        // Drag and Drop functionality for image
-        dropZone.addEventListener("click", () => {
-            imageInput.click();
-        });
-
-        dropZone.addEventListener("dragover", (event) => {
-            event.preventDefault();
-            dropZone.classList.add("dragover");
-        });
-
-        dropZone.addEventListener("dragleave", () => {
-            dropZone.classList.remove("dragover");
-        });
-
-        dropZone.addEventListener("drop", (event) => {
-            event.preventDefault();
-            dropZone.classList.remove("dragover");
-
-            const files = event.dataTransfer.files;
-            handleFiles(files);
-        });
-
-        function handleFiles(files) {
-            for (const file of files) {
-                if (file.type.startsWith("image/")) {
+            imageInput.addEventListener('change', () => {
+                const file = imageInput.files[0];
+                if (file && file.type.startsWith('image/')) {
                     const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const img = document.createElement("img");
-                        img.src = event.target.result;
-                        img.classList.add("file-preview");
-                        img.addEventListener("click", () => {
-                            window.open(img.src);
-                        });
-
+                    reader.onload = () => {
+                        const img = document.createElement('img');
+                        img.src = reader.result;
+                        img.className = 'image-message';
                         messagesDiv.appendChild(img);
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                        setTimeout(() => {
+                            displayMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', 'bot');
+                        }, 2000);
                     };
                     reader.readAsDataURL(file);
                 } else {
                     alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
                 }
-            }
-        }
-    });
+            });
+        });
 
-    // Rasa Webchat Integration
-    !(function () {
-        let e = document.createElement("script");
-        e.setAttribute("src", "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js"),
-        e.setAttribute("defer", "defer"),
-        document.head.appendChild(e),
-        e.onload = () => {
-            window.WebChat.default(
-                {
-                    initPayload: "/greet",
-                    customData: { language: "en" },
-                    socketUrl: "http://localhost:5005", // Rasa backend server URL
-                    title: "Rasa Bot",
-                    subtitle: "Ask me anything!",
-                    showCloseButton: true,
-                    params: { storage: "session" }
-                },
-                null
-            );
-        };
-    })();
-  </script>
+        !(function () {
+            let e = document.createElement("script");
+            e.setAttribute("src", "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js");
+            e.setAttribute("defer", "defer");
+            document.head.appendChild(e);
+            e.onload = () => {
+                window.WebChat.default(
+                    {
+                        initPayload: "/greet",
+                        customData: { language: "en" },
+                        socketUrl: "http://localhost:5005",
+                        title: "Rasa Bot",
+                        subtitle: "Ask me anything!",
+                        showCloseButton: true,
+                        params: { storage: "session" }
+                    },
+                    null
+                );
+            };
+        })();
+    </script>
 </body>
 </html>
