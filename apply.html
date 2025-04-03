@@ -301,16 +301,9 @@
                 displayMessage(message, 'user');
                 userInput.value = ''; // Clear input field
 
-                // Send message to server
-                socket.emit("clientMessage", message);
-
                 // Typing effect
                 typingDiv.innerText = "Bot is typing...";
-
-                // Display bot's response after receiving it from the server
-                socket.on("serverMessage", (message) => {
-                    typingDiv.innerText = "";
-                    displayMessage(message, 'bot');
+              
                 });
             }
         }
