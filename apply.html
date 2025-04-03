@@ -275,7 +275,7 @@
     </div>
 
    <script>
-    // First Script: Chat UI and Image Upload Handling
+    // First Script: Custom Chat UI and Image Upload Handling
     const socket = io("http://localhost:5000");
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -419,7 +419,7 @@
                 {
                     initPayload: "/greet",
                     customData: { language: "en" },
-                    socketUrl: "http://localhost:5005",
+                    socketUrl: "http://localhost:5005", // Rasa backend server URL
                     title: "Rasa Bot",
                     subtitle: "Ask me anything!",
                     showCloseButton: true,
@@ -430,4 +430,5 @@
         };
     })();
 </script>
+
 
