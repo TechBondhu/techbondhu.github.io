@@ -274,139 +274,160 @@
         <input type="file" id="imageInput" style="display: none;" />
     </div>
 
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script>
-        const socket = io("http://localhost:5000");
+   <script>
+    // First Script: Chat UI and Image Upload Handling
+    const socket = io("http://localhost:5000");
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const sendBtn = document.getElementById('sendBtn');
-            const userInput = document.getElementById('userInput');
-            const messagesDiv = document.getElementById('messages');
-            const typingDiv = document.getElementById('typing');
-            const imageInput = document.getElementById('imageInput');
-            const uploadBtn = document.getElementById('uploadBtn');
-            const dropZone = document.getElementById("dropZone");
+    document.addEventListener('DOMContentLoaded', () => {
+        const sendBtn = document.getElementById('sendBtn');
+        const userInput = document.getElementById('userInput');
+        const messagesDiv = document.getElementById('messages');
+        const typingDiv = document.getElementById('typing');
+        const imageInput = document.getElementById('imageInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const dropZone = document.getElementById("dropZone");
 
-            sendBtn.addEventListener('click', sendMessage);
-            userInput.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            function sendMessage() {
-                const message = userInput.value;
-                if (message.trim()) {
-                    // ইউজার মেসেজ দেখানো
-                    displayMessage(message, 'user');
-                    userInput.value = ''; // ইনপুট ফিল্ড পরিষ্কার করা
-
-                    // সার্ভারে মেসেজ পাঠানো
-                    socket.emit("clientMessage", message);
-
-                    // Typing effect
-                    typingDiv.innerText = "Bot is typing...";
-
-                    // সার্ভার থেকে রেসপন্স পাওয়ার পর সেটি UI-তে দেখানো
-                    socket.on("serverMessage", (message) => {
-                        typingDiv.innerText = "";
-                        displayMessage(message, 'bot');
-                    });
-                }
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
+        });
 
-            function displayMessage(message, sender) {
-                let messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-                messageDiv.innerText = message;
-                messagesDiv.appendChild(messageDiv);
+        function sendMessage() {
+            const message = userInput.value;
+            if (message.trim()) {
+                // Display user message
+                displayMessage(message, 'user');
+                userInput.value = ''; // Clear input field
 
-                // সর্বশেষ মেসেজটি দেখানোর জন্য স্ক্রল নিচে নামানো
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                // Send message to server
+                socket.emit("clientMessage", message);
+
+                // Typing effect
+                typingDiv.innerText = "Bot is typing...";
+
+                // Display bot's response after receiving it from the server
+                socket.on("serverMessage", (message) => {
+                    typingDiv.innerText = "";
+                    displayMessage(message, 'bot');
+                });
             }
+        }
 
-            // Image upload functionality
-            uploadBtn.addEventListener('click', () => {
-                imageInput.click();
-            });
+        function displayMessage(message, sender) {
+            let messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            messageDiv.innerText = message;
+            messagesDiv.appendChild(messageDiv);
 
-            imageInput.addEventListener('change', () => {
-                const file = imageInput.files[0];
-                if (file && file.type.startsWith('image/')) {
+            // Scroll to the latest message
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Image upload functionality
+        uploadBtn.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = document.createElement('img');
+                    img.src = reader.result;
+                    img.className = 'image-message';
+                    img.onclick = () => openModal(img.src);
+                    messagesDiv.appendChild(img);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                    // Bot's response after image
+                    setTimeout(() => {
+                        displayMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', 'bot');
+                    }, 2000);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
+            }
+        });
+
+        function openModal(imageSrc) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImg");
+            modal.style.display = "flex";
+            modalImg.src = imageSrc;
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+
+        // Drag and Drop functionality for image
+        dropZone.addEventListener("click", () => {
+            imageInput.click();
+        });
+
+        dropZone.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            dropZone.classList.add("dragover");
+        });
+
+        dropZone.addEventListener("dragleave", () => {
+            dropZone.classList.remove("dragover");
+        });
+
+        dropZone.addEventListener("drop", (event) => {
+            event.preventDefault();
+            dropZone.classList.remove("dragover");
+
+            const files = event.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.type.startsWith("image/")) {
                     const reader = new FileReader();
-                    reader.onload = () => {
-                        const img = document.createElement('img');
-                        img.src = reader.result;
-                        img.className = 'image-message';
-                        img.onclick = () => openModal(img.src);
-                        messagesDiv.appendChild(img);
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    reader.onload = (event) => {
+                        const img = document.createElement("img");
+                        img.src = event.target.result;
+                        img.classList.add("file-preview");
+                        img.addEventListener("click", () => {
+                            window.open(img.src);
+                        });
 
-                        // Bot's response after image
-                        setTimeout(() => {
-                            displayMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', 'bot');
-                        }, 2000);
+                        messagesDiv.appendChild(img);
                     };
                     reader.readAsDataURL(file);
                 } else {
                     alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
                 }
-            });
-
-            function openModal(imageSrc) {
-                const modal = document.getElementById("imageModal");
-                const modalImg = document.getElementById("modalImg");
-                modal.style.display = "flex";
-                modalImg.src = imageSrc;
             }
+        }
+    });
 
-            function closeModal() {
-                document.getElementById("imageModal").style.display = "none";
-            }
+    // Second Script: Rasa Webchat Integration
+    !(function () {
+        let e = document.createElement("script");
+        e.setAttribute("src", "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js"),
+        e.setAttribute("defer", "defer"),
+        document.head.appendChild(e),
+        e.onload = () => {
+            window.WebChat.default(
+                {
+                    initPayload: "/greet",
+                    customData: { language: "en" },
+                    socketUrl: "http://localhost:5005",
+                    title: "Rasa Bot",
+                    subtitle: "Ask me anything!",
+                    showCloseButton: true,
+                    params: { storage: "session" }
+                },
+                null
+            );
+        };
+    })();
+</script>
 
-            // Drag and Drop functionality for image
-            dropZone.addEventListener("click", () => {
-                imageInput.click();
-            });
-
-            dropZone.addEventListener("dragover", (event) => {
-                event.preventDefault();
-                dropZone.classList.add("dragover");
-            });
-
-            dropZone.addEventListener("dragleave", () => {
-                dropZone.classList.remove("dragover");
-            });
-
-            dropZone.addEventListener("drop", (event) => {
-                event.preventDefault();
-                dropZone.classList.remove("dragover");
-
-                const files = event.dataTransfer.files;
-                handleFiles(files);
-            });
-
-            function handleFiles(files) {
-                for (const file of files) {
-                    if (file.type.startsWith("image/")) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            const img = document.createElement("img");
-                            img.src = event.target.result;
-                            img.classList.add("file-preview");
-                            img.addEventListener("click", () => {
-                                window.open(img.src);
-                            });
-
-                            messagesDiv.appendChild(img);
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
