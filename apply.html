@@ -3,25 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
-    
-    <!-- Rasa Webchat -->
+    <title>Chat with Rasa Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .chat-container {
+            width: 350px;
+            height: 500px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+        }
+        #webchat {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.min.js"></script>
 </head>
 <body>
 
     <h1>Welcome to My Website</h1>
+    <p>Chat with our AI assistant below:</p>
 
-    <div id="webchat"></div>
+    <!-- চ্যাট কার্ড -->
+    <div class="chat-container">
+        <div id="webchat"></div>
+    </div>
 
     <script>
       WebChat.default.init({
         selector: "#webchat",
         initPayload: "/greet",
         customData: {"language": "en"}, // optional
-        socketUrl: "http://localhost:5005",  // Rasa server URL
-        title: "My Rasa Bot",
+        socketUrl: "http://localhost:5005",  // তোমার Rasa সার্ভারের URL
+        title: "AI Assistant",
         subtitle: "Ask me anything!",
+        openLauncher: true,  // চ্যাট উইন্ডো খুলতে লঞ্চার আইকন রাখবে
+        showCloseButton: true,  // ব্যবহারকারী চাইলে চ্যাট বন্ধ করতে পারবে
       });
     </script>
 
