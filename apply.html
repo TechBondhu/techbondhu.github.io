@@ -3,121 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Rasa Chatbot</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        #chat-container { width: 300px; margin: 20px auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
-        #messages { height: 300px; overflow-y: auto; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .message { padding: 5px; border-radius: 5px; margin: 5px 0; }
-        .user-message { background: #007bff; color: white; text-align: right; }
-        .bot-message { background: #f1f1f1; text-align: left; }
-        #typing { font-style: italic; color: gray; }
-        #userInput { width: 80%; padding: 5px; }
-        #sendBtn { padding: 5px 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-        .image-message { max-width: 100px; margin: 5px; cursor: pointer; }
-    </style>
+    <title>My Website</title>
+    
+    <!-- Rasa Webchat -->
+    <script src="https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.min.js"></script>
 </head>
 <body>
-    <h1>Welcome to My Rasa Chatbot</h1>
-    <div id="chat-container">
-        <div id="messages"></div>
-        <div id="typing"></div>
-        <input type="text" id="userInput" placeholder="Type a message..." />
-        <button id="sendBtn">Send</button>
-        <input type="file" id="imageInput" style="display: none;">
-        <button id="uploadBtn">Upload Image</button>
-    </div>
+
+    <h1>Welcome to My Website</h1>
+
+    <div id="webchat"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sendBtn = document.getElementById('sendBtn');
-            const userInput = document.getElementById('userInput');
-            const messagesDiv = document.getElementById('messages');
-            const typingDiv = document.getElementById('typing');
-            const imageInput = document.getElementById('imageInput');
-            const uploadBtn = document.getElementById('uploadBtn');
-
-            sendBtn.addEventListener('click', sendMessage);
-            userInput.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') sendMessage();
-            });
-
-            function sendMessage() {
-                const message = userInput.value.trim();
-                if (message) {
-                    displayMessage(message, 'user');
-                    userInput.value = '';
-                    typingDiv.innerText = "Bot is typing...";
-
-                    fetch("http://localhost:5005/webhooks/rest/webhook", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: message })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        typingDiv.innerText = "";
-                        data.forEach(botMsg => displayMessage(botMsg.text, 'bot'));
-                    })
-                    .catch(error => {
-                        typingDiv.innerText = "";
-                        displayMessage("Error connecting to bot!", 'bot');
-                    });
-                }
-            }
-
-            function displayMessage(message, sender) {
-                let messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-                messageDiv.innerText = message;
-                messagesDiv.appendChild(messageDiv);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }
-
-            uploadBtn.addEventListener('click', () => imageInput.click());
-
-            imageInput.addEventListener('change', () => {
-                const file = imageInput.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        const img = document.createElement('img');
-                        img.src = reader.result;
-                        img.className = 'image-message';
-                        messagesDiv.appendChild(img);
-                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-                        setTimeout(() => {
-                            displayMessage('ছবিটি সুন্দর দেখাচ্ছে! 😊', 'bot');
-                        }, 2000);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    alert("শুধুমাত্র ইমেজ ফাইল আপলোড করা যাবে!");
-                }
-            });
-        });
-
-        !(function () {
-            let e = document.createElement("script");
-            e.setAttribute("src", "https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.js");
-            e.setAttribute("defer", "defer");
-            document.head.appendChild(e);
-            e.onload = () => {
-                window.WebChat.default(
-                    {
-                        initPayload: "/greet",
-                        customData: { language: "en" },
-                        socketUrl: "http://localhost:5005",
-                        title: "Rasa Bot",
-                        subtitle: "Ask me anything!",
-                        showCloseButton: true,
-                        params: { storage: "session" }
-                    },
-                    null
-                );
-            };
-        })();
+      WebChat.default.init({
+        selector: "#webchat",
+        initPayload: "/greet",
+        customData: {"language": "en"}, // optional
+        socketUrl: "http://localhost:5005",  // Rasa server URL
+        title: "My Rasa Bot",
+        subtitle: "Ask me anything!",
+      });
     </script>
+
 </body>
 </html>
