@@ -1,115 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rasa Chatbot</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            margin-top: 20px;
-        }
-        .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 350px;
-            height: 500px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-box {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-        }
-        .input-box {
-            display: flex;
-            border-top: 1px solid #ccc;
-            padding: 10px;
-        }
-        .input-box input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .input-box button {
-            margin-left: 10px;
-            padding: 8px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .bot-message, .user-message {
-            margin: 5px;
-            padding: 10px;
-            border-radius: 10px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .bot-message {
-            background: #d1e7dd;
-            text-align: left;
-            align-self: flex-start;
-        }
-        .user-message {
-            background: #cfe2ff;
-            text-align: right;
-            align-self: flex-end;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat Bot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #343541;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 90vw;
+      height: 90vh;
+      background-color: #ffffff;
+      color: #000000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header {
+      background-color: #ede8ec;
+      color: #333;
+      padding: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .messages {
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-message, .bot-message {
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 60%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background-color: #e0e0e0;
+      color: #000;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    .bot-message {
+      background-color: #f1f1f1;
+      color: #000;
+      text-align: left;
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      position: relative;
+    }
+
+    #userInput {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+    }
+
+    #sendBtn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+    }
+
+    #sendBtn:hover {
+      background-color: #1a1a1a;
+    }
+
+    #uploadBtn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        width: 100vw;
+        height: 100vh;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to My Rasa Chatbot</h1>
-    <div class="chat-container">
-        <div class="chat-box" id="chat-box"></div>
-        <div class="input-box">
-            <input type="text" id="user-input" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+  <div class="chat-container">
+    <div class="header">Formbondhu</div>
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
     </div>
-    <script>
-        const chatBox = document.getElementById("chat-box");
-        const userInput = document.getElementById("user-input");
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
+      <button id="uploadBtn">+</button>
+      <input type="file" id="fileInput" style="display: none;">
+    </div>
+  </div>
 
-        function appendMessage(text, className) {
-            const messageDiv = document.createElement("div");
-            messageDiv.className = className;
-            messageDiv.textContent = text;
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sendBtn = document.getElementById('sendBtn');
+      const userInput = document.getElementById('userInput');
+      const messagesDiv = document.getElementById('messages');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const fileInput = document.getElementById('fileInput');
 
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (message === "") return;
-            appendMessage(message, "user-message");
-            userInput.value = "";
-            fetch("http://localhost:5005/webhooks/rest/webhook", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sender: "user", message: message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.length > 0) {
-                    appendMessage(data[0].text, "bot-message");
-                }
-            })
-            .catch(error => console.error("Error:", error));
+      sendBtn.addEventListener('click', sendMessage);
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
         }
-    </script>
+      });
+
+      uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      function sendMessage() {
+        const userMessage = userInput.value.trim();
+        if (userMessage === '') return;
+
+        displayMessage(userMessage, 'user');
+        userInput.value = '';
+
+        // Fake bot response after 1 second
+        setTimeout(() => {
+          displayMessage('আমি বুঝতে পারলাম! 😊', 'bot');
+        }, 1000);
+      }
+
+      function displayMessage(message, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        messageDiv.innerText = message;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = document.createElement('img');
+            img.src = reader.result;
+            img.style.maxWidth = '150px';
+            messagesDiv.appendChild(img);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
