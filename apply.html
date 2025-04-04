@@ -152,61 +152,95 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sendBtn = document.getElementById('sendBtn');
-      const userInput = document.getElementById('userInput');
-      const messagesDiv = document.getElementById('messages');
-      const uploadBtn = document.getElementById('uploadBtn');
-      const fileInput = document.getElementById('fileInput');
+ <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sendBtn = document.getElementById('sendBtn');
+    const userInput = document.getElementById('userInput');
+    const messagesDiv = document.getElementById('messages');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const fileInput = document.getElementById('fileInput');
 
-      sendBtn.addEventListener('click', sendMessage);
-      userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          sendMessage();
-        }
-      });
+    const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook"; // Rasa Server Address
 
-      uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-      });
-
-      function sendMessage() {
-        const userMessage = userInput.value.trim();
-        if (userMessage === '') return;
-
-        displayMessage(userMessage, 'user');
-        userInput.value = '';
-
-        // Fake bot response after 1 second
-        setTimeout(() => {
-          displayMessage('আমি বুঝতে পারলাম! 😊', 'bot');
-        }, 1000);
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
       }
-
-      function displayMessage(message, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-        messageDiv.innerText = message;
-        messagesDiv.appendChild(messageDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files[0];
-        if (file && file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const img = document.createElement('img');
-            img.src = reader.result;
-            img.style.maxWidth = '150px';
-            messagesDiv.appendChild(img);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-          };
-          reader.readAsDataURL(file);
-        }
-      });
     });
-  </script>
+
+    uploadBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    function sendMessage() {
+      const userMessage = userInput.value.trim();
+      if (userMessage === '') return;
+
+      displayMessage(userMessage, 'user');
+      userInput.value = '';
+
+      // Rasa কে মেসেজ পাঠানো
+      fetch(rasaEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          sender: "user", // optionally unique user id
+          message: userMessage
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          data.forEach(entry => {
+            if (entry.text) {
+              displayMessage(entry.text, 'bot');
+            } else if (entry.image) {
+              displayImage(entry.image);
+            }
+          });
+        }
+      })
+      .catch(error => {
+        console.error("Error communicating with Rasa:", error);
+        displayMessage("❌ সার্ভার এর সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
+      });
+    }
+
+    function displayMessage(message, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+      messageDiv.innerText = message;
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function displayImage(imageUrl) {
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.style.maxWidth = '200px';
+      img.style.margin = '10px 0';
+      messagesDiv.appendChild(img);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = document.createElement('img');
+          img.src = reader.result;
+          img.style.maxWidth = '150px';
+          messagesDiv.appendChild(img);
+          messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  });
+</script>
 </body>
 </html>
