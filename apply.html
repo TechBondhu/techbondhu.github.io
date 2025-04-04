@@ -3,53 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Rasa Bot</title>
+    <title>Rasa Chatbot</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 20px;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-top: 20px;
         }
         .chat-container {
-            width: 350px;
-            height: 500px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #fff;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
-        #webchat {
-            width: 100%;
-            height: 100%;
+        .chat-box {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        .input-box {
+            display: flex;
+            border-top: 1px solid #ccc;
+            padding: 10px;
+        }
+        .input-box input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .input-box button {
+            margin-left: 10px;
+            padding: 8px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .bot-message, .user-message {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .bot-message {
+            background: #d1e7dd;
+            text-align: left;
+            align-self: flex-start;
+        }
+        .user-message {
+            background: #cfe2ff;
+            text-align: right;
+            align-self: flex-end;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/rasa-webchat/lib/index.min.js"></script>
 </head>
 <body>
-
-    <h1>Welcome to My Website</h1>
-    <p>Chat with our AI assistant below:</p>
-
-    <!-- চ্যাট কার্ড -->
+    <h1>Welcome to My Rasa Chatbot</h1>
     <div class="chat-container">
-        <div id="webchat"></div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
     </div>
-
     <script>
-      WebChat.default.init({
-        selector: "#webchat",
-        initPayload: "/greet",
-        customData: {"language": "en"}, // optional
-        socketUrl: "http://localhost:5005",  // তোমার Rasa সার্ভারের URL
-        title: "AI Assistant",
-        subtitle: "Ask me anything!",
-        openLauncher: true,  // চ্যাট উইন্ডো খুলতে লঞ্চার আইকন রাখবে
-        showCloseButton: true,  // ব্যবহারকারী চাইলে চ্যাট বন্ধ করতে পারবে
-      });
-    </script>
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
 
+        function appendMessage(text, className) {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = className;
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message === "") return;
+            appendMessage(message, "user-message");
+            userInput.value = "";
+            fetch("http://localhost:5005/webhooks/rest/webhook", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sender: "user", message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    appendMessage(data[0].text, "bot-message");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
 </body>
 </html>
