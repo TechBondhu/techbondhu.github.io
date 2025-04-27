@@ -37,12 +37,12 @@
       border-radius: 20px;
       display: inline-block;
       max-width: 80%;
+      clear: both;
     }
 
     .user {
       background: #d1e7dd;
       text-align: right;
-      align-self: flex-end;
       float: right;
     }
 
@@ -65,6 +65,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="chat-container">
@@ -75,10 +76,32 @@
 
     <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." onkeypress="handleKey(event)">
     <input type="file" id="upload" accept="image/*">
-
   </div>
 
+  <!-- Socket.IO লাইব্রেরি -->
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+
   <script>
+    const socket = io('http://localhost:5005'); // Rasa সার্ভারের URL
+
+    socket.on('connect', function() {
+      console.log('✅ সংযোগ স্থাপিত হয়েছে Rasa বটের সাথে');
+    });
+
+    socket.on('bot_uttered', function (response) {
+      console.log('🤖 বট উত্তর:', response);
+      if (response.text) {
+        addMessage(response.text, "bot");
+      }
+    });
+
+    function sendMessage(message) {
+      socket.emit('user_uttered', {
+        message: message,
+        session_id: socket.id
+      });
+    }
+
     function addMessage(text, sender) {
       const chatbox = document.getElementById('chatbox');
       const msgDiv = document.createElement("div");
@@ -92,34 +115,42 @@
       if (event.key === "Enter") {
         const input = document.getElementById('userInput');
         if (input.value.trim()) {
-          addMessage(input.value, "user");
-          setTimeout(() => addMessage("🤖 বট: আমি বুঝতে পারছি!", "bot"), 1000);
+          const userMessage = input.value;
+          addMessage(userMessage, "user");
+          sendMessage(userMessage);
           input.value = "";
         }
       }
     }
 
+    // OCR প্রসেসিং
     document.getElementById('upload').addEventListener('change', async function () {
       const file = this.files[0];
       if (!file) return;
 
-      addMessage("📤 ছবি আপলোড হয়েছে, OCR প্রসেস হচ্ছে...", "user");
+      addMessage("📤 ছবি আপলোড হয়েছে, OCR প্রসেস হচ্ছে...", "user");
 
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/ocr", {
-        method: "POST",
-        body: formData
-      });
+      try {
+        const response = await fetch("/ocr", {
+          method: "POST",
+          body: formData
+        });
 
-      const result = await response.json();
-      if (result.text) {
-        addMessage("📝 OCR টেক্সট:\n" + result.text, "bot");
-      } else {
-        addMessage("❌ OCR করতে সমস্যা হয়েছে!", "bot");
+        const result = await response.json();
+        if (result.text) {
+          addMessage("📝 OCR টেক্সট:\n" + result.text, "bot");
+        } else {
+          addMessage("❌ OCR করতে সমস্যা হয়েছে!", "bot");
+        }
+      } catch (error) {
+        console.error(error);
+        addMessage("❌ সার্ভার সমস্যার কারণে OCR করতে পারছি না।", "bot");
       }
     });
+
   </script>
 
 </body>
