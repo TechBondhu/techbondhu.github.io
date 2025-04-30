@@ -95,7 +95,6 @@
 
   <script>
     const socket = io('http://localhost:5005'); // Rasa সার্ভারের URL
-    let currentSlot = 1; // Tracks which slot (image_slot, image_slot_2, etc.)
 
     socket.on('connect', function() {
       console.log('✅ সংযোগ স্থাপিত হয়েছে Rasa বটের সাথে');
@@ -107,7 +106,7 @@
       if (response.text) {
         addMessage(response.text, "bot");
       }
-      // Check if bot is asking for the next image
+      // Check if bot is asking for the image
       if (response.text.includes("ডকুমেন্টের ইমেজ আপলোড করুন")) {
         document.querySelector('.upload-btn').disabled = false;
       } else if (response.text.includes("রেজিস্ট্রেশন সম্পন্ন")) {
@@ -159,17 +158,10 @@
         (error, result) => {
           if (!error && result && result.event === 'success') {
             const url = result.info.secure_url;
-            addMessage(`✅ ছবি ${currentSlot} আপলোড সফল! URL: ${url}`, "bot");
-            const slotName = `image_slot${currentSlot === 1 ? '' : '_' + currentSlot}`;
+            addMessage(`✅ ইমেজ আপলোড সফল! URL: ${url}`, "bot");
             sendMessage(url); // Rasa-কে URL পাঠানো
-            currentSlot++;
-            if (currentSlot > 5) {
-              addMessage("📌 সর্বোচ্চ ৫টি ছবি আপলোড হয়েছে।", "bot");
-              document.querySelector('.upload-btn').disabled = true;
-              sendMessage("complete_form");
-            }
           } else if (error) {
-            addMessage(`❌ ছবি আপলোডে সমস্যা: ${error}`, "bot");
+            addMessage(`❌ ইমেজ আপলোডে সমস্যা: ${error}`, "bot");
           }
         }
       ).open();
