@@ -18,7 +18,7 @@
       max-width: 600px;
       background: #ffffff;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+ampaign: 0 0 10px rgba(0,0,0,0.1);
       padding: 20px;
     }
 
@@ -83,9 +83,11 @@
 
   <script>
     const socket = io('http://localhost:5005'); // Rasa সার্ভারের URL
+    let currentSlot = 1; // Tracks which slot (image_slot, image_slot_2, etc.)
 
     socket.on('connect', function() {
       console.log('✅ সংযোগ স্থাপিত হয়েছে Rasa বটের সাথে');
+      addMessage("✅ সংযোগ স্থাপিত! দয়া করে আপনার তথ্য দিন।", "bot");
     });
 
     socket.on('bot_uttered', function (response) {
@@ -93,12 +95,19 @@
       if (response.text) {
         addMessage(response.text, "bot");
       }
+      // Check if bot is asking for the next image
+      if (response.text.includes("ডকুমেন্টের ইমেজ আপলোড করুন")) {
+        document.getElementById('upload').disabled = false;
+      } else if (response.text.includes("রেজিস্ট্রেশন সম্পন্ন")) {
+        document.getElementById('upload').disabled = true;
+      }
     });
 
-    function sendMessage(message) {
+    function sendMessage(message, metadata = {}) {
       socket.emit('user_uttered', {
         message: message,
-        session_id: socket.id
+        session_id: socket.id,
+        metadata: metadata
       });
     }
 
@@ -123,34 +132,45 @@
       }
     }
 
-    // OCR প্রসেসিং
+    // Image upload handling
     document.getElementById('upload').addEventListener('change', async function () {
       const file = this.files[0];
-      if (!file) return;
+      if (!file) {
+        addMessage("❌ দয়া করে একটি ছবি সিলেক্ট করুন।", "bot");
+        return;
+      }
 
-      addMessage("📤 ছবি আপলোড হয়েছে, OCR প্রসেস হচ্ছে...", "user");
+      addMessage("📤 ছবি আপলোড হচ্ছে...", "user");
 
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("image", file);
 
       try {
-        const response = await fetch("/ocr", {
+        const response = await fetch("/upload", {
           method: "POST",
           body: formData
         });
 
         const result = await response.json();
-        if (result.text) {
-          addMessage("📝 OCR টেক্সট:\n" + result.text, "bot");
+        if (result.image_url) {
+          const slotName = `image_slot${currentSlot === 1 ? '' : '_' + currentSlot}`;
+          addMessage(`✅ ছবি ${currentSlot} আপলোড সফল!`, "bot");
+          sendMessage(`set_${slotName}`, { image: result.image_url });
+          this.value = ''; // Clear file input
+          currentSlot++;
+          if (currentSlot > 5) {
+            addMessage("📌 সর্বোচ্চ ৫টি ছবি আপলোড হয়েছে।", "bot");
+            document.getElementById('upload').disabled = true;
+            sendMessage("complete_form");
+          }
         } else {
-          addMessage("❌ OCR করতে সমস্যা হয়েছে!", "bot");
+          addMessage("❌ ছবি আপলোডে সমস্যা হয়েছে!", "bot");
         }
       } catch (error) {
         console.error(error);
-        addMessage("❌ সার্ভার সমস্যার কারণে OCR করতে পারছি না।", "bot");
+        addMessage("❌ সার্ভার সমস্যার কারণে ছবি আপলোড করতে পারছি না।", "bot");
       }
     });
-
   </script>
 
 </body>
