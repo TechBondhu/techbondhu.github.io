@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formbondhu - Instant Application Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -329,6 +330,7 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#features">Features</a></li>
                     <li><a href="#testimonials">Testimonials</a></li>
+                    <li><a href="chat.html">Chatbot</a></li>
                     <li><a href="#contact">Contact</a></li>
                 </ul>
             </nav>
@@ -339,7 +341,7 @@
     <section class="hero" id="home">
         <h1>Revolutionize Applications with Formbondhu</h1>
         <p>Experience the future of instant applications with our AI-powered chatbot platform.</p>
-        <a href="#try-now" class="btn">Get Started</a>
+        <a href="chat.html" class="btn">Get Started</a>
     </section>
 
     <!-- Features Section -->
@@ -384,11 +386,12 @@
     </section>
 
     <!-- Chatbot Widget -->
-    <div class="chatbot-widget" onclick="toggleChatbot()">
+    <a href="chat.html" class="chatbot-widget">
         <i class="fas fa-comment"></i> Try Our Chatbot
-    </div>
+    </a>
     <div class="chatbot-popup" id="chatbotPopup">
         <p>Hello! I’m Formbondhu. How can I assist you today?</p>
+        <a href="chat.html" style="display: block; text-align: center; color: #1E3A8A; text-decoration: none;">Open Chatbot</a>
     </div>
 
     <!-- Footer -->
@@ -396,8 +399,6 @@
         <p>© 2025 InnovateBot. All rights reserved.</p>
     </footer>
 
-    <!-- Font Awesome for Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
         function toggleChatbot() {
             const popup = document.getElementById('chatbotPopup');
