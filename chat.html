@@ -365,7 +365,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded'); // ডিবাগ: DOM লোড হয়েছে কিনা চেক
+            console.log('DOM fully loaded'); // ডিবাগ: DOM লোড হয়েছে কিনা
 
             // DOM এলিমেন্ট
             const sendBtn = document.getElementById('sendBtn');
@@ -388,10 +388,10 @@
             let chatHistory = [];
             let currentChatIndex = -1;
 
-            // ইভেন্ট লিসেনার সেটআপ
+            // ইভেন্ট লিসেনার
             if (!historyIcon) console.error('History icon not found!');
             historyIcon.addEventListener('click', () => {
-                console.log('History icon clicked'); // ডিবাগ: আইকন ক্লিক হয়েছে কিনা
+                console.log('History icon clicked'); // ডিবাগ
                 toggleSidebar();
             });
 
@@ -447,6 +447,7 @@
                         }
                     } catch (e) {
                         console.error('Error parsing local storage:', e);
+                        chatHistory = [];
                     }
                 } else {
                     console.log('No chat history found in local storage');
@@ -458,14 +459,42 @@
                 console.log('Saving to local storage:', chatHistory); // ডিবাগ
                 try {
                     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                    console.log('Chat history saved successfully'); // ডিবাগ
                 } catch (e) {
                     console.error('Error saving to local storage:', e);
                 }
             }
 
+            // হিস্ট্রি আপডেট
+            function updateHistory() {
+                console.log('Updating history with chatHistory:', chatHistory); // ডিবাগ
+                historyList.innerHTML = '';
+                if (chatHistory.length === 0) {
+                    console.log('No history items to display'); // ডিবাগ
+                    return;
+                }
+                chatHistory.forEach((chat, index) => {
+                    console.log('Adding history item:', chat.messages[0].text, 'at index:', index); // ডিবাগ
+                    const historyItem = document.createElement('div');
+                    historyItem.classList.add('history-item');
+                    historyItem.innerHTML = `
+                        <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
+                        <div class="timestamp">${chat.timestamp}</div>
+                    `;
+                    historyItem.addEventListener('click', () => {
+                        console.log('Loading chat:', index); // ডিবাগ
+                        loadChat(index);
+                    });
+                    historyList.appendChild(historyItem);
+                });
+            }
+
             function sendMessage(predefinedMessage = null) {
                 const userMessage = predefinedMessage || userInput.value.trim();
-                if (userMessage === '') return;
+                if (userMessage === '') {
+                    console.log('Empty message, skipping'); // ডিবাগ
+                    return;
+                }
 
                 console.log('Sending message:', userMessage); // ডিবাগ
                 if (!firstMessageSent) {
@@ -482,7 +511,8 @@
 
                 displayMessage(userMessage, 'user');
                 userInput.value = '';
-                updateHistory();
+                saveToLocalStorage(); // হিস্ট্রি সেভ
+                updateHistory(); // হিস্ট্রি আপডেট
 
                 fetch(rasaEndpoint, {
                     method: "POST",
@@ -507,13 +537,15 @@
                                 displayImage(entry.image);
                             }
                         });
-                        updateHistory();
+                        saveToLocalStorage(); // Rasa রেসপন্স সেভ
+                        updateHistory(); // হিস্ট্রি আপডেট
                     }
                 })
                 .catch(error => {
                     console.error("Error communicating with Rasa:", error);
                     displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
                     chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!" });
+                    saveToLocalStorage(); // এরর মেসেজ সেভ
                     updateHistory();
                 });
             }
@@ -544,6 +576,7 @@
                         const imageUrl = data.url;
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
                         displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
+                        saveToLocalStorage(); // ইমেজ আপলোড সেভ
                         updateHistory();
 
                         fetch(rasaEndpoint, {
@@ -564,17 +597,20 @@
                                     displayMessage(entry.text, 'bot');
                                 }
                             });
+                            saveToLocalStorage(); // Rasa রেসপন্স সেভ
                             updateHistory();
                         })
                         .catch(error => {
                             console.error("Error sending URL to Rasa:", error);
                             chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Rasa-এ URL পাঠাতে সমস্যা!" });
                             displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
+                            saveToLocalStorage();
                             updateHistory();
                         });
                     } else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `❌ ইমেজ আপলোডে সমস্যা: ${data.error}` });
                         displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
+                        saveToLocalStorage();
                         updateHistory();
                     }
                 })
@@ -582,6 +618,7 @@
                     console.error("Error uploading image to Flask:", error);
                     displayMessage("❌ Flask API-এ ইমেজ আপলোডে সমস্যা!", 'bot');
                     chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Flask API-এ ইমেজ আপলোডে সমস্যা!" });
+                    saveToLocalStorage();
                     updateHistory();
                 });
             }
@@ -614,6 +651,7 @@
                 });
                 currentChatIndex = chatHistory.length - 1;
                 saveToLocalStorage();
+                updateHistory();
             }
 
             function startNewChat() {
@@ -622,26 +660,8 @@
                 welcomeMessage.style.display = 'block';
                 firstMessageSent = false;
                 currentChatIndex = -1;
-                updateHistory();
-            }
-
-            function updateHistory() {
-                console.log('Updating history'); // ডিবাগ
-                historyList.innerHTML = '';
-                chatHistory.forEach((chat, index) => {
-                    const historyItem = document.createElement('div');
-                    historyItem.classList.add('history-item');
-                    historyItem.innerHTML = `
-                        <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
-                        <div class="timestamp">${chat.timestamp}</div>
-                    `;
-                    historyItem.addEventListener('click', () => {
-                        console.log('Loading chat:', index); // ডিবাগ
-                        loadChat(index);
-                    });
-                    historyList.appendChild(historyItem);
-                });
                 saveToLocalStorage();
+                updateHistory();
             }
 
             function loadChat(index) {
