@@ -429,7 +429,7 @@
                     <li><a href="#home" onclick="smoothScroll('home')">Home</a></li>
                     <li><a href="#features" onclick="smoothScroll('features')">Features</a></li>
                     <li><a href="#testimonials" onclick="smoothScroll('testimonials')">Testimonials</a></li>
-                    <li><a href="#" onclick="redirectToChat()">Chatbot</a></li>
+                    <li><a href="javascript:void(0)" onclick="redirectToChat(event)">Chatbot</a></li>
                     <li><a href="#contact" onclick="smoothScroll('contact')">Contact</a></li>
                 </ul>
             </nav>
@@ -440,7 +440,7 @@
     <section class="hero" id="home">
         <h1>Revolutionize Applications with Formbondhu</h1>
         <p>Experience the future of instant applications with our AI-powered chatbot platform.</p>
-        <a href="#" class="btn" onclick="redirectToChat()">Get Started</a>
+        <a href="javascript:void(0)" class="btn" onclick="redirectToChat(event)">Get Started</a>
     </section>
 
     <!-- Features Section -->
@@ -490,7 +490,7 @@
     </div>
     <div class="chatbot-popup" id="chatbotPopup">
         <p>Hello! I’m Formbondhu. How can I assist you today?</p>
-        <a href="#" onclick="redirectToChat()">Open Chatbot</a>
+        <a href="javascript:void(0)" onclick="redirectToChat(event)">Open Chatbot</a>
     </div>
 
     <!-- Footer -->
@@ -518,8 +518,9 @@
         }
 
         // Redirect to Chatbot Page
-        function redirectToChat() {
-            window.location.href = 'chat.html';
+        function redirectToChat(event) {
+            event.preventDefault(); // Prevent default link behavior
+            window.location.replace('chat.html'); // Use replace for reliable redirection
         }
     </script>
 </body>
