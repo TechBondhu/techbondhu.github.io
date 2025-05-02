@@ -1,192 +1,288 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>চ্যাটবট সহায়তা</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat Bot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f6f9;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #343541;
+      color: white;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 20px;
+      height: 100vh;
     }
 
     .chat-container {
-      width: 100%;
-      max-width: 600px;
-      background: #ffffff;
+      width: 90vw;
+      height: 90vh;
+      background-color: #ffffff;
+      color: #000000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 20px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     }
 
-    #chatbox {
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
+    .header {
+      background-color: #ede8ec;
+      color: #333;
+      padding: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      height: 100%;
+    }
+
+    .messages {
       height: 400px;
       overflow-y: auto;
-      background: #fafafa;
+      display: flex;
+      flex-direction: column;
     }
 
-    .message {
-      margin: 10px 0;
-      padding: 8px 12px;
-      border-radius: 20px;
-      display: inline-block;
-      max-width: 80%;
-      clear: both;
+    .user-message, .bot-message {
+      padding: 10px 15px;
+      border-radius: 10px;
+      max-width: 60%;
+      word-wrap: break-word;
     }
 
-    .user {
-      background: #d1e7dd;
+    .user-message {
+      background-color: #e0e0e0;
+      color: #000;
       text-align: right;
-      float: right;
+      margin-left: auto;
     }
 
-    .bot {
-      background: #f8d7da;
+    .bot-message {
+      background-color: #f1f1f1;
+      color: #000;
       text-align: left;
-      float: left;
     }
 
-    input[type="text"] {
-      width: calc(100% - 22px);
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+      position: relative;
+    }
+
+    #userInput {
+      flex-grow: 1;
+      padding: 10px;
+      font-size: 16px;
       border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
     }
 
-    button.upload-btn {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
-      background: #4CAF50;
+    #sendBtn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 18px;
+      transition: background-color 0.3s ease;
+    }
+
+    #sendBtn:hover {
+      background-color: #1a1a1a;
+    }
+
+    #uploadBtn {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background-color: black;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
+      font-size: 20px;
     }
 
-    button.upload-btn:hover {
-      background: #45a049;
+    @media (max-width: 600px) {
+      .chat-container {
+        width: 100vw;
+        height: 100vh;
+      }
     }
   </style>
 </head>
-
 <body>
   <div class="chat-container">
-    <h2 style="text-align:center;">🤖 আবেদন সহায়ক চ্যাটবট</h2>
-    <div id="chatbox">
-      <div class="message bot">👋 হ্যালো! ছবি আপলোড করুন বা কিছু লিখুন।</div>
+    <div class="header">Formbondhu</div>
+    <div class="chat-box">
+      <div class="messages" id="messages"></div>
     </div>
-
-    <input type="text" id="userInput" placeholder="আপনার বার্তা লিখুন..." onkeypress="handleKey(event)">
-    <button class="upload-btn" onclick="openCloudinaryWidget()">ইমেজ আপলোড করুন</button>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message...">
+      <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
+      <button id="uploadBtn">+</button>
+      <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
+    </div>
   </div>
 
-  <!-- Cloudinary Upload Widget -->
-  <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
-
   <script>
-    const RASA_SERVER_URL = "http://localhost:5005/webhooks/rest/webhook";
-    const SENDER_ID = "user_" + Math.random().toString(36).substr(2, 9); // Random user ID
+    document.addEventListener('DOMContentLoaded', () => {
+      const sendBtn = document.getElementById('sendBtn');
+      const userInput = document.getElementById('userInput');
+      const messagesDiv = document.getElementById('messages');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const fileInput = document.getElementById('fileInput');
 
-    // চ্যাটবক্সে মেসেজ যোগ করা
-    function addMessage(text, sender) {
-      const chatbox = document.getElementById('chatbox');
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", sender);
-      msgDiv.innerText = text;
-      chatbox.appendChild(msgDiv);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
+      const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook"; // Rasa Server Address
+      const flaskEndpoint = "http://localhost:5000/upload"; // Flask API Address
 
-    // Rasa সার্ভারে মেসেজ পাঠানো
-    async function sendMessage(message) {
-      try {
-        const response = await fetch(RASA_SERVER_URL, {
+      // প্রাথমিক মেসেজ পাঠানো
+      sendMessage("/start");
+
+      sendBtn.addEventListener('click', sendMessage);
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+
+      uploadBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (file && file.type.startsWith('image/')) {
+          uploadImageToFlask(file);
+        }
+      });
+
+      function sendMessage() {
+        const userMessage = userInput.value.trim();
+        if (userMessage === '') return;
+
+        displayMessage(userMessage, 'user');
+        userInput.value = '';
+
+        // Rasa-কে মেসেজ পাঠানো
+        fetch(rasaEndpoint, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            sender: SENDER_ID,
-            message: message,
-          }),
+            sender: "user",
+            message: userMessage
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(entry => {
+              if (entry.text) {
+                displayMessage(entry.text, 'bot');
+              } else if (entry.image) {
+                displayImage(entry.image);
+              }
+            });
+          }
+        })
+        .catch(error => {
+          console.error("Error communicating with Rasa:", error);
+          displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
         });
+      }
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+      function uploadImageToFlask(file) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-        const data = await response.json();
-        console.log("Rasa Response:", data);
-
-        // Rasa থেকে রেসপন্স প্রসেস করা
-        data.forEach((msg) => {
-          if (msg.text) {
-            addMessage(msg.text, "bot");
+        fetch(flaskEndpoint, {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.url) {
+            const imageUrl = data.url;
+            displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
+            // Rasa-কে URL পাঠানো
+            fetch(rasaEndpoint, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                sender: "user",
+                message: imageUrl
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              data.forEach(entry => {
+                if (entry.text) {
+                  displayMessage(entry.text, 'bot');
+                }
+              });
+            })
+            .catch(error => {
+              console.error("Error sending URL to Rasa:", error);
+              displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
+            });
+          } else {
+            displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
           }
-          // Check if bot is asking for the image
-          if (msg.text && msg.text.includes("ডকুমেন্টের ইমেজ আপলোড করুন")) {
-            document.querySelector('.upload-btn').disabled = false;
-          } else if (msg.text && msg.text.includes("রেজিস্ট্রেশন সম্পন্ন")) {
-            document.querySelector('.upload-btn').disabled = true;
-          }
+        })
+        .catch(error => {
+          console.error("Error uploading image to Flask:", error);
+          displayMessage("❌ Flask API-এ ইমেজ আপলোডে সমস্যা!", 'bot');
         });
-      } catch (error) {
-        console.error("Error sending message to Rasa:", error);
-        addMessage("❌ Rasa সার্ভারের সাথে সংযোগ ত্রুটি!", "bot");
       }
-    }
 
-    // Enter কী চাপলে মেসেজ পাঠানো
-    function handleKey(event) {
-      if (event.key === "Enter") {
-        const input = document.getElementById('userInput');
-        if (input.value.trim()) {
-          const userMessage = input.value;
-          addMessage(userMessage, "user");
-          sendMessage(userMessage);
-          input.value = "";
-        }
+      function displayMessage(message, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+        messageDiv.innerText = message;
+        messagesDiv.appendChild(messageDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
-    }
 
-    // Cloudinary Upload Widget
-    function openCloudinaryWidget() {
-      window.cloudinary.createUploadWidget(
-        {
-          cloudName: 'dsgz8jaue', // আপনার Cloudinary Cloud Name
-          uploadPreset: 'registration_upload', // আপনার Upload Preset
-          folder: 'registration_images',
-          sources: ['local', 'url', 'camera'],
-          multiple: false,
-          resourceType: 'image',
-          clientAllowedFormats: ['png', 'jpg', 'jpeg'],
-        },
-        (error, result) => {
-          console.log("Cloudinary Result:", result);
-          console.log("Cloudinary Error:", error);
-          if (!error && result && result.event === 'success') {
-            const url = result.info.secure_url;
-            addMessage(`✅ ইমেজ আপলোড সফল! URL: ${url}`, "bot");
-            sendMessage(url); // Rasa-কে URL পাঠানো
-          } else if (error) {
-            addMessage(`❌ ইমেজ আপলোডে সমস্যা: ${error}`, "bot");
-          }
-        }
-      ).open();
-    }
-
-    // পেজ লোড হলে প্রাথমিক মেসেজ পাঠানো
-    window.onload = function() {
-      sendMessage("/start");
-    };
+      function displayImage(imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.maxWidth = '200px';
+        img.style.margin = '10px 0';
+        messagesDiv.appendChild(img);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    });
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9394eeb18b2b676e',t:'MTc0NjE2MTc4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
