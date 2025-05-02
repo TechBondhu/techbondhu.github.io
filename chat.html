@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formbondhu Chatbot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -142,16 +143,31 @@
         .history-list {
             flex-grow: 1;
             overflow-y: auto;
+            overflow-x: hidden; /* নিচের স্ক্রলবার সরানো */
             display: flex;
             flex-direction: column;
             gap: 10px;
             padding-top: 10px;
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
+            padding-right: 10px; /* টেক্সটের সাথে স্ক্রলবারের গ্যাপ */
+            scrollbar-width: thin; /* Firefox */
+            scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
         }
 
         .history-list::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+            width: 8px; /* Chrome, Safari, Opera */
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
         }
 
         .history-item {
@@ -331,6 +347,26 @@
             z-index: 2;
         }
 
+        .loading {
+            display: none;
+            align-self: flex-start;
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 20px;
+            color: #3B82F6;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .user-message,
         .bot-message {
             padding: 15px 20px;
@@ -340,6 +376,8 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 18px;
             margin-bottom: 10px;
+            font-family: 'Tiro Bangla', serif;
+            font-weight: 700; /* বোল্ড করা */
         }
 
         .user-message {
@@ -374,6 +412,8 @@
             border-radius: 20px;
             outline: none;
             transition: border-color 0.3s ease;
+            font-family: 'Tiro Bangla', serif;
+            font-weight: 700; /* বোল্ড করা */
         }
 
         #userInput:focus {
@@ -504,6 +544,12 @@
             let chatHistory = [];
             let currentChatIndex = -1;
             let isRequestPending = false; // ডিবাউন্সিংয়ের জন্য ফ্ল্যাগ
+
+            // লোডিং এলিমেন্ট তৈরি
+            const loadingDiv = document.createElement('div');
+            loadingDiv.classList.add('loading');
+            loadingDiv.innerHTML = '<i class="fas fa-spinner"></i>';
+            messagesDiv.appendChild(loadingDiv);
 
             // ডিবাউন্স ফাংশন
             function debounce(func, wait) {
@@ -691,6 +737,15 @@
                 }
             }
 
+            function showLoading() {
+                loadingDiv.style.display = 'block';
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
+            function hideLoading() {
+                loadingDiv.style.display = 'none';
+            }
+
             async function sendMessage(predefinedMessage = null) {
                 if (isRequestPending) {
                     console.log('Request already pending, skipping'); // ডিবাগ
@@ -713,6 +768,10 @@
                         startNewChatSession(userMessage);
                     } else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
+                        // হিস্ট্রি লিস্টে এই চ্যাটটি প্রথমে নিয়ে আসা
+                        const currentChat = chatHistory.splice(currentChatIndex, 1)[0];
+                        chatHistory.unshift(currentChat);
+                        currentChatIndex = 0;
                     }
                 }
 
@@ -721,6 +780,7 @@
                 saveToLocalStorage();
                 updateHistory();
 
+                showLoading(); // লোডিং আইকন দেখানো
                 isRequestPending = true;
                 try {
                     const serverAvailable = await checkServerStatus();
@@ -769,6 +829,7 @@
                     updateHistory();
                 } finally {
                     isRequestPending = false;
+                    hideLoading(); // লোডিং আইকন লুকানো
                 }
             }
 
@@ -792,6 +853,7 @@
                 const formData = new FormData();
                 formData.append('file', file);
 
+                showLoading(); // লোডিং আইকন দেখানো
                 isRequestPending = true;
                 try {
                     const response = await fetch(flaskEndpoint, {
@@ -806,6 +868,10 @@
                         const imageUrl = data.url;
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
                         displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
+                        // হিস্ট্রি লিস্টে এই চ্যাটটি প্রথমে নিয়ে আসা
+                        const currentChat = chatHistory.splice(currentChatIndex, 1)[0];
+                        chatHistory.unshift(currentChat);
+                        currentChatIndex = 0;
                         saveToLocalStorage();
                         updateHistory();
 
@@ -855,6 +921,7 @@
                     updateHistory();
                 } finally {
                     isRequestPending = false;
+                    hideLoading(); // লোডিং আইকন লুকানো
                 }
             }
 
@@ -880,11 +947,11 @@
             function startNewChatSession(firstMessage) {
                 console.log('Starting new chat session with message:', firstMessage); // ডিবাগ
                 const timestamp = new Date().toLocaleString();
-                chatHistory.push({
+                chatHistory.unshift({
                     messages: [{ sender: 'user', text: firstMessage }],
                     timestamp: timestamp
                 });
-                currentChatIndex = chatHistory.length - 1;
+                currentChatIndex = 0;
                 saveToLocalStorage();
                 updateHistory();
             }
@@ -892,6 +959,7 @@
             function startNewChat() {
                 console.log('Starting new chat'); // ডিবাগ
                 messagesDiv.innerHTML = '';
+                messagesDiv.appendChild(loadingDiv); // লোডিং এলিমেন্ট আবার যোগ করা
                 welcomeMessage.style.display = 'block';
                 firstMessageSent = false;
                 currentChatIndex = -1;
@@ -906,6 +974,7 @@
                 console.log('Loading chat index:', index); // ডিবাগ
                 currentChatIndex = index;
                 messagesDiv.innerHTML = '';
+                messagesDiv.appendChild(loadingDiv); // লোডিং এলিমেন্ট আবার যোগ করা
                 welcomeMessage.style.display = 'none';
                 firstMessageSent = true;
                 chatHistory[index].messages.forEach(msg => {
