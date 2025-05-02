@@ -66,6 +66,13 @@
             color: #F59E0B;
         }
 
+        .hamburger {
+            display: none;
+            font-size: 24px;
+            color: #1E3A8A;
+            cursor: pointer;
+        }
+
         /* Hero Section with Particle Animation */
         .hero {
             height: 100vh;
@@ -259,6 +266,9 @@
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .chatbot-widget:hover {
@@ -276,6 +286,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             padding: 15px;
             text-align: left;
+            border: 1px solid #ddd;
         }
 
         .chatbot-popup.active {
@@ -285,6 +296,24 @@
         .chatbot-popup p {
             font-size: 14px;
             color: #333;
+            margin-bottom: 10px;
+        }
+
+        .chatbot-popup a {
+            display: block;
+            text-align: center;
+            color: #1E3A8A;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px;
+            background-color: #F59E0B;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .chatbot-popup a:hover {
+            background-color: #D97706;
         }
 
         /* Footer */
@@ -309,13 +338,32 @@
                 font-size: 16px;
             }
 
+            .hamburger {
+                display: block;
+            }
+
             nav ul {
+                display: none;
                 flex-direction: column;
-                align-items: center;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: #fff;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                padding: 10px 0;
+            }
+
+            nav ul.active {
+                display: flex;
             }
 
             nav ul li {
                 margin: 10px 0;
+            }
+
+            nav ul li a {
+                font-size: 18px;
             }
         }
     </style>
@@ -326,12 +374,15 @@
         <div class="nav-container">
             <div class="logo">Formbondhu</div>
             <nav>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#testimonials">Testimonials</a></li>
+                <div class="hamburger" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul id="navMenu">
+                    <li><a href="#home" onclick="smoothScroll('home')">Home</a></li>
+                    <li><a href="#features" onclick="smoothScroll('features')">Features</a></li>
+                    <li><a href="#testimonials" onclick="smoothScroll('testimonials')">Testimonials</a></li>
                     <li><a href="chat.html">Chatbot</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#contact" onclick="smoothScroll('contact')">Contact</a></li>
                 </ul>
             </nav>
         </div>
@@ -386,20 +437,33 @@
     </section>
 
     <!-- Chatbot Widget -->
-    <a href="chat.html" class="chatbot-widget">
+    <div class="chatbot-widget" onclick="toggleChatbot()">
         <i class="fas fa-comment"></i> Try Our Chatbot
-    </a>
+    </div>
     <div class="chatbot-popup" id="chatbotPopup">
         <p>Hello! I’m Formbondhu. How can I assist you today?</p>
-        <a href="chat.html" style="display: block; text-align: center; color: #1E3A8A; text-decoration: none;">Open Chatbot</a>
+        <a href="chat.html">Open Chatbot</a>
     </div>
 
     <!-- Footer -->
-    <footer>
-        <p>© 2025 InnovateBot. All rights reserved.</p>
+    <footer id="contact">
+        <p>© 2025 Formbondhu. All rights reserved.</p>
     </footer>
 
     <script>
+        // Toggle Hamburger Menu
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Smooth Scroll Function
+        function smoothScroll(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+            toggleMenu(); // Close menu on mobile after clicking
+        }
+
+        // Toggle Chatbot Popup
         function toggleChatbot() {
             const popup = document.getElementById('chatbotPopup');
             popup.classList.toggle('active');
