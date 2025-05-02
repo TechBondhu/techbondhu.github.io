@@ -20,12 +20,12 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0; /* ফুল স্ক্রিনের জন্য মার্জিন রিমুভ */
+      margin: 0;
     }
 
     .chat-container {
-      width: 100vw; /* ফুল স্ক্রিনের জন্য */
-      height: 100vh; /* ফুল স্ক্রিনের জন্য */
+      width: 100vw;
+      height: 100vh;
       background-color: #ffffff;
       color: #000000;
       display: flex;
@@ -106,7 +106,7 @@
       width: 45px;
       height: 45px;
       border-radius: 50%;
-      background-color: #F59E0B;
+      background-color: #1E3A8A;
       color: #fff;
       border: none;
       cursor: pointer;
@@ -118,7 +118,7 @@
     }
 
     #sendBtn:hover {
-      background-color: #D97706;
+      background-color: #3B82F6;
     }
 
     #uploadBtn {
@@ -130,6 +130,11 @@
       border: none;
       cursor: pointer;
       font-size: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    #uploadBtn:hover {
+      background-color: #3B82F6;
     }
   </style>
 </head>
@@ -141,9 +146,9 @@
     </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Type your message...">
-      <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
       <button id="uploadBtn">+</button>
       <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
+      <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
     </div>
   </div>
 
