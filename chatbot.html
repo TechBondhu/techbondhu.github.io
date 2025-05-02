@@ -478,16 +478,20 @@
 
       function updateHistory() {
         historyList.innerHTML = '';
-        chatHistory.forEach((chat, index) => {
-          const historyItem = document.createElement('div');
-          historyItem.classList.add('history-item');
-          historyItem.innerHTML = `
-            <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
-            <div class="timestamp">${chat.timestamp}</div>
-          `;
-          historyItem.addEventListener('click', () => loadChat(index));
-          historyList.appendChild(historyItem);
-        });
+        if (chatHistory.length > 0) {
+          chatHistory.forEach((chat, index) => {
+            if (chat.messages && chat.messages.length > 0) {
+              const historyItem = document.createElement('div');
+              historyItem.classList.add('history-item');
+              historyItem.innerHTML = `
+                <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
+                <div class="timestamp">${chat.timestamp}</div>
+              `;
+              historyItem.addEventListener('click', () => loadChat(index));
+              historyList.appendChild(historyItem);
+            }
+          });
+        }
       }
 
       function loadChat(index) {
@@ -495,13 +499,15 @@
         messagesDiv.innerHTML = '';
         welcomeMessage.style.display = 'none';
         firstMessageSent = true;
-        chatHistory[index].messages.forEach(msg => {
-          if (msg.text) {
-            displayMessage(msg.text, msg.sender);
-          } else if (msg.image) {
-            displayImage(msg.image);
-          }
-        });
+        if (chatHistory[index] && chatHistory[index].messages) {
+          chatHistory[index].messages.forEach(msg => {
+            if (msg.text) {
+              displayMessage(msg.text, msg.sender);
+            } else if (msg.image) {
+              displayImage(msg.image);
+            }
+          });
+        }
         sidebar.classList.remove('open');
       }
 
