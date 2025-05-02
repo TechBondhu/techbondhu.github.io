@@ -334,9 +334,9 @@
 
     <!-- Hero Section -->
     <section class="hero" id="home">
-        <h1>Revolutionize Applications with Formbondhu</h1>
+        <h1>Applications with Formbondhu</h1>
         <p>Experience the future of instant applications with our AI-powered chatbot platform.</p>
-        <a href="chatbot.html" class="btn">Get Started</a>
+        <a href="chatbot.html" class="btn" id="getStartedBtn">Get Started</a>
     </section>
 
     <!-- Features Section -->
@@ -391,6 +391,16 @@
         function toggleMenu() {
             const menu = document.getElementById('navMenu');
             menu.classList.toggle('active');
+        }
+
+        // Get Started বাটনে ক্লিক এবং টাচ ইভেন্ট
+        const getStartedBtn = document.getElementById('getStartedBtn');
+        getStartedBtn.addEventListener('click', redirectToChatbot);
+        getStartedBtn.addEventListener('touchend', redirectToChatbot);
+
+        function redirectToChatbot(event) {
+            event.preventDefault(); // ডিফল্ট লিঙ্ক আচরণ বন্ধ করা
+            window.location.href = 'chatbot.html'; // ম্যানুয়ালি রিডাইরেক্ট
         }
     </script>
 </body>
