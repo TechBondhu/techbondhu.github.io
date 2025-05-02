@@ -32,6 +32,7 @@
       flex-direction: column;
       overflow: hidden;
       box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      position: relative;
     }
 
     .header {
@@ -49,25 +50,75 @@
       padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      gap: 20px;
       overflow-y: auto;
       height: 100%;
       background: linear-gradient(135deg, #f9f9f9, #E5E7EB);
+      position: relative;
     }
+
+    .welcome-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .welcome-message h2 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .welcome-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .welcome-buttons button {
+      padding: 10px 20px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      background: #fff;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .welcome-buttons button:hover {
+      background-color: #f0f0f0;
+    }
+
+    .welcome-buttons button i {
+      margin-right: 5px;
+    }
+
+    .welcome-buttons button:nth-child(1) { color: #FF6F61; }
+    .welcome-buttons button:nth-child(2) { color: #6B7280; }
+    .welcome-buttons button:nth-child(3) { color: #F59E0B; }
 
     .messages {
       height: 400px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      z-index: 2;
     }
 
     .user-message, .bot-message {
-      padding: 10px 15px;
-      border-radius: 10px;
+      padding: 15px 20px;
+      border-radius: 12px;
       max-width: 60%;
       word-wrap: break-word;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      font-size: 18px;
     }
 
     .user-message {
@@ -86,25 +137,26 @@
     .input-area {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px;
+      gap: 15px;
+      padding: 15px;
       background: #fff;
       border-top: 1px solid #ccc;
       position: relative;
+      z-index: 2;
     }
 
     #userInput {
       flex-grow: 1;
-      padding: 10px;
-      font-size: 16px;
+      padding: 12px;
+      font-size: 18px;
       border: 1px solid #ccc;
       border-radius: 20px;
       outline: none;
     }
 
     #sendBtn {
-      width: 45px;
-      height: 45px;
+      width: 55px;
+      height: 55px;
       border-radius: 50%;
       background-color: #1E3A8A;
       color: #fff;
@@ -113,7 +165,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
+      font-size: 22px;
       transition: background-color 0.3s ease;
     }
 
@@ -122,14 +174,14 @@
     }
 
     #uploadBtn {
-      width: 45px;
-      height: 45px;
+      width: 55px;
+      height: 55px;
       border-radius: 50%;
       background-color: #1E3A8A;
       color: white;
       border: none;
       cursor: pointer;
-      font-size: 20px;
+      font-size: 24px;
       transition: background-color 0.3s ease;
     }
 
@@ -142,6 +194,14 @@
   <div class="chat-container">
     <div class="header">Formbondhu</div>
     <div class="chat-box">
+      <div class="welcome-message" id="welcomeMessage">
+        <h2>How can Formbondhu assist you today?</h2>
+        <div class="welcome-buttons">
+          <button onclick="sendMessage('Submit an application')"><i class="fas fa-paper-plane"></i>Submit an application</button>
+          <button onclick="sendMessage('Get support')"><i class="fas fa-headset"></i>Get support</button>
+          <button onclick="sendMessage('Ask a question')"><i class="fas fa-question-circle"></i>Ask a question</button>
+        </div>
+      </div>
       <div class="messages" id="messages"></div>
     </div>
     <div class="input-area">
@@ -159,11 +219,12 @@
       const messagesDiv = document.getElementById('messages');
       const uploadBtn = document.getElementById('uploadBtn');
       const fileInput = document.getElementById('fileInput');
+      const welcomeMessage = document.getElementById('welcomeMessage');
 
       const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
       const flaskEndpoint = "http://localhost:5000/upload";
 
-      sendMessage("/start");
+      let firstMessageSent = false;
 
       sendBtn.addEventListener('click', sendMessage);
       userInput.addEventListener('keypress', (e) => {
@@ -183,9 +244,15 @@
         }
       });
 
-      function sendMessage() {
-        const userMessage = userInput.value.trim();
+      function sendMessage(predefinedMessage = null) {
+        const userMessage = predefinedMessage || userInput.value.trim();
         if (userMessage === '') return;
+
+        // প্রথম মেসেজ পাঠানোর পর ওয়েলকাম মেসেজ লুকিয়ে ফেলা
+        if (!firstMessageSent) {
+          welcomeMessage.style.display = 'none';
+          firstMessageSent = true;
+        }
 
         displayMessage(userMessage, 'user');
         userInput.value = '';
@@ -219,6 +286,12 @@
       }
 
       function uploadImageToFlask(file) {
+        // প্রথম মেসেজ পাঠানোর পর ওয়েলকাম মেসেজ লুকিয়ে ফেলা
+        if (!firstMessageSent) {
+          welcomeMessage.style.display = 'none';
+          firstMessageSent = true;
+        }
+
         const formData = new FormData();
         formData.append('file', file);
 
