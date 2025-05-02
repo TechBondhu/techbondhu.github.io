@@ -43,6 +43,38 @@
       font-weight: bold;
       text-align: center;
       border-bottom: 2px solid #ddd;
+      position: relative;
+    }
+
+    .history-icon {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .history-icon:hover {
+      color: #3B82F6;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #1E3A8A;
+      color: #fff;
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 10;
+    }
+
+    .sidebar.open {
+      left: 0;
     }
 
     .chat-box {
@@ -102,7 +134,7 @@
 
     .welcome-buttons button:nth-child(1) { color: #FF6F61; }
     .welcome-buttons button:nth-child(2) { color: #6B7280; }
-    .welcome-buttons button:nth-child(3) { color: #F59E0B; }
+    welcome-buttons button:nth-child(3) { color: #F59E0B; }
 
     .messages {
       height: 400px;
@@ -192,7 +224,13 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="header">Formbondhu</div>
+    <div class="header">Formbondhu
+      <i class="fas fa-history history-icon" onclick="toggleSidebar()"></i>
+    </div>
+    <div class="sidebar" id="sidebar">
+      <h3>History</h3>
+      <!-- Add history content here -->
+    </div>
     <div class="chat-box">
       <div class="welcome-message" id="welcomeMessage">
         <h2>How can Formbondhu assist you today?</h2>
@@ -220,6 +258,7 @@
       const uploadBtn = document.getElementById('uploadBtn');
       const fileInput = document.getElementById('fileInput');
       const welcomeMessage = document.getElementById('welcomeMessage');
+      const sidebar = document.getElementById('sidebar');
 
       const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
       const flaskEndpoint = "http://localhost:5000/upload";
@@ -248,7 +287,6 @@
         const userMessage = predefinedMessage || userInput.value.trim();
         if (userMessage === '') return;
 
-        // প্রথম মেসেজ পাঠানোর পর ওয়েলকাম মেসেজ লুকিয়ে ফেলা
         if (!firstMessageSent) {
           welcomeMessage.style.display = 'none';
           firstMessageSent = true;
@@ -286,7 +324,6 @@
       }
 
       function uploadImageToFlask(file) {
-        // প্রথম মেসেজ পাঠানোর পর ওয়েলকাম মেসেজ লুকিয়ে ফেলা
         if (!firstMessageSent) {
           welcomeMessage.style.display = 'none';
           firstMessageSent = true;
@@ -351,6 +388,10 @@
         img.style.margin = '10px 0';
         messagesDiv.appendChild(img);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      function toggleSidebar() {
+        sidebar.classList.toggle('open');
       }
     });
   </script>
