@@ -72,18 +72,63 @@
     .sidebar {
       position: fixed;
       top: 0;
-      left: -250px;
-      width: 250px;
+      left: -300px;
+      width: 300px;
       height: 100%;
       background-color: #1E3A8A;
       color: #fff;
       padding: 20px;
       transition: left 0.3s ease;
       z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
     .sidebar.open {
       left: 0;
+    }
+
+    .sidebar h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .history-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .history-item {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .history-item:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .history-item p {
+      font-size: 16px;
+      color: #fff;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-item .timestamp {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 5px;
     }
 
     .chat-box {
@@ -242,7 +287,7 @@
     </div>
     <div class="sidebar" id="sidebar">
       <h3>History</h3>
-      <!-- Add history content here -->
+      <div class="history-list" id="historyList"></div>
     </div>
     <div class="chat-box">
       <div class="welcome-message" id="welcomeMessage">
@@ -272,11 +317,14 @@
       const fileInput = document.getElementById('fileInput');
       const welcomeMessage = document.getElementById('welcomeMessage');
       const sidebar = document.getElementById('sidebar');
+      const historyList = document.getElementById('historyList');
 
       const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
       const flaskEndpoint = "http://localhost:5000/upload";
 
       let firstMessageSent = false;
+      let chatHistory = [];
+      let currentChatIndex = -1;
 
       sendBtn.addEventListener('click', sendMessage);
       userInput.addEventListener('keypress', (e) => {
@@ -303,10 +351,18 @@
         if (!firstMessageSent) {
           welcomeMessage.style.display = 'none';
           firstMessageSent = true;
+          startNewChatSession(userMessage);
+        } else {
+          if (currentChatIndex === -1) {
+            startNewChatSession(userMessage);
+          } else {
+            chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
+          }
         }
 
         displayMessage(userMessage, 'user');
         userInput.value = '';
+        updateHistory();
 
         fetch(rasaEndpoint, {
           method: "POST",
@@ -323,16 +379,21 @@
           if (Array.isArray(data)) {
             data.forEach(entry => {
               if (entry.text) {
+                chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: entry.text });
                 displayMessage(entry.text, 'bot');
               } else if (entry.image) {
+                chatHistory[currentChatIndex].messages.push({ sender: 'bot', image: entry.image });
                 displayImage(entry.image);
               }
             });
+            updateHistory();
           }
         })
         .catch(error => {
           console.error("Error communicating with Rasa:", error);
           displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
+          chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!" });
+          updateHistory();
         });
       }
 
@@ -340,6 +401,11 @@
         if (!firstMessageSent) {
           welcomeMessage.style.display = 'none';
           firstMessageSent = true;
+          startNewChatSession("Image upload");
+        } else {
+          if (currentChatIndex === -1) {
+            startNewChatSession("Image upload");
+          }
         }
 
         const formData = new FormData();
@@ -353,7 +419,10 @@
         .then(data => {
           if (data.url) {
             const imageUrl = data.url;
+            chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
             displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
+            updateHistory();
+
             fetch(rasaEndpoint, {
               method: "POST",
               headers: {
@@ -368,21 +437,29 @@
             .then(data => {
               data.forEach(entry => {
                 if (entry.text) {
+                  chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: entry.text });
                   displayMessage(entry.text, 'bot');
                 }
               });
+              updateHistory();
             })
             .catch(error => {
               console.error("Error sending URL to Rasa:", error);
+              chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Rasa-এ URL পাঠাতে সমস্যা!" });
               displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
+              updateHistory();
             });
           } else {
+            chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `❌ ইমেজ আপলোডে সমস্যা: ${data.error}` });
             displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
+            updateHistory();
           }
         })
         .catch(error => {
           console.error("Error uploading image to Flask:", error);
+          chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Flask API-এ ইমেজ আপলোডে সমস্যা!" });
           displayMessage("❌ Flask API-এ ইমেজ আপলোডে সমস্যা!", 'bot');
+          updateHistory();
         });
       }
 
@@ -403,14 +480,54 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
       }
 
-      function toggleSidebar() {
-        sidebar.classList.toggle('open');
+      function startNewChatSession(firstMessage) {
+        const timestamp = new Date().toLocaleString();
+        chatHistory.push({
+          messages: [{ sender: 'user', text: firstMessage }],
+          timestamp: timestamp
+        });
+        currentChatIndex = chatHistory.length - 1;
       }
 
       function startNewChat() {
         messagesDiv.innerHTML = '';
         welcomeMessage.style.display = 'block';
         firstMessageSent = false;
+        currentChatIndex = -1;
+        updateHistory();
+      }
+
+      function toggleSidebar() {
+        sidebar.classList.toggle('open');
+      }
+
+      function updateHistory() {
+        historyList.innerHTML = '';
+        chatHistory.forEach((chat, index) => {
+          const historyItem = document.createElement('div');
+          historyItem.classList.add('history-item');
+          historyItem.innerHTML = `
+            <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
+            <div class="timestamp">${chat.timestamp}</div>
+          `;
+          historyItem.addEventListener('click', () => loadChat(index));
+          historyList.appendChild(historyItem);
+        });
+      }
+
+      function loadChat(index) {
+        currentChatIndex = index;
+        messagesDiv.innerHTML = '';
+        welcomeMessage.style.display = 'none';
+        firstMessageSent = true;
+        chatHistory[index].messages.forEach(msg => {
+          if (msg.text) {
+            displayMessage(msg.text, msg.sender);
+          } else if (msg.image) {
+            displayImage(msg.image);
+          }
+        });
+        sidebar.classList.remove('open');
       }
     });
   </script>
