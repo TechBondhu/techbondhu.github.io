@@ -344,6 +344,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            gap: 10px;
             z-index: 2;
         }
 
@@ -396,7 +397,7 @@
         .input-area {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             padding: 15px;
             background: #fff;
             border-top: 1px solid #ccc;
@@ -407,7 +408,7 @@
         #userInput {
             flex-grow: 1;
             padding: 12px;
-            font-size: 18px;
+            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 20px;
             outline: none;
@@ -422,8 +423,8 @@
 
         #sendBtn,
         #uploadBtn {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             background-color: #1E3A8A;
             color: #fff;
@@ -432,7 +433,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 22px;
+            font-size: 20px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
@@ -443,7 +444,7 @@
         }
 
         #uploadBtn {
-            font-size: 24px;
+            font-size: 22px;
         }
 
         .modal {
@@ -500,14 +501,22 @@
         @media (max-width: 768px) {
             .sidebar { width: 250px; }
             .chat-container.sidebar-open { margin-left: 250px; width: calc(100vw - 250px); }
+            .user-message, .bot-message { max-width: 80%; }
+            .welcome-message h2 { font-size: 20px; }
+            .welcome-buttons button { font-size: 12px; padding: 8px 16px; }
+            #userInput { font-size: 14px; padding: 10px; }
+            #sendBtn, #uploadBtn { width: 40px; height: 40px; font-size: 18px; }
         }
 
         @media (max-width: 480px) {
             .sidebar { width: 200px; }
             .chat-container.sidebar-open { margin-left: 200px; width: calc(100vw - 200px); }
-            .user-message, .bot-message { max-width: 80%; }
-            .welcome-message h2 { font-size: 20px; }
-            .welcome-buttons button { font-size: 12px; padding: 8px 16px; }
+            .user-message, .bot-message { max-width: 90%; font-size: 16px; padding: 12px; }
+            .welcome-message h2 { font-size: 18px; }
+            .welcome-buttons button { font-size: 10px; padding: 6px 12px; }
+            .input-area { padding: 10px; }
+            #userInput { font-size: 12px; padding: 8px; }
+            #sendBtn, #uploadBtn { width: 35px; height: 35px; font-size: 16px; }
         }
     </style>
 </head>
@@ -894,7 +903,7 @@
             function displayImage(imageUrl) {
                 const img = document.createElement('img');
                 img.src = imageUrl;
-                img.style.maxWidth = '200px';
+                img.style.max-width = '200px';
                 img.style.margin = '10px 0';
                 messagesDiv.appendChild(img);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
