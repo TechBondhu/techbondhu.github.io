@@ -88,7 +88,7 @@
             left: -300px;
             width: 300px;
             height: 100%;
-            background-color: #1E3A8A;
+            background: linear-gradient(135deg, #1E3A8A, #3B82F6);
             color: #fff;
             padding: 20px;
             transition: left 0.3s ease, opacity 0.3s ease;
@@ -98,6 +98,7 @@
             flex-direction: column;
             gap: 15px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
 
         .sidebar.open {
@@ -105,11 +106,17 @@
             opacity: 1;
         }
 
-        .sidebar h3 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar-icon {
+            font-size: 24px;
+            cursor: pointer;
         }
 
         .search-input {
@@ -138,6 +145,13 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding-top: 10px;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .history-list::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .history-item {
@@ -146,6 +160,7 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -176,21 +191,54 @@
             margin-top: 5px;
         }
 
-        .history-item-actions {
-            display: flex;
-            gap: 10px;
+        .history-item .options {
+            opacity: 0;
+            position: absolute;
+            right: 15px;
+            transition: opacity 0.3s ease;
         }
 
-        .history-item-actions i {
-            font-size: 16px;
-            color: #fff;
+        .history-item:hover .options {
+            opacity: 1;
+        }
+
+        .options i {
+            font-size: 18px;
             cursor: pointer;
+            margin-left: 10px;
             transition: color 0.3s ease, transform 0.2s ease;
         }
 
-        .history-item-actions i:hover {
+        .options i:hover {
             color: #3B82F6;
             transform: scale(1.2);
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 40px;
+            background-color: #1E3A8A;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+        }
+
+        .dropdown.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 15px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #3B82F6;
         }
 
         .chat-box {
@@ -402,8 +450,8 @@
             Formbondhu
         </div>
         <div class="sidebar" id="sidebar">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>History</h3>
+            <div class="sidebar-header">
+                <i class="fas fa-bars sidebar-icon" id="sidebarIcon"></i>
                 <i class="fas fa-times" style="cursor: pointer; font-size: 20px;" id="closeSidebar"></i>
             </div>
             <input type="text" class="search-input" id="searchInput" placeholder="Search chat history...">
@@ -447,6 +495,7 @@
             const closeSidebar = document.getElementById('closeSidebar');
             const searchInput = document.getElementById('searchInput');
             const chatBox = document.getElementById('chatBox');
+            const sidebarIcon = document.getElementById('sidebarIcon');
 
             const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
             const flaskEndpoint = "http://localhost:5000/upload";
@@ -454,6 +503,16 @@
             let firstMessageSent = false;
             let chatHistory = [];
             let currentChatIndex = -1;
+            let isRequestPending = false; // ডিবাউন্সিংয়ের জন্য ফ্ল্যাগ
+
+            // ডিবাউন্স ফাংশন
+            function debounce(func, wait) {
+                let timeout;
+                return function (...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
 
             // ইভেন্ট লিসেনার
             if (!historyIcon) console.error('History icon not found!');
@@ -463,10 +522,10 @@
             });
 
             if (!newChatIcon) console.error('New chat icon not found!');
-            newChatIcon.addEventListener('click', () => {
+            newChatIcon.addEventListener('click', debounce(() => {
                 console.log('New chat icon clicked'); // ডিবাগ
                 startNewChat();
-            });
+            }, 500));
 
             if (!closeSidebar) console.error('Close sidebar icon not found!');
             closeSidebar.addEventListener('click', () => {
@@ -474,10 +533,16 @@
                 toggleSidebar();
             });
 
-            sendBtn.addEventListener('click', sendMessage);
+            if (!sidebarIcon) console.error('Sidebar icon not found!');
+            sidebarIcon.addEventListener('click', () => {
+                console.log('Sidebar icon clicked'); // ডিবাগ
+                toggleSidebar();
+            });
+
+            sendBtn.addEventListener('click', debounce(() => sendMessage(), 500));
             userInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    sendMessage();
+                    debounce(() => sendMessage(), 500)();
                 }
             });
 
@@ -562,18 +627,17 @@
                             <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
                             <div class="timestamp">${chat.timestamp}</div>
                         </div>
-                        <div class="history-item-actions">
-                            <i class="fas fa-edit" title="Edit"></i>
-                            <i class="fas fa-trash" title="Delete"></i>
+                        <div class="options">
+                            <i class="fas fa-ellipsis-v" id="optionIcon-${index}"></i>
+                        </div>
+                        <div class="dropdown" id="dropdown-${index}">
+                            <div class="dropdown-item" onclick="renameHistory(${index}, event)">Rename</div>
+                            <div class="dropdown-item" onclick="deleteHistory(${index}, event)">Delete</div>
                         </div>
                     `;
-                    historyItem.querySelector('.fa-edit').addEventListener('click', (e) => {
+                    historyItem.querySelector(`#optionIcon-${index}`).addEventListener('click', (e) => {
                         e.stopPropagation();
-                        editHistoryItem(index);
-                    });
-                    historyItem.querySelector('.fa-trash').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        deleteHistoryItem(index);
+                        toggleDropdown(index);
                     });
                     historyItem.addEventListener('click', () => {
                         console.log('Loading chat:', index); // ডিবাগ
@@ -583,9 +647,13 @@
                 });
             }
 
-            // হিস্ট্রি আইটেম এডিট
-            function editHistoryItem(index) {
-                console.log('Editing history item:', index); // ডিবাগ
+            function toggleDropdown(index) {
+                const dropdown = document.getElementById(`dropdown-${index}`);
+                dropdown.classList.toggle('active');
+            }
+
+            function renameHistory(index, event) {
+                event.stopPropagation();
                 const newText = prompt('Edit the chat title:', chatHistory[index].messages[0].text);
                 if (newText && newText.trim()) {
                     chatHistory[index].messages[0].text = newText.trim();
@@ -595,11 +663,11 @@
                         loadChat(index);
                     }
                 }
+                toggleDropdown(index);
             }
 
-            // হিস্ট্রি আইটেম ডিলিট
-            function deleteHistoryItem(index) {
-                console.log('Deleting history item:', index); // ডিবাগ
+            function deleteHistory(index, event) {
+                event.stopPropagation();
                 if (confirm('Are you sure you want to delete this chat?')) {
                     chatHistory.splice(index, 1);
                     if (currentChatIndex === index) {
@@ -610,9 +678,25 @@
                     saveToLocalStorage();
                     updateHistory(searchInput.value.trim());
                 }
+                toggleDropdown(index);
             }
 
-            function sendMessage(predefinedMessage = null) {
+            async function checkServerStatus() {
+                try {
+                    const response = await fetch(rasaEndpoint, { method: 'OPTIONS' });
+                    return response.ok;
+                } catch (error) {
+                    console.error('Server status check failed:', error);
+                    return false;
+                }
+            }
+
+            async function sendMessage(predefinedMessage = null) {
+                if (isRequestPending) {
+                    console.log('Request already pending, skipping'); // ডিবাগ
+                    return;
+                }
+
                 const userMessage = predefinedMessage || userInput.value.trim();
                 if (userMessage === '') {
                     console.log('Empty message, skipping'); // ডিবাগ
@@ -637,18 +721,26 @@
                 saveToLocalStorage();
                 updateHistory();
 
-                fetch(rasaEndpoint, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        sender: "user",
-                        message: userMessage
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
+                isRequestPending = true;
+                try {
+                    const serverAvailable = await checkServerStatus();
+                    if (!serverAvailable) {
+                        throw new Error('Server not available');
+                    }
+
+                    const response = await fetch(rasaEndpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            sender: "user",
+                            message: userMessage
+                        }),
+                        signal: AbortSignal.timeout(5000) // 5 সেকেন্ড টাইমআউট
+                    });
+
+                    const data = await response.json();
                     console.log('Rasa response:', data); // ডিবাগ
                     if (Array.isArray(data)) {
                         data.forEach(entry => {
@@ -663,17 +755,29 @@
                         saveToLocalStorage();
                         updateHistory();
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error("Error communicating with Rasa:", error);
-                    displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
-                    chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!" });
+                    let errorMessage = "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!";
+                    if (error.name === 'TimeoutError') {
+                        errorMessage = "❌ সার্ভার রেসপন্স করতে দেরি করছে (টাইমআউট)!";
+                    } else if (error.message === 'Server not available') {
+                        errorMessage = "❌ সার্ভার চলছে না! দয়া করে Rasa সার্ভার চেক করুন।";
+                    }
+                    displayMessage(errorMessage, 'bot');
+                    chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: errorMessage });
                     saveToLocalStorage();
                     updateHistory();
-                });
+                } finally {
+                    isRequestPending = false;
+                }
             }
 
-            function uploadImageToFlask(file) {
+            async function uploadImageToFlask(file) {
+                if (isRequestPending) {
+                    console.log('Request already pending, skipping'); // ডিবাগ
+                    return;
+                }
+
                 console.log('Uploading image:', file.name); // ডিবাগ
                 if (!firstMessageSent) {
                     welcomeMessage.style.display = 'none';
@@ -688,12 +792,15 @@
                 const formData = new FormData();
                 formData.append('file', file);
 
-                fetch(flaskEndpoint, {
-                    method: "POST",
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
+                isRequestPending = true;
+                try {
+                    const response = await fetch(flaskEndpoint, {
+                        method: "POST",
+                        body: formData,
+                        signal: AbortSignal.timeout(5000) // 5 সেকেন্ড টাইমআউট
+                    });
+
+                    const data = await response.json();
                     console.log('Flask response:', data); // ডিবাগ
                     if (data.url) {
                         const imageUrl = data.url;
@@ -702,7 +809,12 @@
                         saveToLocalStorage();
                         updateHistory();
 
-                        fetch(rasaEndpoint, {
+                        const serverAvailable = await checkServerStatus();
+                        if (!serverAvailable) {
+                            throw new Error('Server not available');
+                        }
+
+                        const rasaResponse = await fetch(rasaEndpoint, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json"
@@ -710,40 +822,40 @@
                             body: JSON.stringify({
                                 sender: "user",
                                 message: imageUrl
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            data.forEach(entry => {
-                                if (entry.text) {
-                                    chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: entry.text });
-                                    displayMessage(entry.text, 'bot');
-                                }
-                            });
-                            saveToLocalStorage();
-                            updateHistory();
-                        })
-                        .then(error => {
-                            console.error("Error sending URL to Rasa:", error);
-                            chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Rasa-এ URL পাঠাতে সমস্যা!" });
-                            displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
-                            saveToLocalStorage();
-                            updateHistory();
+                            }),
+                            signal: AbortSignal.timeout(5000)
                         });
+
+                        const rasaData = await rasaResponse.json();
+                        rasaData.forEach(entry => {
+                            if (entry.text) {
+                                chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: entry.text });
+                                displayMessage(entry.text, 'bot');
+                            }
+                        });
+                        saveToLocalStorage();
+                        updateHistory();
                     } else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `❌ ইমেজ আপলোডে সমস্যা: ${data.error}` });
                         displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
                         saveToLocalStorage();
                         updateHistory();
                     }
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error("Error uploading image to Flask:", error);
-                    displayMessage("❌ Flask API-এ ইমেজ আপলোডে সমস্যা!", 'bot');
-                    chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Flask API-এ ইমেজ আপলোডে সমস্যা!" });
+                    let errorMessage = "❌ Flask API-এ ইমেজ আপলোডে সমস্যা!";
+                    if (error.name === 'TimeoutError') {
+                        errorMessage = "❌ Flask সার্ভার রেসপন্স করতে দেরি করছে (টাইমআউট)!";
+                    } else if (error.message === 'Server not available') {
+                        errorMessage = "❌ Rasa সার্ভার চলছে না! দয়া করে সার্ভার চেক করুন।";
+                    }
+                    displayMessage(errorMessage, 'bot');
+                    chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: errorMessage });
                     saveToLocalStorage();
                     updateHistory();
-                });
+                } finally {
+                    isRequestPending = false;
+                }
             }
 
             function displayMessage(message, sender) {
