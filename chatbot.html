@@ -319,12 +319,11 @@
       const sidebar = document.getElementById('sidebar');
       const historyList = document.getElementById('historyList');
 
-      const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
-      const flaskEndpoint = "http://localhost:5000/upload";
-
       let firstMessageSent = false;
-      let chatHistory = [];
       let currentChatIndex = -1;
+
+      // Load chat history from localStorage
+      let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
 
       sendBtn.addEventListener('click', sendMessage);
       userInput.addEventListener('keypress', (e) => {
@@ -362,39 +361,8 @@
 
         displayMessage(userMessage, 'user');
         userInput.value = '';
+        saveToLocalStorage();
         updateHistory();
-
-        fetch(rasaEndpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            sender: "user",
-            message: userMessage
-          })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (Array.isArray(data)) {
-            data.forEach(entry => {
-              if (entry.text) {
-                chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: entry.text });
-                displayMessage(entry.text, 'bot');
-              } else if (entry.image) {
-                chatHistory[currentChatIndex].messages.push({ sender: 'bot', image: entry.image });
-                displayImage(entry.image);
-              }
-            });
-            updateHistory();
-          }
-        })
-        .catch(error => {
-          console.error("Error communicating with Rasa:", error);
-          displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
-          chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!" });
-          updateHistory();
-        });
       }
 
       function uploadImageToFlask(file) {
@@ -411,7 +379,7 @@
         const formData = new FormData();
         formData.append('file', file);
 
-        fetch(flaskEndpoint, {
+        fetch('http://localhost:5000/upload', {
           method: "POST",
           body: formData
         })
@@ -421,9 +389,10 @@
             const imageUrl = data.url;
             chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
             displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
+            saveToLocalStorage();
             updateHistory();
 
-            fetch(rasaEndpoint, {
+            fetch('http://localhost:5005/webhooks/rest/webhook', {
               method: "POST",
               headers: {
                 "Content-Type": "application/json"
@@ -441,17 +410,20 @@
                   displayMessage(entry.text, 'bot');
                 }
               });
+              saveToLocalStorage();
               updateHistory();
             })
             .catch(error => {
               console.error("Error sending URL to Rasa:", error);
               chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Rasa-এ URL পাঠাতে সমস্যা!" });
               displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
+              saveToLocalStorage();
               updateHistory();
             });
           } else {
             chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `❌ ইমেজ আপলোডে সমস্যা: ${data.error}` });
             displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
+            saveToLocalStorage();
             updateHistory();
           }
         })
@@ -459,6 +431,7 @@
           console.error("Error uploading image to Flask:", error);
           chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Flask API-এ ইমেজ আপলোডে সমস্যা!" });
           displayMessage("❌ Flask API-এ ইমেজ আপলোডে সমস্যা!", 'bot');
+          saveToLocalStorage();
           updateHistory();
         });
       }
@@ -487,6 +460,7 @@
           timestamp: timestamp
         });
         currentChatIndex = chatHistory.length - 1;
+        saveToLocalStorage();
       }
 
       function startNewChat() {
@@ -494,6 +468,7 @@
         welcomeMessage.style.display = 'block';
         firstMessageSent = false;
         currentChatIndex = -1;
+        saveToLocalStorage();
         updateHistory();
       }
 
@@ -529,6 +504,13 @@
         });
         sidebar.classList.remove('open');
       }
+
+      function saveToLocalStorage() {
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+      }
+
+      // Load history on page load
+      updateHistory();
     });
   </script>
 </body>
