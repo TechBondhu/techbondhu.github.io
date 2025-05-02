@@ -72,13 +72,14 @@
             font-size: 24px;
             color: #fff;
             cursor: pointer;
-            transition: color 0.3s ease;
+            transition: color 0.3s ease, transform 0.2s ease;
         }
 
         .history-icon:hover,
         .new-chat-icon:hover,
         .home-icon:hover {
             color: #3B82F6;
+            transform: scale(1.1);
         }
 
         .sidebar {
@@ -90,7 +91,8 @@
             background-color: #1E3A8A;
             color: #fff;
             padding: 20px;
-            transition: left 0.3s ease;
+            transition: left 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -100,6 +102,7 @@
 
         .sidebar.open {
             left: 0;
+            opacity: 1;
         }
 
         .sidebar h3 {
@@ -107,6 +110,26 @@
             margin-bottom: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             padding-bottom: 10px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 20px;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-input:focus {
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .history-list {
@@ -123,11 +146,19 @@
             border-radius: 10px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .history-item:hover {
             background-color: rgba(255, 255, 255, 0.2);
             transform: translateX(5px);
+        }
+
+        .history-item-content {
+            flex-grow: 1;
+            overflow: hidden;
         }
 
         .history-item p {
@@ -145,6 +176,23 @@
             margin-top: 5px;
         }
 
+        .history-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .history-item-actions i {
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .history-item-actions i:hover {
+            color: #3B82F6;
+            transform: scale(1.2);
+        }
+
         .chat-box {
             flex-grow: 1;
             padding: 20px;
@@ -155,6 +203,16 @@
             height: 100%;
             background: linear-gradient(135deg, #f9f9f9, #E5E7EB);
             position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        .chat-box.fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .welcome-message {
@@ -166,6 +224,12 @@
             z-index: 2;
             width: 100%;
             padding: 20px;
+            animation: slideUp 0.5s ease-in-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, -30%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
         }
 
         .welcome-message h2 {
@@ -342,9 +406,10 @@
                 <h3>History</h3>
                 <i class="fas fa-times" style="cursor: pointer; font-size: 20px;" id="closeSidebar"></i>
             </div>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search chat history...">
             <div class="history-list" id="historyList"></div>
         </div>
-        <div class="chat-box">
+        <div class="chat-box" id="chatBox">
             <div class="welcome-message" id="welcomeMessage">
                 <h2>How can Formbondhu assist you today?</h2>
                 <div class="welcome-buttons">
@@ -365,7 +430,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded'); // ডিবাগ: DOM লোড হয়েছে কিনা
+            console.log('DOM fully loaded'); // ডিবাগ
 
             // DOM এলিমেন্ট
             const sendBtn = document.getElementById('sendBtn');
@@ -380,6 +445,8 @@
             const historyIcon = document.getElementById('historyIcon');
             const newChatIcon = document.getElementById('newChatIcon');
             const closeSidebar = document.getElementById('closeSidebar');
+            const searchInput = document.getElementById('searchInput');
+            const chatBox = document.getElementById('chatBox');
 
             const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
             const flaskEndpoint = "http://localhost:5000/upload";
@@ -425,6 +492,11 @@
                 }
             });
 
+            searchInput.addEventListener('input', () => {
+                console.log('Search input:', searchInput.value); // ডিবাগ
+                updateHistory(searchInput.value.trim());
+            });
+
             // সাইডবার টগল ফাংশন
             function toggleSidebar() {
                 console.log('Toggling sidebar'); // ডিবাগ
@@ -466,27 +538,78 @@
             }
 
             // হিস্ট্রি আপডেট
-            function updateHistory() {
-                console.log('Updating history with chatHistory:', chatHistory); // ডিবাগ
+            function updateHistory(searchQuery = '') {
+                console.log('Updating history with search query:', searchQuery); // ডিবাগ
                 historyList.innerHTML = '';
-                if (chatHistory.length === 0) {
+                let filteredHistory = chatHistory;
+                if (searchQuery) {
+                    filteredHistory = chatHistory.filter(chat =>
+                        chat.messages[0].text.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                    console.log('Filtered history:', filteredHistory); // ডিবাগ
+                }
+                if (filteredHistory.length === 0) {
                     console.log('No history items to display'); // ডিবাগ
+                    historyList.innerHTML = '<p style="color: rgba(255, 255, 255, 0.6); text-align: center;">No chats found</p>';
                     return;
                 }
-                chatHistory.forEach((chat, index) => {
+                filteredHistory.forEach((chat, index) => {
                     console.log('Adding history item:', chat.messages[0].text, 'at index:', index); // ডিবাগ
                     const historyItem = document.createElement('div');
                     historyItem.classList.add('history-item');
                     historyItem.innerHTML = `
-                        <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
-                        <div class="timestamp">${chat.timestamp}</div>
+                        <div class="history-item-content">
+                            <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
+                            <div class="timestamp">${chat.timestamp}</div>
+                        </div>
+                        <div class="history-item-actions">
+                            <i class="fas fa-edit" title="Edit"></i>
+                            <i class="fas fa-trash" title="Delete"></i>
+                        </div>
                     `;
+                    historyItem.querySelector('.fa-edit').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        editHistoryItem(index);
+                    });
+                    historyItem.querySelector('.fa-trash').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteHistoryItem(index);
+                    });
                     historyItem.addEventListener('click', () => {
                         console.log('Loading chat:', index); // ডিবাগ
                         loadChat(index);
                     });
                     historyList.appendChild(historyItem);
                 });
+            }
+
+            // হিস্ট্রি আইটেম এডিট
+            function editHistoryItem(index) {
+                console.log('Editing history item:', index); // ডিবাগ
+                const newText = prompt('Edit the chat title:', chatHistory[index].messages[0].text);
+                if (newText && newText.trim()) {
+                    chatHistory[index].messages[0].text = newText.trim();
+                    saveToLocalStorage();
+                    updateHistory(searchInput.value.trim());
+                    if (currentChatIndex === index) {
+                        loadChat(index);
+                    }
+                }
+            }
+
+            // হিস্ট্রি আইটেম ডিলিট
+            function deleteHistoryItem(index) {
+                console.log('Deleting history item:', index); // ডিবাগ
+                if (confirm('Are you sure you want to delete this chat?')) {
+                    chatHistory.splice(index, 1);
+                    if (currentChatIndex === index) {
+                        startNewChat();
+                    } else if (currentChatIndex > index) {
+                        currentChatIndex--;
+                    }
+                    saveToLocalStorage();
+                    updateHistory(searchInput.value.trim());
+                }
             }
 
             function sendMessage(predefinedMessage = null) {
@@ -511,8 +634,8 @@
 
                 displayMessage(userMessage, 'user');
                 userInput.value = '';
-                saveToLocalStorage(); // হিস্ট্রি সেভ
-                updateHistory(); // হিস্ট্রি আপডেট
+                saveToLocalStorage();
+                updateHistory();
 
                 fetch(rasaEndpoint, {
                     method: "POST",
@@ -537,15 +660,15 @@
                                 displayImage(entry.image);
                             }
                         });
-                        saveToLocalStorage(); // Rasa রেসপন্স সেভ
-                        updateHistory(); // হিস্ট্রি আপডেট
+                        saveToLocalStorage();
+                        updateHistory();
                     }
                 })
                 .catch(error => {
                     console.error("Error communicating with Rasa:", error);
                     displayMessage("❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!", 'bot');
                     chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না!" });
-                    saveToLocalStorage(); // এরর মেসেজ সেভ
+                    saveToLocalStorage();
                     updateHistory();
                 });
             }
@@ -576,7 +699,7 @@
                         const imageUrl = data.url;
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
                         displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
-                        saveToLocalStorage(); // ইমেজ আপলোড সেভ
+                        saveToLocalStorage();
                         updateHistory();
 
                         fetch(rasaEndpoint, {
@@ -597,10 +720,10 @@
                                     displayMessage(entry.text, 'bot');
                                 }
                             });
-                            saveToLocalStorage(); // Rasa রেসপন্স সেভ
+                            saveToLocalStorage();
                             updateHistory();
                         })
-                        .catch(error => {
+                        .then(error => {
                             console.error("Error sending URL to Rasa:", error);
                             chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: "❌ Rasa-এ URL পাঠাতে সমস্যা!" });
                             displayMessage("❌ Rasa-এ URL পাঠাতে সমস্যা!", 'bot');
@@ -660,8 +783,11 @@
                 welcomeMessage.style.display = 'block';
                 firstMessageSent = false;
                 currentChatIndex = -1;
+                chatBox.classList.add('fade-in');
+                setTimeout(() => chatBox.classList.remove('fade-in'), 500);
                 saveToLocalStorage();
                 updateHistory();
+                searchInput.value = '';
             }
 
             function loadChat(index) {
