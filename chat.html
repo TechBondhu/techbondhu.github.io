@@ -381,7 +381,7 @@
         }
 
         .user-message {
-            background-color: #3B82F6; /* পরিবর্তিত: গাঢ় নীল থেকে হালকা নীল */
+            background-color: #3B82F6;
             color: #fff;
             text-align: right;
             margin-left: auto;
@@ -497,36 +497,17 @@
             color: #fff;
         }
 
-        /* রেসপনসিভ ডিজাইন */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 250px;
-            }
-            .chat-container.sidebar-open {
-                margin-left: 250px;
-                width: calc(100vw - 250px);
-            }
+            .sidebar { width: 250px; }
+            .chat-container.sidebar-open { margin-left: 250px; width: calc(100vw - 250px); }
         }
 
         @media (max-width: 480px) {
-            .sidebar {
-                width: 200px;
-            }
-            .chat-container.sidebar-open {
-                margin-left: 200px;
-                width: calc(100vw - 200px);
-            }
-            .user-message,
-            .bot-message {
-                max-width: 80%;
-            }
-            .welcome-message h2 {
-                font-size: 20px;
-            }
-            .welcome-buttons button {
-                font-size: 12px;
-                padding: 8px 16px;
-            }
+            .sidebar { width: 200px; }
+            .chat-container.sidebar-open { margin-left: 200px; width: calc(100vw - 200px); }
+            .user-message, .bot-message { max-width: 80%; }
+            .welcome-message h2 { font-size: 20px; }
+            .welcome-buttons button { font-size: 12px; padding: 8px 16px; }
         }
     </style>
 </head>
@@ -578,8 +559,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM fully loaded');
-
             const sendBtn = document.getElementById('sendBtn');
             const userInput = document.getElementById('userInput');
             const messagesDiv = document.getElementById('messages');
