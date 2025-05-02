@@ -369,6 +369,24 @@ document.addEventListener('DOMContentLoaded', () => {
   let chatHistory = [];
   let currentChatIndex = -1;
 
+  // লোকাল স্টোরেজ থেকে হিস্ট্রি লোড করা
+  function loadFromLocalStorage() {
+    const storedHistory = localStorage.getItem('chatHistory');
+    if (storedHistory) {
+      chatHistory = JSON.parse(storedHistory);
+      currentChatIndex = chatHistory.length > 0 ? 0 : -1; // প্রথম চ্যাট লোড করা
+      updateHistory();
+      if (currentChatIndex >= 0) {
+        loadChat(currentChatIndex);
+      }
+    }
+  }
+
+  // লোকাল স্টোরেজে হিস্ট্রি সেভ করা
+  function saveToLocalStorage() {
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  }
+
   sendBtn.addEventListener('click', sendMessage);
   userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
@@ -530,6 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
       timestamp: timestamp
     });
     currentChatIndex = chatHistory.length - 1;
+    saveToLocalStorage(); // নতুন চ্যাট সেশন সেভ করা
   }
 
   function startNewChat() {
@@ -557,6 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
       historyItem.addEventListener('click', () => loadChat(index));
       historyList.appendChild(historyItem);
     });
+    saveToLocalStorage(); // হিস্ট্রি আপডেটের পর সেভ করা
   }
 
   function loadChat(index) {
@@ -571,17 +591,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayImage(msg.image);
       }
     });
-        }
-        sidebar.classList.remove('open');
-      }
+    sidebar.classList.remove('open');
+    chatContainer.classList.remove('sidebar-open');
+  }
 
-      function saveToLocalStorage() {
-        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-      }
-
-      // Load history on page load
-      updateHistory();
-    });
+  // পেজ লোডের সময় হিস্ট্রি লোড করা
+  loadFromLocalStorage();
+});
   </script>
 </body>
 </html>
