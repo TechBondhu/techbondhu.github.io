@@ -28,7 +28,7 @@
             width: 100%;
             top: 0;
             z-index: 1000;
-            padding: 15px 0;
+            padding: 10px 0;
         }
 
         .nav-container {
@@ -37,11 +37,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 15px;
         }
 
         .logo {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 600;
             color: #1E3A8A;
         }
@@ -52,13 +52,13 @@
         }
 
         nav ul li {
-            margin-left: 30px;
+            margin-left: 20px;
         }
 
         nav ul li a {
             text-decoration: none;
             color: #1E3A8A;
-            font-size: 16px;
+            font-size: 14px;
             transition: color 0.3s;
         }
 
@@ -68,12 +68,12 @@
 
         .hamburger {
             display: none;
-            font-size: 24px;
+            font-size: 22px;
             color: #1E3A8A;
             cursor: pointer;
         }
 
-        /* Hero Section with Particle Animation */
+        /* Hero Section */
         .hero {
             height: 100vh;
             background: linear-gradient(135deg, #1E3A8A, #3B82F6);
@@ -85,32 +85,35 @@
             color: white;
             position: relative;
             overflow: hidden;
+            padding: 20px;
         }
 
         .hero h1 {
-            font-size: 50px;
-            margin-bottom: 20px;
+            font-size: 40px;
+            margin-bottom: 15px;
             animation: fadeInDown 1s ease-out;
         }
 
         .hero p {
-            font-size: 20px;
-            margin-bottom: 30px;
-            max-width: 600px;
+            font-size: 18px;
+            margin-bottom: 25px;
+            max-width: 500px;
             animation: fadeInUp 1s ease-out;
         }
 
         .hero .btn {
             background-color: #F59E0B;
             color: #fff;
-            padding: 12px 30px;
+            padding: 10px 25px;
             text-decoration: none;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             transition: background-color 0.3s;
             animation: fadeInUp 1s ease-out 0.5s;
             animation-fill-mode: both;
+            cursor: pointer;
+            display: inline-block;
         }
 
         .hero .btn:hover {
@@ -120,8 +123,8 @@
         .hero::before {
             content: '';
             position: absolute;
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             top: 10%;
@@ -132,8 +135,8 @@
         .hero::after {
             content: '';
             position: absolute;
-            width: 200px;
-            height: 200px;
+            width: 160px;
+            height: 160px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             bottom: 10%;
@@ -143,7 +146,7 @@
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-30px); }
+            50% { transform: translateY(-20px); }
         }
 
         @keyframes fadeInDown {
@@ -158,27 +161,27 @@
 
         /* Features Section */
         .features {
-            padding: 80px 20px;
+            padding: 60px 15px;
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
         }
 
         .features h2 {
-            font-size: 36px;
-            margin-bottom: 40px;
+            font-size: 30px;
+            margin-bottom: 30px;
             color: #1E3A8A;
         }
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
         }
 
         .feature-card {
             background-color: #fff;
-            padding: 30px;
+            padding: 20px;
             border-radius: 10px;
             transition: transform 0.3s, box-shadow 0.3s;
             opacity: 0;
@@ -189,51 +192,51 @@
         .feature-card:nth-child(3) { animation-delay: 0.4s; }
 
         .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
 
         .feature-card i {
-            font-size: 40px;
+            font-size: 35px;
             color: #F59E0B;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .feature-card h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin-bottom: 10px;
             color: #1E3A8A;
         }
 
         .feature-card p {
-            font-size: 16px;
+            font-size: 14px;
             color: #555;
         }
 
         /* Testimonial Section */
         .testimonials {
-            padding: 80px 20px;
+            padding: 60px 15px;
             background-color: #fff;
             text-align: center;
         }
 
         .testimonials h2 {
-            font-size: 36px;
-            margin-bottom: 40px;
+            font-size: 30px;
+            margin-bottom: 30px;
             color: #1E3A8A;
         }
 
         .testimonial-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
         .testimonial-card {
             background-color: #F9FAFB;
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             opacity: 0;
             animation: fadeInUp 0.8s ease-out forwards;
@@ -243,13 +246,13 @@
         .testimonial-card:nth-child(3) { animation-delay: 0.4s; }
 
         .testimonial-card p {
-            font-size: 16px;
+            font-size: 14px;
             color: #555;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .testimonial-card span {
-            font-size: 14px;
+            font-size: 12px;
             color: #F59E0B;
             font-weight: 600;
         }
@@ -257,18 +260,19 @@
         /* Chatbot Widget */
         .chatbot-widget {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 15px;
+            right: 15px;
             background-color: #1E3A8A;
             color: white;
-            padding: 15px 20px;
+            padding: 12px 18px;
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 14px;
         }
 
         .chatbot-widget:hover {
@@ -278,13 +282,13 @@
         .chatbot-popup {
             display: none;
             position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 300px;
+            bottom: 70px;
+            right: 15px;
+            width: 250px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            padding: 15px;
+            padding: 12px;
             text-align: left;
             border: 1px solid #ddd;
         }
@@ -294,9 +298,9 @@
         }
 
         .chatbot-popup p {
-            font-size: 14px;
+            font-size: 13px;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .chatbot-popup a {
@@ -305,11 +309,12 @@
             color: #1E3A8A;
             text-decoration: none;
             font-weight: 600;
-            padding: 8px;
+            padding: 6px;
             background-color: #F59E0B;
             color: white;
             border-radius: 5px;
             transition: background-color 0.3s;
+            font-size: 13px;
         }
 
         .chatbot-popup a:hover {
@@ -321,21 +326,31 @@
             background-color: #1E3A8A;
             color: white;
             text-align: center;
-            padding: 20px 0;
+            padding: 15px 0;
         }
 
         footer p {
-            font-size: 14px;
+            font-size: 12px;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .hero {
+                padding: 15px;
+            }
+
             .hero h1 {
-                font-size: 32px;
+                font-size: 28px;
             }
 
             .hero p {
-                font-size: 16px;
+                font-size: 14px;
+                max-width: 90%;
+            }
+
+            .hero .btn {
+                padding: 8px 20px;
+                font-size: 14px;
             }
 
             .hamburger {
@@ -346,7 +361,7 @@
                 display: none;
                 flex-direction: column;
                 position: absolute;
-                top: 60px;
+                top: 50px;
                 left: 0;
                 width: 100%;
                 background-color: #fff;
@@ -359,11 +374,44 @@
             }
 
             nav ul li {
-                margin: 10px 0;
+                margin: 8px 0;
             }
 
             nav ul li a {
-                font-size: 18px;
+                font-size: 16px;
+            }
+
+            .features, .testimonials {
+                padding: 40px 10px;
+            }
+
+            .features h2, .testimonials h2 {
+                font-size: 24px;
+            }
+
+            .chatbot-widget {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            .chatbot-popup {
+                width: 220px;
+                bottom: 60px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .hero p {
+                font-size: 12px;
+            }
+
+            .hero .btn {
+                padding: 6px 15px;
+                font-size: 12px;
             }
         }
     </style>
@@ -381,7 +429,7 @@
                     <li><a href="#home" onclick="smoothScroll('home')">Home</a></li>
                     <li><a href="#features" onclick="smoothScroll('features')">Features</a></li>
                     <li><a href="#testimonials" onclick="smoothScroll('testimonials')">Testimonials</a></li>
-                    <li><a href="chat.html">Chatbot</a></li>
+                    <li><a href="#" onclick="redirectToChat()">Chatbot</a></li>
                     <li><a href="#contact" onclick="smoothScroll('contact')">Contact</a></li>
                 </ul>
             </nav>
@@ -392,7 +440,7 @@
     <section class="hero" id="home">
         <h1>Revolutionize Applications with Formbondhu</h1>
         <p>Experience the future of instant applications with our AI-powered chatbot platform.</p>
-        <a href="chat.html" class="btn">Get Started</a>
+        <a href="#" class="btn" onclick="redirectToChat()">Get Started</a>
     </section>
 
     <!-- Features Section -->
@@ -442,7 +490,7 @@
     </div>
     <div class="chatbot-popup" id="chatbotPopup">
         <p>Hello! I’m Formbondhu. How can I assist you today?</p>
-        <a href="chat.html">Open Chatbot</a>
+        <a href="#" onclick="redirectToChat()">Open Chatbot</a>
     </div>
 
     <!-- Footer -->
@@ -460,13 +508,18 @@
         // Smooth Scroll Function
         function smoothScroll(sectionId) {
             document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-            toggleMenu(); // Close menu on mobile after clicking
+            toggleMenu();
         }
 
         // Toggle Chatbot Popup
         function toggleChatbot() {
             const popup = document.getElementById('chatbotPopup');
             popup.classList.toggle('active');
+        }
+
+        // Redirect to Chatbot Page
+        function redirectToChat() {
+            window.location.href = 'chat.html';
         }
     </script>
 </body>
