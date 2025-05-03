@@ -137,7 +137,7 @@
             position: absolute;
             width: 160px;
             height: 160px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 245, 255, 0.2);
             border-radius: 50%;
             bottom: 10%;
             right: 10%;
@@ -218,6 +218,7 @@
             padding: 60px 15px;
             background-color: #fff;
             text-align: center;
+            margin-bottom: 80px; /* Added space for chatbot widget */
         }
 
         .testimonials h2 {
@@ -260,7 +261,7 @@
         /* Chatbot Widget */
         .chatbot-widget {
             position: fixed;
-            bottom: 15px;
+            bottom: 70px; /* Adjusted to move further up */
             right: 15px;
             background-color: #1E3A8A;
             color: white;
@@ -273,6 +274,7 @@
             align-items: center;
             gap: 8px;
             font-size: 14px;
+            z-index: 2; /* Ensure it stays above other elements */
         }
 
         .chatbot-widget:hover {
@@ -282,7 +284,7 @@
         .chatbot-popup {
             display: none;
             position: fixed;
-            bottom: 90px;
+            bottom: 125px; /* Adjusted to align with chatbot-widget */
             right: 15px;
             width: 250px;
             background-color: #fff;
@@ -291,6 +293,7 @@
             padding: 12px;
             text-align: left;
             border: 1px solid #ddd;
+            z-index: 2; /* Ensure it stays above other elements */
         }
 
         .chatbot-popup.active {
@@ -391,14 +394,19 @@
                 font-size: 24px;
             }
 
+            .testimonials {
+                margin-bottom: 70px; /* Adjusted for smaller screens */
+            }
+
             .chatbot-widget {
                 padding: 10px 15px;
                 font-size: 12px;
+                bottom: 70px; /* Adjusted for smaller screens */
             }
 
             .chatbot-popup {
                 width: 220px;
-                bottom: 90px;
+                bottom: 125px; /* Adjusted for smaller screens */
             }
         }
 
