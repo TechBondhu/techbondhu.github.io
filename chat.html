@@ -396,7 +396,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 18px;
             margin-bottom: 10px;
-            font-family: 'Tiro Bangla', serif;
+            font-family: 'Tiro+Bangla', serif;
             font-weight: 700;
         }
 
@@ -432,7 +432,7 @@
             border-radius: 20px;
             outline: none;
             transition: border-color 0.3s ease;
-            font-family: 'Tiro Bangla', serif;
+            font-family: 'Tiro+Bangla', serif;
             font-weight: 700;
         }
 
@@ -486,6 +486,10 @@
             text-align: center;
             width: 300px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #f9f9f9, #E5E7EB);
+            font-family: 'Tiro+Bangla', serif;
+            font-weight: 700;
+            color: #1E3A8A;
         }
 
         .modal-content p {
@@ -502,19 +506,32 @@
         .modal-buttons button {
             padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
+            font-family: 'Tiro+Bangla', serif;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .modal-buttons .cancel {
             background-color: #D1D5DB;
-            color: #333;
+            color: #1E3A8A;
+        }
+
+        .modal-buttons .cancel:hover {
+            background-color: #B0B5B9;
+            transform: scale(1.05);
         }
 
         .modal-buttons .confirm {
-            background-color: #EF4444;
+            background-color: #F59E0B;
             color: #fff;
+        }
+
+        .modal-buttons .confirm:hover {
+            background-color: #D97706;
+            transform: scale(1.05);
         }
 
         @media (max-width: 768px) {
@@ -752,14 +769,17 @@
             function showDeleteModal(index) {
                 deleteIndex = index;
                 deleteModal.style.display = 'flex';
+                console.log('Modal opened, deleteIndex:', deleteIndex); // Debug
             }
 
             function hideModal() {
                 deleteModal.style.display = 'none';
+                console.log('Modal closed, deleteIndex reset to:', -1); // Debug
                 deleteIndex = -1;
             }
 
             function confirmDeleteAction() {
+                console.log('Confirm delete called, deleteIndex:', deleteIndex); // Debug
                 if (deleteIndex !== -1) {
                     chatHistory.splice(deleteIndex, 1);
                     if (currentChatIndex === deleteIndex) startNewChat();
@@ -767,6 +787,7 @@
                     saveToLocalStorage();
                     updateHistory(searchInput.value.trim());
                     hideModal();
+                    console.log('Chat deleted, new chatHistory length:', chatHistory.length); // Debug
                 }
             }
 
