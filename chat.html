@@ -965,7 +965,7 @@
             <div class="welcome-message" id="welcomeMessage">
                 <h2>How can Formbondhu assist you today?</h2>
                 <div class="welcome-buttons">
-                    <button onclick="sendMessage('Submit an application')"><i class="fas fa-paper-plane"></i>Submit an application</button>
+                    <button onclick="startNewChatSession('')"><i class="fas fa-play"></i>Get Started</button>
                     <button onclick="sendMessage('Get support')"><i class="fas fa-headset"></i>Get support</button>
                     <button onclick="sendMessage('Ask a question')"><i class="fas fa-question-circle"></i>Ask a question</button>
                 </div>
@@ -1090,9 +1090,8 @@
                 if (storedHistory) {
                     try {
                         chatHistory = JSON.parse(storedHistory);
-                        currentChatIndex = chatHistory.length > 0 ? 0 : -1;
+                        currentChatIndex = -1; // Default to no chat selected
                         updateHistory();
-                        if (currentChatIndex >= 0) loadChat(currentChatIndex);
                     } catch (e) {
                         console.error('Error parsing local storage:', e);
                         chatHistory = [];
@@ -1437,14 +1436,22 @@
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
 
-            async function startNewChatSession(firstMessage) {
+            async function startNewChatSession(firstMessage = null) {
                 await resetSession();
-                const timestamp = new Date().toLocaleString();
-                chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp, sessionId: currentSessionId });
-                currentChatIndex = 0;
-                saveToLocalStorage();
-                updateHistory();
-                sendMessage(firstMessage);
+                messagesDiv.innerHTML = '';
+                welcomeMessage.style.display = 'none';
+                firstMessageSent = firstMessage ? true : false;
+                currentChatIndex = -1;
+                chatBox.classList.add('fade-in');
+                setTimeout(() => chatBox.classList.remove('fade-in'), 500);
+                if (firstMessage) {
+                    const timestamp = new Date().toLocaleString();
+                    chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp, sessionId: currentSessionId });
+                    currentChatIndex = 0;
+                    saveToLocalStorage();
+                    updateHistory();
+                    sendMessage(firstMessage);
+                }
             }
 
             function startNewChat() {
