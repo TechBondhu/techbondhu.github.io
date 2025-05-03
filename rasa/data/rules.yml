@@ -1,0 +1,113 @@
+version: "3.1"
+
+rules:
+# Bangla
+- rule: Start Registration Form
+  steps:
+  - intent: request_registration
+  - action: registration_form
+  - active_loop: registration_form
+
+- rule: Submit Registration Form
+  condition:
+  - active_loop: registration_form
+  steps:
+  - action: registration_form
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete
+
+# English
+- rule: Start Registration Form English
+  steps:
+  - intent: request_registration_english
+  - action: registration_form_english
+  - active_loop: registration_form_english
+
+- rule: Submit Registration Form English
+  condition:
+  - active_loop: registration_form_english
+  steps:
+  - action: registration_form_english
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete_english
+
+# Chinese
+- rule: Start Registration Form Chinese
+  steps:
+  - intent: request_registration_chinese
+  - action: registration_form_chinese
+  - active_loop: registration_form_chinese
+
+- rule: Submit Registration Form Chinese
+  condition:
+  - active_loop: registration_form_chinese
+  steps:
+  - action: registration_form_chinese
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete_chinese
+
+# Tamil
+- rule: Start Registration Form Tamil
+  steps:
+  - intent: request_registration_tamil
+  - action: registration_form_tamil
+  - active_loop: registration_form_tamil
+
+- rule: Submit Registration Form Tamil
+  condition:
+  - active_loop: registration_form_tamil
+  steps:
+  - action: registration_form_tamil
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete_tamil
+
+# Arabic
+- rule: Start Registration Form Arabic
+  steps:
+  - intent: request_registration_arabic
+  - action: registration_form_arabic
+  - active_loop: registration_form_arabic
+
+- rule: Submit Registration Form Arabic
+  condition:
+  - active_loop: registration_form_arabic
+  steps:
+  - action: registration_form_arabic
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete_arabic
+
+# Hindi
+- rule: Start Registration Form Hindi
+  steps:
+  - intent: request_registration_hindi
+  - action: registration_form_hindi
+  - active_loop: registration_form_hindi
+
+- rule: Submit Registration Form Hindi
+  condition:
+  - active_loop: registration_form_hindi
+  steps:
+  - action: registration_form_hindi
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_registration_complete_hindi
+
+- rule: Start NID Application Form
+  steps:
+  - intent: apply_nid
+  - action: nid_application_form
+  - active_loop: nid_application_form
+
+- rule: Submit NID Application Form
+  condition:
+  - active_loop: nid_application_form
+  steps:
+  - action: nid_application_form
+  - active_loop: null
+  - action: action_send_to_firebase
+  - action: utter_nid_application_complete
