@@ -701,10 +701,12 @@
                             <i class="fas fa-ellipsis-v" id="optionIcon-${index}"></i>
                         </div>
                         <div class="dropdown" id="dropdown-${index}">
-                            <div class="dropdown-item" onclick="renameHistory(${index}, event)">Rename</div>
-                            <div class="dropdown-item" onclick="showDeleteModal(${index}, event)">Delete</div>
+                            <div class="dropdown-item rename-item-${index}">Rename</div>
+                            <div class="dropdown-item delete-item-${index}">Delete</div>
                         </div>
                     `;
+
+                    // Add event listener for dropdown toggle
                     historyItem.querySelector(`#optionIcon-${index}`).addEventListener('click', (e) => {
                         e.stopPropagation();
                         const allDropdowns = document.querySelectorAll('.dropdown');
@@ -713,6 +715,20 @@
                         });
                         toggleDropdown(index);
                     });
+
+                    // Add event listeners for Rename and Delete
+                    historyItem.querySelector(`.rename-item-${index}`).addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        renameHistory(index);
+                        toggleDropdown(index);
+                    });
+
+                    historyItem.querySelector(`.delete-item-${index}`).addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showDeleteModal(index);
+                        toggleDropdown(index);
+                    });
+
                     historyItem.addEventListener('click', () => loadChat(index));
                     historyList.appendChild(historyItem);
                 });
@@ -723,8 +739,7 @@
                 dropdown.classList.toggle('active');
             }
 
-            function renameHistory(index, event) {
-                event.stopPropagation();
+            function renameHistory(index) {
                 const newText = prompt('Edit the chat title:', chatHistory[index].messages[0].text);
                 if (newText && newText.trim()) {
                     chatHistory[index].messages[0].text = newText.trim();
@@ -732,14 +747,11 @@
                     updateHistory(searchInput.value.trim());
                     if (currentChatIndex === index) loadChat(index);
                 }
-                toggleDropdown(index);
             }
 
-            function showDeleteModal(index, event) {
-                event.stopPropagation();
+            function showDeleteModal(index) {
                 deleteIndex = index;
                 deleteModal.style.display = 'flex';
-                toggleDropdown(index);
             }
 
             function hideModal() {
