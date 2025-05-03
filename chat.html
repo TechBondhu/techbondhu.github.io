@@ -345,25 +345,25 @@
             display: flex;
             flex-direction: column;
             padding-bottom: 60px;
-            padding-right: 15px; /* Added padding to create distance from scrollbar */
+            padding-right: 20px; /* Increased padding for better spacing from scrollbar */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
 
         .messages::-webkit-scrollbar {
             width: 8px;
-            margin-left: 10px; /* Ensure scrollbar stays at the right edge */
+            margin-left: 15px; /* Increased margin for better positioning */
         }
 
         .messages::-webkit-scrollbar-track {
             background: #f1f1f1;
-            margin-left: 10px; /* Ensure track aligns with scrollbar */
+            margin-left: 15px;
         }
 
         .messages::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 10px;
-            margin-left: 10px; /* Align thumb with scrollbar */
+            margin-left: 15px;
         }
 
         .messages::-webkit-scrollbar-thumb:hover {
@@ -416,14 +416,14 @@
         .bot-message {
             padding: 15px 20px;
             border-radius: 12px;
-            max-width: 70%; /* Reduced max-width to avoid overlap */
+            max-width: 65%; /* Reduced max-width further for better spacing */
             word-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 18px;
             margin-bottom: 10px;
             font-family: 'Tiro+Bangla', serif;
             font-weight: 700;
-            margin-right: 20px; /* Added margin to create distance from scrollbar */
+            margin-right: 25px; /* Increased margin for better separation from scrollbar */
         }
 
         .user-message {
@@ -1172,7 +1172,7 @@
                 let filteredHistory = chatHistory;
                 if (searchQuery) {
                     filteredHistory = chatHistory.filter(chat =>
-                        chat.messages[0].text.toLowerCase().includes(searchQuery.toLowerCase())
+                        chat.messages.some(msg => msg.text && msg.text.toLowerCase().includes(searchQuery.toLowerCase()))
                     );
                 }
                 if (filteredHistory.length === 0) {
@@ -1182,9 +1182,10 @@
                 filteredHistory.forEach((chat, index) => {
                     const historyItem = document.createElement('div');
                     historyItem.classList.add('history-item');
+                    const firstMessage = chat.messages.find(msg => msg.text) || { text: 'No text available' };
                     historyItem.innerHTML = `
                         <div class="history-item-content">
-                            <p>${chat.messages[0].text.substring(0, 50)}${chat.messages[0].text.length > 50 ? '...' : ''}</p>
+                            <p>${firstMessage.text.substring(0, 50)}${firstMessage.text.length > 50 ? '...' : ''}</p>
                             <div class="timestamp">${chat.timestamp}</div>
                         </div>
                         <div class="options">
@@ -1229,7 +1230,8 @@
 
             function showRenameModal(index) {
                 deleteIndex = index;
-                renameInput.value = chatHistory[index].messages[0].text;
+                const firstMessage = chatHistory[index].messages.find(msg => msg.text) || { text: '' };
+                renameInput.value = firstMessage.text;
                 renameModal.style.display = 'flex';
                 console.log('Rename modal opened, deleteIndex:', deleteIndex);
             }
@@ -1245,7 +1247,12 @@
                 if (deleteIndex !== -1) {
                     const newText = renameInput.value.trim();
                     if (newText) {
-                        chatHistory[deleteIndex].messages[0].text = newText;
+                        const firstMessageIndex = chatHistory[deleteIndex].messages.findIndex(msg => msg.text);
+                        if (firstMessageIndex !== -1) {
+                            chatHistory[deleteIndex].messages[firstMessageIndex].text = newText;
+                        } else {
+                            chatHistory[deleteIndex].messages.unshift({ sender: 'user', text: newText });
+                        }
                         saveToSessionStorage();
                         updateHistory(searchInput.value.trim());
                         if (currentChatIndex === deleteIndex) loadChat(deleteIndex);
