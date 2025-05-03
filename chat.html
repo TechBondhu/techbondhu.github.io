@@ -345,21 +345,25 @@
             display: flex;
             flex-direction: column;
             padding-bottom: 60px;
+            padding-right: 15px; /* Added padding to create distance from scrollbar */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
 
         .messages::-webkit-scrollbar {
             width: 8px;
+            margin-left: 10px; /* Ensure scrollbar stays at the right edge */
         }
 
         .messages::-webkit-scrollbar-track {
             background: #f1f1f1;
+            margin-left: 10px; /* Ensure track aligns with scrollbar */
         }
 
         .messages::-webkit-scrollbar-thumb {
             background: #888;
             border-radius: 10px;
+            margin-left: 10px; /* Align thumb with scrollbar */
         }
 
         .messages::-webkit-scrollbar-thumb:hover {
@@ -412,13 +416,14 @@
         .bot-message {
             padding: 15px 20px;
             border-radius: 12px;
-            max-width: 60%;
+            max-width: 70%; /* Reduced max-width to avoid overlap */
             word-wrap: break-word;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 18px;
             margin-bottom: 10px;
             font-family: 'Tiro+Bangla', serif;
             font-weight: 700;
+            margin-right: 20px; /* Added margin to create distance from scrollbar */
         }
 
         .user-message {
@@ -748,6 +753,7 @@
                 padding: 12px 15px;
                 font-size: 16px;
                 margin-bottom: 8px;
+                margin-right: 15px; /* Adjusted for tablets */
             }
 
             .input-area {
@@ -906,6 +912,7 @@
                 padding: 10px 12px;
                 font-size: 14px;
                 margin-bottom: 6px;
+                margin-right: 10px; /* Adjusted for mobile */
             }
 
             .input-area {
