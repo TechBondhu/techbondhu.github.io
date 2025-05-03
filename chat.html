@@ -1027,7 +1027,7 @@
             const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
 
             const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
-            const flaskEndpoint = "http://localhost:5000/upload";
+            const sessionEndpoint = "http://localhost:5005/sessions";
 
             let firstMessageSent = false;
             let chatHistory = [];
@@ -1035,6 +1035,7 @@
             let isRequestPending = false;
             let deleteIndex = -1;
             let loadingDiv = null;
+            let currentSessionId = null;
 
             function debounce(func, wait) {
                 let timeout;
@@ -1229,6 +1230,22 @@
                 }
             }
 
+            async function resetSession() {
+                try {
+                    const response = await fetch(sessionEndpoint, {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ reset: true })
+                    });
+                    const data = await response.json();
+                    currentSessionId = data.session_id;
+                    return true;
+                } catch (error) {
+                    console.error('Session reset failed:', error);
+                    return false;
+                }
+            }
+
             function showLoading() {
                 if (loadingDiv) {
                     loadingDiv.remove();
@@ -1265,9 +1282,9 @@
                 if (!firstMessageSent) {
                     welcomeMessage.style.display = 'none';
                     firstMessageSent = true;
-                    startNewChatSession(userMessage);
+                    await startNewChatSession(userMessage);
                 } else {
-                    if (currentChatIndex === -1) startNewChatSession(userMessage);
+                    if (currentChatIndex === -1) await startNewChatSession(userMessage);
                     else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
                         const currentChat = chatHistory.splice(currentChatIndex, 1)[0];
@@ -1289,7 +1306,10 @@
 
                     const response = await fetch(rasaEndpoint, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Session-ID": currentSessionId || ''
+                        },
                         body: JSON.stringify({ sender: "user", message: userMessage }),
                         signal: AbortSignal.timeout(5000)
                     });
@@ -1331,8 +1351,8 @@
                 if (!firstMessageSent) {
                     welcomeMessage.style.display = 'none';
                     firstMessageSent = true;
-                    startNewChatSession("Image upload");
-                } else if (currentChatIndex === -1) startNewChatSession("Image upload");
+                    await startNewChatSession("Image upload");
+                } else if (currentChatIndex === -1) await startNewChatSession("Image upload");
 
                 const formData = new FormData();
                 formData.append('file', file);
@@ -1362,7 +1382,10 @@
 
                         const rasaResponse = await fetch(rasaEndpoint, {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                            headers: { 
+                                "Content-Type": "application/json",
+                                "Session-ID": currentSessionId || ''
+                            },
                             body: JSON.stringify({ sender: "user", message: imageUrl }),
                             signal: AbortSignal.timeout(5000)
                         });
@@ -1414,13 +1437,14 @@
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
 
-            function startNewChatSession(firstMessage) {
+            async function startNewChatSession(firstMessage) {
+                await resetSession();
                 const timestamp = new Date().toLocaleString();
-                chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp });
+                chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp, sessionId: currentSessionId });
                 currentChatIndex = 0;
                 saveToLocalStorage();
                 updateHistory();
-                sendMessage(firstMessage); // Automatically send the first message to start a new Rasa session
+                sendMessage(firstMessage);
             }
 
             function startNewChat() {
@@ -1444,6 +1468,7 @@
                     if (msg.text) displayMessage(msg.text, msg.sender);
                     else if (msg.image) displayImage(msg.image);
                 });
+                currentSessionId = chatHistory[index].sessionId;
                 sidebar.classList.remove('open');
                 chatContainer.classList.remove('sidebar-open');
             }
