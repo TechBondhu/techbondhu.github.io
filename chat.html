@@ -1413,6 +1413,7 @@
                 currentChatIndex = 0;
                 saveToLocalStorage();
                 updateHistory();
+                sendMessage(firstMessage); // Automatically send the first message to start a new Rasa session
             }
 
             function startNewChat() {
