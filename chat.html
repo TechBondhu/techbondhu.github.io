@@ -345,6 +345,7 @@
             display: flex;
             flex-direction: column;
             padding-bottom: 60px;
+            padding-right: 16px; /* Added to prevent scrollbar overlap */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
@@ -1334,14 +1335,13 @@
                     welcomeMessage.style.display = 'none';
                     firstMessageSent = true;
                     await startNewChatSession(userMessage);
-                } else {
-                    if (currentChatIndex === -1) await startNewChatSession(userMessage);
-                    else {
-                        chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
-                        saveToLocalStorage();
-                    }
                 }
 
+                // Add user message to chat history and display it
+                if (currentChatIndex !== -1) {
+                    chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
+                    saveToLocalStorage();
+                }
                 displayMessage(userMessage, 'user');
                 userInput.value = '';
                 updateHistory();
@@ -1486,8 +1486,10 @@
                 await resetSession();
                 if (firstMessage) {
                     const timestamp = new Date().toLocaleString();
-                    chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp, sessionId: currentSessionId });
+                    chatHistory.unshift({ messages: [], timestamp, sessionId: currentSessionId });
                     currentChatIndex = 0;
+                    saveToLocalStorage();
+                    updateHistory();
                 }
                 messagesDiv.innerHTML = '';
                 welcomeMessage.style.display = 'none';
@@ -1495,8 +1497,6 @@
                 chatBox.classList.add('fade-in');
                 setTimeout(() => chatBox.classList.remove('fade-in'), 500);
                 if (firstMessage) {
-                    saveToLocalStorage();
-                    updateHistory();
                     sendMessage(firstMessage);
                 }
             }
