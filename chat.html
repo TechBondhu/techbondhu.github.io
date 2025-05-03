@@ -171,7 +171,7 @@
         }
 
         .history-item {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 285, 0.1);
             padding: 15px;
             border-radius: 10px;
             cursor: pointer;
@@ -715,8 +715,8 @@
             <h3>Rename Chat</h3>
             <input type="text" id="renameInput" placeholder="Enter new title">
             <div class="rename-modal-buttons">
-                <button class="cancel" onclick="hideRenameModal()">Cancel</button>
-                <button class="save" onclick="saveRename()">Save</button>
+                <button class="cancel" id="renameCancelBtn">Cancel</button>
+                <button class="save" id="renameSaveBtn">Save</button>
             </div>
         </div>
     </div>
@@ -743,6 +743,8 @@
             const deleteModal = document.getElementById('deleteModal');
             const renameModal = document.getElementById('renameModal');
             const renameInput = document.getElementById('renameInput');
+            const renameCancelBtn = document.getElementById('renameCancelBtn');
+            const renameSaveBtn = document.getElementById('renameSaveBtn');
 
             const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
             const flaskEndpoint = "http://localhost:5000/upload";
@@ -776,6 +778,17 @@
                 if (file && file.type.startsWith('image/')) uploadImageToFlask(file);
             });
             searchInput.addEventListener('input', () => updateHistory(searchInput.value.trim()));
+
+            // Add event listeners for Rename modal buttons
+            renameCancelBtn.addEventListener('click', () => {
+                console.log('Cancel button clicked'); // Debug
+                hideRenameModal();
+            });
+
+            renameSaveBtn.addEventListener('click', () => {
+                console.log('Save button clicked'); // Debug
+                saveRename();
+            });
 
             function toggleSidebar() {
                 sidebar.classList.toggle('open');
@@ -871,14 +884,17 @@
                 deleteIndex = index; // Reuse deleteIndex for rename context
                 renameInput.value = chatHistory[index].messages[0].text;
                 renameModal.style.display = 'flex';
+                console.log('Rename modal opened, deleteIndex:', deleteIndex); // Debug
             }
 
             function hideRenameModal() {
                 renameModal.style.display = 'none';
                 deleteIndex = -1;
+                console.log('Rename modal closed, deleteIndex reset to:', -1); // Debug
             }
 
             function saveRename() {
+                console.log('Saving rename, deleteIndex:', deleteIndex); // Debug
                 if (deleteIndex !== -1) {
                     const newText = renameInput.value.trim();
                     if (newText) {
