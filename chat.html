@@ -60,7 +60,7 @@
 
         .header-icons {
             position: absolute;
-            left: 20px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             display: flex;
@@ -569,11 +569,6 @@
             animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         .rename-modal-content h3 {
             font-size: 20px;
             margin-bottom: 15px;
@@ -637,39 +632,311 @@
             transform: translateY(-2px);
         }
 
+        /* Responsive Design for Tablets (max-width: 768px) */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 250px;
+            .chat-container {
+                width: 100vw;
+                height: 100vh;
             }
+
             .chat-container.sidebar-open {
-                margin-left: 250px;
-                width: calc(100vw - 250px);
+                margin-left: 0;
+                width: 100vw;
+            }
+
+            .header {
+                padding: 10px;
+                font-size: 20px;
+            }
+
+            .header-icons {
+                left: 10px;
+                gap: 10px;
+            }
+
+            .history-icon,
+            .new-chat-icon,
+            .home-icon {
+                font-size: 20px;
+            }
+
+            .sidebar {
+                width: 80%;
+                max-width: 250px;
+                padding: 15px;
+            }
+
+            .sidebar-header {
+                padding-bottom: 8px;
+            }
+
+            .sidebar-icon {
+                font-size: 20px;
+            }
+
+            .search-input {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .history-item {
+                padding: 10px;
+            }
+
+            .history-item p {
+                font-size: 14px;
+            }
+
+            .history-item .timestamp {
+                font-size: 10px;
+            }
+
+            .options i {
+                font-size: 16px;
+            }
+
+            .dropdown {
+                top: 35px;
+            }
+
+            .dropdown-item {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .chat-box {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .welcome-message h2 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .welcome-buttons button {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
+            .user-message,
+            .bot-message {
+                max-width: 75%;
+                padding: 12px 15px;
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .input-area {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            #userInput {
+                padding: 10px;
+                font-size: 16px;
+            }
+
+            #sendBtn,
+            #uploadBtn {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            #uploadBtn {
+                font-size: 20px;
+            }
+
+            .modal-content,
+            .rename-modal-content {
+                width: 80%;
+                max-width: 300px;
+                padding: 20px;
+            }
+
+            .modal-content p {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+
+            .modal-buttons button,
+            .rename-modal-buttons button {
+                padding: 8px 20px;
+                font-size: 12px;
+            }
+
+            .rename-modal-content h3 {
+                font-size: 18px;
+                margin-bottom: 12px;
+            }
+
+            .rename-modal-content input {
+                padding: 10px;
+                font-size: 14px;
+                margin-bottom: 15px;
             }
         }
 
+        /* Responsive Design for Mobile Devices (max-width: 480px) */
         @media (max-width: 480px) {
-            .sidebar {
-                width: 200px;
+            .chat-container {
+                width: 100vw;
+                height: 100vh;
             }
+
             .chat-container.sidebar-open {
-                margin-left: 200px;
-                width: calc(100vw - 200px);
+                margin-left: 0;
+                width: 100vw;
             }
+
+            .header {
+                padding: 8px;
+                font-size: 18px;
+            }
+
+            .header-icons {
+                left: 8px;
+                gap: 8px;
+            }
+
+            .history-icon,
+            .new-chat-icon,
+            .home-icon {
+                font-size: 18px;
+            }
+
+            .sidebar {
+                width: 85%;
+                max-width: 200px;
+                padding: 10px;
+            }
+
+            .sidebar-header {
+                padding-bottom: 6px;
+            }
+
+            .sidebar-icon {
+                font-size: 18px;
+            }
+
+            .search-input {
+                padding: 6px;
+                font-size: 12px;
+            }
+
+            .history-item {
+                padding: 8px;
+            }
+
+            .history-item p {
+                font-size: 12px;
+            }
+
+            .history-item .timestamp {
+                font-size: 8px;
+            }
+
+            .options i {
+                font-size: 14px;
+            }
+
+            .dropdown {
+                top: 30px;
+            }
+
+            .dropdown-item {
+                padding: 5px 10px;
+                font-size: 10px;
+            }
+
+            .chat-box {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .welcome-message {
+                padding: 15px;
+            }
+
+            .welcome-message h2 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-buttons {
+                gap: 8px;
+            }
+
+            .welcome-buttons button {
+                padding: 6px 12px;
+                font-size: 10px;
+            }
+
+            .welcome-buttons button i {
+                margin-right: 3px;
+            }
+
             .user-message,
             .bot-message {
                 max-width: 80%;
+                padding: 10px 12px;
+                font-size: 14px;
+                margin-bottom: 6px;
             }
-            .welcome-message h2 {
-                font-size: 20px;
+
+            .input-area {
+                padding: 8px;
+                gap: 8px;
             }
-            .welcome-buttons button {
-                font-size: 12px;
-                padding: 8px 16px;
+
+            #userInput {
+                padding: 8px;
+                font-size: 14px;
             }
+
+            #sendBtn,
+            #uploadBtn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            #uploadBtn {
+                font-size: 18px;
+            }
+
             .modal-content,
             .rename-modal-content {
-                width: 250px;
+                width: 90%;
+                max-width: 250px;
                 padding: 15px;
+            }
+
+            .modal-content p {
+                font-size: 12px;
+                margin-bottom: 12px;
+            }
+
+            .modal-buttons {
+                gap: 10px;
+            }
+
+            .modal-buttons button,
+            .rename-modal-buttons button {
+                padding: 6px 15px;
+                font-size: 10px;
+            }
+
+            .rename-modal-content h3 {
+                font-size: 16px;
+                margin-bottom: 10px;
+            }
+
+            .rename-modal-content input {
+                padding: 8px;
+                font-size: 12px;
+                margin-bottom: 12px;
             }
         }
     </style>
@@ -790,7 +1057,6 @@
             });
             searchInput.addEventListener('input', () => updateHistory(searchInput.value.trim()));
 
-            // Add event listeners for Rename modal buttons
             renameCancelBtn.addEventListener('click', () => {
                 console.log('Rename Cancel button clicked');
                 hideRenameModal();
@@ -801,7 +1067,6 @@
                 saveRename();
             });
 
-            // Add event listeners for Delete modal buttons
             deleteCancelBtn.addEventListener('click', () => {
                 console.log('Delete Cancel button clicked');
                 hideModal();
