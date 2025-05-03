@@ -1058,11 +1058,11 @@
             let loadingDiv = null;
             let currentSessionId = null;
 
-            // Load state from localStorage on page load
-            function loadStateFromLocalStorage() {
-                const storedHistory = localStorage.getItem('chatHistory');
-                const storedIndex = localStorage.getItem('currentChatIndex');
-                const storedSessionId = localStorage.getItem('currentSessionId');
+            // Load state from sessionStorage on page load
+            function loadStateFromSessionStorage() {
+                const storedHistory = sessionStorage.getItem('chatHistory');
+                const storedIndex = sessionStorage.getItem('currentChatIndex');
+                const storedSessionId = sessionStorage.getItem('currentSessionId');
                 if (storedHistory) {
                     try {
                         chatHistory = JSON.parse(storedHistory);
@@ -1076,7 +1076,7 @@
                             startNewChat();
                         }
                     } catch (e) {
-                        console.error('Error parsing local storage:', e);
+                        console.error('Error parsing session storage:', e);
                         chatHistory = [];
                         startNewChat();
                     }
@@ -1094,14 +1094,28 @@
                 };
             }
 
+            // Event listeners with strict debouncing
+            let isSending = false;
+            const debouncedSendMessage = debounce(() => {
+                if (!isSending) {
+                    isSending = true;
+                    sendMessage().finally(() => {
+                        isSending = false;
+                    });
+                }
+            }, 500);
+
+            sendBtn.addEventListener('click', debouncedSendMessage);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    debouncedSendMessage();
+                }
+            });
+
             historyIcon.addEventListener('click', () => toggleSidebar());
             newChatIcon.addEventListener('click', debounce(() => startNewChat(), 500));
             closeSidebar.addEventListener('click', () => toggleSidebar());
             sidebarIcon.addEventListener('click', () => toggleSidebar());
-            sendBtn.addEventListener('click', debounce(() => sendMessage(), 500));
-            userInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') debounce(() => sendMessage(), 500)();
-            });
             uploadBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
@@ -1134,27 +1148,15 @@
                 chatContainer.classList.toggle('sidebar-open');
             }
 
-            function loadFromLocalStorage() {
-                const storedHistory = localStorage.getItem('chatHistory');
-                if (storedHistory) {
-                    try {
-                        chatHistory = JSON.parse(storedHistory);
-                    } catch (e) {
-                        console.error('Error parsing local storage:', e);
-                        chatHistory = [];
-                    }
-                }
-            }
-
-            function saveToLocalStorage() {
+            function saveToSessionStorage() {
                 try {
-                    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-                    localStorage.setItem('currentChatIndex', currentChatIndex);
+                    sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                    sessionStorage.setItem('currentChatIndex', currentChatIndex);
                     if (currentSessionId) {
-                        localStorage.setItem('currentSessionId', currentSessionId);
+                        sessionStorage.setItem('currentSessionId', currentSessionId);
                     }
                 } catch (e) {
-                    console.error('Error saving to local storage:', e);
+                    console.error('Error saving to session storage:', e);
                 }
             }
 
@@ -1237,7 +1239,7 @@
                     const newText = renameInput.value.trim();
                     if (newText) {
                         chatHistory[deleteIndex].messages[0].text = newText;
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                         updateHistory(searchInput.value.trim());
                         if (currentChatIndex === deleteIndex) loadChat(deleteIndex);
                     }
@@ -1263,7 +1265,7 @@
                     chatHistory.splice(deleteIndex, 1);
                     if (currentChatIndex === deleteIndex) startNewChat();
                     else if (currentChatIndex > deleteIndex) currentChatIndex--;
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     updateHistory(searchInput.value.trim());
                     hideModal();
                     console.log('Chat deleted, new chatHistory length:', chatHistory.length);
@@ -1289,7 +1291,7 @@
                     });
                     const data = await response.json();
                     currentSessionId = data.session_id;
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     return true;
                 } catch (error) {
                     console.error('Session reset failed:', error);
@@ -1330,6 +1332,8 @@
                 const userMessage = predefinedMessage || userInput.value.trim();
                 if (userMessage === '') return;
 
+                isRequestPending = true;
+
                 if (!firstMessageSent) {
                     welcomeMessage.style.display = 'none';
                     firstMessageSent = true;
@@ -1338,7 +1342,7 @@
                     if (currentChatIndex === -1) await startNewChatSession(userMessage);
                     else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                     }
                 }
 
@@ -1347,7 +1351,6 @@
                 updateHistory();
 
                 showLoading();
-                isRequestPending = true;
                 try {
                     const serverAvailable = await checkServerStatus();
                     if (!serverAvailable) throw new Error('Server not available');
@@ -1375,7 +1378,7 @@
                                 displayImage(entry.image);
                             }
                         });
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                         updateHistory();
                     }
                 } catch (error) {
@@ -1385,7 +1388,7 @@
                     else if (error.message === 'Server not available') errorMessage = "❌ সার্ভার চলছে না! দয়া করে Rasa সার্ভার চেক করুন।";
                     displayMessage(errorMessage, 'bot');
                     chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: errorMessage });
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     updateHistory();
                 } finally {
                     isRequestPending = false;
@@ -1419,7 +1422,7 @@
                         const imageUrl = data.url;
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
                         displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                         updateHistory();
 
                         const serverAvailable = await checkServerStatus();
@@ -1442,12 +1445,12 @@
                                 displayMessage(entry.text, 'bot');
                             }
                         });
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                         updateHistory();
                     } else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `❌ ইমেজ আপলোডে সমস্যা: ${data.error}` });
                         displayMessage(`❌ ইমেজ আপলোডে সমস্যা: ${data.error}`, 'bot');
-                        saveToLocalStorage();
+                        saveToSessionStorage();
                         updateHistory();
                     }
                 } catch (error) {
@@ -1457,7 +1460,7 @@
                     else if (error.message === 'Server not available') errorMessage = "❌ Rasa সার্ভার চলছে না! দয়া করে সার্ভার চেক করুন।";
                     displayMessage(errorMessage, 'bot');
                     chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: errorMessage });
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     updateHistory();
                 } finally {
                     isRequestPending = false;
@@ -1495,7 +1498,7 @@
                 chatBox.classList.add('fade-in');
                 setTimeout(() => chatBox.classList.remove('fade-in'), 500);
                 if (firstMessage) {
-                    saveToLocalStorage();
+                    saveToSessionStorage();
                     updateHistory();
                     sendMessage(firstMessage);
                 }
@@ -1507,9 +1510,10 @@
                 firstMessageSent = false;
                 currentChatIndex = -1;
                 currentSessionId = null;
+                chatHistory = [];
                 chatBox.classList.add('fade-in');
                 setTimeout(() => chatBox.classList.remove('fade-in'), 500);
-                saveToLocalStorage();
+                saveToSessionStorage();
                 updateHistory();
                 searchInput.value = '';
             }
@@ -1526,11 +1530,11 @@
                 currentSessionId = chatHistory[index].sessionId;
                 sidebar.classList.remove('open');
                 chatContainer.classList.remove('sidebar-open');
-                saveToLocalStorage();
+                saveToSessionStorage();
             }
 
             // Initialize state on page load
-            loadStateFromLocalStorage();
+            loadStateFromSessionStorage();
         });
     </script>
 </body>
