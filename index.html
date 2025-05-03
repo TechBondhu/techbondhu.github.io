@@ -281,49 +281,6 @@
             background-color: #F59E0B;
         }
 
-        .chatbot-popup {
-            display: none;
-            position: fixed;
-            bottom: 125px; /* Adjusted to align with chatbot-widget */
-            right: 15px;
-            width: 250px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            padding: 12px;
-            text-align: left;
-            border: 1px solid #ddd;
-            z-index: 2; /* Ensure it stays above other elements */
-        }
-
-        .chatbot-popup.active {
-            display: block;
-        }
-
-        .chatbot-popup p {
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .chatbot-popup a {
-            display: block;
-            text-align: center;
-            color: #1E3A8A;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 6px;
-            background-color: #F59E0B;
-            color: white;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-            font-size: 13px;
-        }
-
-        .chatbot-popup a:hover {
-            background-color: #D97706;
-        }
-
         /* Footer */
         footer {
             background-color: #1E3A8A;
@@ -402,11 +359,6 @@
                 padding: 10px 15px;
                 font-size: 12px;
                 bottom: 70px; /* Adjusted for smaller screens */
-            }
-
-            .chatbot-popup {
-                width: 220px;
-                bottom: 125px; /* Adjusted for smaller screens */
             }
         }
 
@@ -495,12 +447,8 @@
     </section>
 
     <!-- Chatbot Widget -->
-    <div class="chatbot-widget" onclick="toggleChatbot()">
+    <div class="chatbot-widget" onclick="redirectToChat(event)">
         <i class="fas fa-comment"></i> Try Our Chatbot
-    </div>
-    <div class="chatbot-popup" id="chatbotPopup">
-        <p>Hello! I’m Formbondhu. How can I assist you today?</p>
-        <a href="javascript:void(0)" onclick="redirectToChat(event)">Open Chatbot</a>
     </div>
 
     <!-- Footer -->
@@ -519,12 +467,6 @@
         function smoothScroll(sectionId) {
             document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
             toggleMenu();
-        }
-
-        // Toggle Chatbot Popup
-        function toggleChatbot() {
-            const popup = document.getElementById('chatbotPopup');
-            popup.classList.toggle('active');
         }
 
         // Redirect to Chatbot Page
