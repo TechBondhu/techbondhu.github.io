@@ -344,7 +344,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            padding-bottom: 60px; /* Ensure space for input area */
+            padding-bottom: 60px;
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
@@ -444,7 +444,7 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            margin-top: auto; /* Pushes input area to the bottom */
+            margin-top: auto;
         }
 
         #userInput {
@@ -1058,6 +1058,34 @@
             let loadingDiv = null;
             let currentSessionId = null;
 
+            // Load state from localStorage on page load
+            function loadStateFromLocalStorage() {
+                const storedHistory = localStorage.getItem('chatHistory');
+                const storedIndex = localStorage.getItem('currentChatIndex');
+                const storedSessionId = localStorage.getItem('currentSessionId');
+                if (storedHistory) {
+                    try {
+                        chatHistory = JSON.parse(storedHistory);
+                        currentChatIndex = storedIndex !== null ? parseInt(storedIndex) : -1;
+                        currentSessionId = storedSessionId || null;
+                        if (currentChatIndex >= 0 && currentChatIndex < chatHistory.length) {
+                            loadChat(currentChatIndex);
+                            welcomeMessage.style.display = 'none';
+                            firstMessageSent = true;
+                        } else {
+                            startNewChat();
+                        }
+                    } catch (e) {
+                        console.error('Error parsing local storage:', e);
+                        chatHistory = [];
+                        startNewChat();
+                    }
+                } else {
+                    startNewChat();
+                }
+                updateHistory();
+            }
+
             function debounce(func, wait) {
                 let timeout;
                 return function (...args) {
@@ -1111,8 +1139,6 @@
                 if (storedHistory) {
                     try {
                         chatHistory = JSON.parse(storedHistory);
-                        currentChatIndex = -1; // Default to no chat selected
-                        updateHistory();
                     } catch (e) {
                         console.error('Error parsing local storage:', e);
                         chatHistory = [];
@@ -1123,6 +1149,10 @@
             function saveToLocalStorage() {
                 try {
                     localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+                    localStorage.setItem('currentChatIndex', currentChatIndex);
+                    if (currentSessionId) {
+                        localStorage.setItem('currentSessionId', currentSessionId);
+                    }
                 } catch (e) {
                     console.error('Error saving to local storage:', e);
                 }
@@ -1259,6 +1289,7 @@
                     });
                     const data = await response.json();
                     currentSessionId = data.session_id;
+                    saveToLocalStorage();
                     return true;
                 } catch (error) {
                     console.error('Session reset failed:', error);
@@ -1307,15 +1338,12 @@
                     if (currentChatIndex === -1) await startNewChatSession(userMessage);
                     else {
                         chatHistory[currentChatIndex].messages.push({ sender: 'user', text: userMessage });
-                        const currentChat = chatHistory.splice(currentChatIndex, 1)[0];
-                        chatHistory.unshift(currentChat);
-                        currentChatIndex = 0;
+                        saveToLocalStorage();
                     }
                 }
 
                 displayMessage(userMessage, 'user');
                 userInput.value = '';
-                saveToLocalStorage();
                 updateHistory();
 
                 showLoading();
@@ -1391,9 +1419,6 @@
                         const imageUrl = data.url;
                         chatHistory[currentChatIndex].messages.push({ sender: 'bot', text: `✅ ইমেজ আপলোড সফল! URL: ${imageUrl}` });
                         displayMessage(`✅ ইমেজ আপলোড সফল! URL: ${imageUrl}`, 'bot');
-                        const currentChat = chatHistory.splice(currentChatIndex, 1)[0];
-                        chatHistory.unshift(currentChat);
-                        currentChatIndex = 0;
                         saveToLocalStorage();
                         updateHistory();
 
@@ -1459,16 +1484,17 @@
 
             async function startNewChatSession(firstMessage = null) {
                 await resetSession();
-                messagesDiv.innerHTML = '';
-                welcomeMessage.style.display = 'none';
-                firstMessageSent = firstMessage ? true : false;
-                currentChatIndex = -1;
-                chatBox.classList.add('fade-in');
-                setTimeout(() => chatBox.classList.remove('fade-in'), 500);
                 if (firstMessage) {
                     const timestamp = new Date().toLocaleString();
                     chatHistory.unshift({ messages: [{ sender: 'user', text: firstMessage }], timestamp, sessionId: currentSessionId });
                     currentChatIndex = 0;
+                }
+                messagesDiv.innerHTML = '';
+                welcomeMessage.style.display = 'none';
+                firstMessageSent = firstMessage ? true : false;
+                chatBox.classList.add('fade-in');
+                setTimeout(() => chatBox.classList.remove('fade-in'), 500);
+                if (firstMessage) {
                     saveToLocalStorage();
                     updateHistory();
                     sendMessage(firstMessage);
@@ -1480,6 +1506,7 @@
                 welcomeMessage.style.display = 'block';
                 firstMessageSent = false;
                 currentChatIndex = -1;
+                currentSessionId = null;
                 chatBox.classList.add('fade-in');
                 setTimeout(() => chatBox.classList.remove('fade-in'), 500);
                 saveToLocalStorage();
@@ -1499,9 +1526,11 @@
                 currentSessionId = chatHistory[index].sessionId;
                 sidebar.classList.remove('open');
                 chatContainer.classList.remove('sidebar-open');
+                saveToLocalStorage();
             }
 
-            loadFromLocalStorage();
+            // Initialize state on page load
+            loadStateFromLocalStorage();
         });
     </script>
 </body>
