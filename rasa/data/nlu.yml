@@ -1,0 +1,83 @@
+version: "3.1"
+
+nlu:
+- intent: request_registration
+  examples: |
+    - আমি রেজিস্ট্রেশন করতে চাই
+    - আমাকে রেজিস্ট্রেশন করতে দাও
+    - রেজিস্ট্রেশন করতে চাই
+
+- intent: inform
+  examples: |
+    - মোহাম্মদ শিহাব [name]
+    - আব্দুল কাদের [father_name]
+    - ঢাকা, বাংলাদেশ [address]
+    - ১২-০৩-১৯৯৫ [dob]
+    - Mohammad Shihab [name_english]
+    - Abdul Kader [father_name_english]
+    - Dhaka, Bangladesh [address_english]
+    - 12-03-1995 [dob_english]
+    - 张伟 [name_chinese]
+    - 张国强 [father_name_chinese]
+    - 中国北京 [address_chinese]
+    - 12-03-1995 [dob_chinese]
+    - முகமது சிஹாப் [name_tamil]
+    - அப்துல் காதர் [father_name_tamil]
+    - சென்னை, தமிழ்நாடு [address_tamil]
+    - 12-03-1995 [dob_tamil]
+    - محمد شهاب [name_arabic]
+    - عبد القادر [father_name_arabic]
+    - دبي، الإمارات [address_arabic]
+    - 12-03-1995 [dob_arabic]
+    - मोहम्मद शिहाब [name_hindi]
+    - अब्दुल कादर [father_name_hindi]
+    - दिल्ली, भारत [address_hindi]
+    - 12-03-1995 [dob_hindi]
+    - https://res.cloudinary.com/dsgz8jaue/image/upload/v1746072802/registration_images/6062174351089845545.jpg
+    - https://res.cloudinary.com/dsgz8jaue/image/upload/v1746071544/registration_images/6062174351089845547.jpg
+- intent: request_registration_english
+  examples: |
+    - I want to do registration
+    - Please help me with registration
+    - How to apply for registration
+    - Help me with registration
+
+- intent: request_registration_chinese
+  examples: |
+    - 我想注册
+    - 请帮我注册
+    - 如何申请注册
+    - 帮助我进行注册
+
+- intent: request_registration_tamil
+  examples: |
+    - நான் பதிவு செய்ய விரும்புகிறேன்
+    - எனக்கு பதிவு செய்ய உதவவும்
+    - பதிவுக்கு எப்படி விண்ணப்பிப்பது
+    - பதிவு செய்ய உதவி செய்யவும்
+
+- intent: request_registration_arabic
+  examples: |
+    - أريد التسجيل
+    - ساعدني في التسجيل
+    - كيف يمكنني التسجيل
+    - أرغب في إكمال التسجيل
+
+
+- intent: request_registration_hindi
+  examples: |
+    - मैं रजिस्ट्रेशन करना चाहता हूँ
+    - कृपया मुझे रजिस्ट्रेशन में मदद करें
+    - रजिस्ट्रेशन के लिए कैसे आवेदन करें
+    - रजिस्ट्रेशन करने में मेरी मदद करें
+
+
+- intent: apply_nid
+  examples: |
+    - আমি এনআইডি আবেদন করতে চাই
+    - জাতীয় পরিচয়পত্রের জন্য আবেদন করতে চাই
+    - আমি নতুন এনআইডি করতে চাই
+    - এনআইডি কার্ডের জন্য আবেদন করব
+    - আমার জন্য একটি এনআইডি তৈরি করতে চাই
+    - জাতীয় পরিচয়পত্রের আবেদন কীভাবে করব?
+    - এনআইডি আবেদনের প্রক্রিয়া কী?
