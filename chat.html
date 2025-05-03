@@ -345,7 +345,7 @@
             display: flex;
             flex-direction: column;
             padding-bottom: 60px;
-            padding-right: 16px; /* Added to prevent scrollbar overlap */
+            padding-right: 16px;
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
         }
@@ -438,56 +438,82 @@
         .input-area {
             display: flex;
             align-items: center;
-            gap: 15px;
             padding: 15px;
-            background: #fff;
-            border-top: 1px solid #ccc;
+            background: transparent;
             position: relative;
             z-index: 2;
             width: 100%;
             margin-top: auto;
         }
 
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
         #userInput {
             flex-grow: 1;
-            padding: 12px;
+            padding: 10px 50px 10px 15px;
             font-size: 18px;
-            border: 1px solid #ccc;
+            border: none;
             border-radius: 20px;
             outline: none;
-            transition: border-color 0.3s ease;
+            background: transparent;
             font-family: 'Tiro+Bangla', serif;
             font-weight: 700;
         }
 
         #userInput:focus {
-            border-color: #3B82F6;
+            border: none;
         }
 
         #sendBtn,
         #uploadBtn {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background-color: #1E3A8A;
-            color: #fff;
+            position: absolute;
+            right: 15px;
             border: none;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 22px;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        #sendBtn:hover,
-        #uploadBtn:hover {
+        #sendBtn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1E3A8A;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        #sendBtn:hover {
             background-color: #3B82F6;
             transform: scale(1.1);
         }
 
         #uploadBtn {
-            font-size: 24px;
+            right: 65px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1E3A8A, #3B82F6);
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        #uploadBtn:hover {
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transform: scale(1.1);
         }
 
         .modal {
@@ -753,23 +779,28 @@
 
             .input-area {
                 padding: 10px;
-                gap: 10px;
+            }
+
+            .input-wrapper {
+                padding: 8px 12px;
             }
 
             #userInput {
-                padding: 10px;
+                padding: 8px 45px 8px 12px;
                 font-size: 16px;
             }
 
-            #sendBtn,
-            #uploadBtn {
-                width: 45px;
-                height: 45px;
-                font-size: 18px;
+            #sendBtn {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
             }
 
             #uploadBtn {
-                font-size: 20px;
+                right: 55px;
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
             }
 
             .modal-content,
@@ -911,23 +942,28 @@
 
             .input-area {
                 padding: 8px;
-                gap: 8px;
+            }
+
+            .input-wrapper {
+                padding: 6px 10px;
             }
 
             #userInput {
-                padding: 8px;
+                padding: 6px 40px 6px 10px;
                 font-size: 14px;
             }
 
-            #sendBtn,
-            #uploadBtn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
+            #sendBtn {
+                width: 30px;
+                height: 30px;
+                font-size: 14px;
             }
 
             #uploadBtn {
-                font-size: 18px;
+                right: 45px;
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
             }
 
             .modal-content,
@@ -995,10 +1031,12 @@
             <div class="messages" id="messages"></div>
         </div>
         <div class="input-area">
-            <input type="text" id="userInput" placeholder="Type your message...">
-            <button id="uploadBtn">+</button>
-            <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
-            <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Type your message...">
+                <button id="uploadBtn">+</button>
+                <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
+                <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
+            </div>
         </div>
     </div>
     <div class="modal" id="deleteModal">
