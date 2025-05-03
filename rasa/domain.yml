@@ -1,0 +1,410 @@
+version: "3.1"
+
+intents:
+  - request_registration
+  - inform
+  - request_registration_english
+  - request_registration_chinese
+  - request_registration_tamil
+  - request_registration_arabic
+  - request_registration_hindi
+
+entities:
+  - name
+  - father_name
+  - address
+  - dob
+  - name_english
+  - father_name_english
+  - address_english
+  - dob_english
+  - name_chinese
+  - father_name_chinese
+  - address_chinese
+  - dob_chinese
+  - name_tamil
+  - father_name_tamil
+  - address_tamil
+  - dob_tamil
+  - name_arabic
+  - father_name_arabic
+  - address_arabic
+  - dob_arabic
+  - name_hindi
+  - father_name_hindi
+  - address_hindi
+  - dob_hindi
+
+
+slots:
+  name:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form
+        requested_slot: name
+  father_name:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form
+        requested_slot: father_name
+  address:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form
+        requested_slot: address
+  dob:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form
+        requested_slot: dob
+  image_slot:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form
+        requested_slot: image_slot
+  # English
+  name_english:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_english
+        requested_slot: name_english
+  father_name_english:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_english
+        requested_slot: father_name_english
+  address_english:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_english
+        requested_slot: address_english
+  dob_english:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_english
+        requested_slot: dob_english
+  image_slot_english:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_english
+        requested_slot: image_slot_english
+  # Chinese
+  name_chinese:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_chinese
+        requested_slot: name_chinese
+  father_name_chinese:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_chinese
+        requested_slot: father_name_chinese
+  address_chinese:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_chinese
+        requested_slot: address_chinese
+  dob_chinese:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_chinese
+        requested_slot: dob_chinese
+  image_slot_chinese:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_chinese
+        requested_slot: image_slot_chinese
+  # Tamil
+  name_tamil:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_tamil
+        requested_slot: name_tamil
+  father_name_tamil:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_tamil
+        requested_slot: father_name_tamil
+  address_tamil:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_tamil
+        requested_slot: address_tamil
+  dob_tamil:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_tamil
+        requested_slot: dob_tamil
+  image_slot_tamil:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_tamil
+        requested_slot: image_slot_tamil
+  # Arabic
+  name_arabic:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_arabic
+        requested_slot: name_arabic
+  father_name_arabic:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_arabic
+        requested_slot: father_name_arabic
+  address_arabic:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_arabic
+        requested_slot: address_arabic
+  dob_arabic:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_arabic
+        requested_slot: dob_arabic
+  image_slot_arabic:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_arabic
+        requested_slot: image_slot_arabic
+  # Hindi
+  name_hindi:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_hindi
+        requested_slot: name_hindi
+  father_name_hindi:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_hindi
+        requested_slot: father_name_hindi
+  address_hindi:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_hindi
+        requested_slot: address_hindi
+  dob_hindi:
+    type: text
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_hindi
+        requested_slot: dob_hindi
+  image_slot_hindi:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_text
+      conditions:
+      - active_loop: registration_form_hindi
+        requested_slot: image_slot_hindi
+
+responses:
+  utter_ask_name:
+    - text: "আপনার নাম বাংলায় শুদ্ধ করে লিখুন। (উদাহরণ: মোহাম্মদ শিহাব)।  
+            শুধু আপনার নাম লিখুন। অন্য কিছু লিখবেন না।"
+  utter_ask_father_name:
+    - text: "আপনার বাবার নাম লিখুন। (উদাহরণ: আব্দুল কাদের)।  
+            শুধু আপনার বাবার নাম লিখুন। অন্য কিছু লিখবেন না।"
+  utter_ask_address:
+    - text: "আপনার ঠিকানা লিখুন। (উদাহরণ: ঢাকা, বাংলাদেশ)।  
+            শুধু আপনার ঠিকানা লিখুন। অন্য কিছু লিখবেন না।"
+  utter_ask_dob:
+    - text: "আপনার জন্মতারিখ লিখুন। (উদাহরণ: ১২-০৩-১৯৯৫)।  
+            শুধু আপনার জন্মতারিখ লিখুন। দয়া করে day-month-year ফরম্যাটে লিখুন।"
+  utter_ask_image_slot:
+    - text: "দয়া করে আপনার ডকুমেন্টের ইমেজ আপলোড করুন (যেমন, NID, পাসপোর্ট)।"
+  utter_registration_complete:
+    - text: "ধন্যবাদ! আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে।"
+  # English response
+  utter_ask_name_english:
+    - text: "Write your name properly. (example: Mohammad Shihab)  
+            Just write your name."
+  utter_ask_father_name_english:
+    - text: "Write your father's name (example: Abdul Kader).  
+            Just write your father's name."
+  utter_ask_address_english:
+    - text: "Write your address (example: Dhaka, Bangladesh).  
+            Just write your address."
+  utter_ask_dob_english:
+    - text: "Write your date of birth (example: 12-03-1995).  
+            Just write your date of birth in the format day-month-year."
+  utter_ask_image_slot_english:
+    - text: "Please upload an image of your document (e.g., NID, passport)."
+  utter_registration_complete_english:
+    - text: "Thank you! Your application is done."
+  # Chinese response
+  utter_ask_name_chinese:
+    - text: "请 gang 确书写您的姓名。(例如: 张伟)  
+            只写您的姓名，不要写其他内容。"
+  utter_ask_father_name_chinese:
+    - text: "请写您父亲的姓名。(例如: 张国强)  
+            只写您父亲的姓名，不要写其他内容。"
+  utter_ask_address_chinese:
+    - text: "请写您的地址。(例如: 中国北京)  
+            只写您的地址，不要写其他内容。"
+  utter_ask_dob_chinese:
+    - text: "请写您的出生日期。(例如: 12-03-1995)  
+            只写您的出生日期，请使用日-月-年格式。"
+  utter_ask_image_slot_chinese:
+    - text: "请上传您的证件图片(例如: 身份证、护照)。"
+  utter_registration_complete_chinese:
+    - text: "谢谢! 您的注册已完成。"
+  # Tamil response
+  utter_ask_name_tamil:
+    - text: "உங்கள் பெயரை சரியாக எழுதவும். (எ.கா: முகமது சCotton)  
+            உங்கள் பெயரை மட்டும் எழுதவும். வேறு எதையும் எழுத வேண்டாம்."
+  utter_ask_father_name_tamil:
+    - text: "உங்கள் தந்தையின் பெயரை எழுதவும். (எ.கா: அப்துல் காதர்)  
+            உங்கள் தந்தையின் பெயரை மட்டும் எழுதவும். வேறு எதையும் எழுத வேண்டாம்."
+  utter_ask_address_tamil:
+    - text: "உங்கள் முகவரியை எழுதவும். (எ.கா: சென்னை, தமிழ்நாடு)  
+            உங்கள் முகவரியை மட்டும் எழுதவும். வேறு எதையும் எழுத வேண்டாம்."
+  utter_ask_dob_tamil:
+    - text: "உங்கள் பிறந்த தேதியை எழுதவும். (எ.கா: 12-03-1995)  
+            உங்கள் பிறந்த தேதியை மட்டும் எழுதவும். தயவுசெய்து நாள்-மாதம்-ஆண்டு வடிவத்தில் எழுதவும்."
+  utter_ask_image_slot_tamil:
+    - text: "உங்கள் ஆவணத்தின் படத்தை பதிவேற்றவும் (எ.கா: NID, பாஸ்போர்ட்)."
+  utter_registration_complete_tamil:
+    - text: "நன்றி! உங்கள் பதிவு முடிந்தது."
+  # Arabic
+  utter_ask_name_arabic:
+    - text: "يرجى كتابة اسمك بشكل صحيح. (مثال: محمد شهاب)  
+            اكتب اسمك فقط، دون معلومات أخرى."
+  utter_ask_father_name_arabic:
+    - text: "يرجى كتابة اسم والدك. (مثال: عبد القادر)  
+            اكتب اسم والدك فقط، دون معلومات أخرى."
+  utter_ask_address_arabic:
+    - text: "يرجى كتابة عنوانك. (مثال: دبي، الإمارات)  
+            اكتب عنوانك فقط، دون معلومات أخرى."
+  utter_ask_dob_arabic:
+    - text: "يرجى كتابة تاريخ ميلادك. (مثال: 12-03-1995)  
+            اكتب تاريخ ميلادك فقط، باستخدام تنسيق اليوم-الشهر-السنة."
+  utter_ask_image_slot_arabic:
+    - text: "يرجى رفع صورة وثيقتك (مثال: بطاقة الهوية، جواز السفر)."
+  utter_registration_complete_arabic:
+    - text: "شكرًا! تم إكمال تسجيلك."
+  # Hindi
+  utter_ask_name_hindi:
+    - text: "कृपया अपना नाम सही से लिखें। (उदाहरण: मोहम्मद शिहाब)  
+            केवल अपना नाम लिखें, और कुछ नहीं।"
+  utter_ask_father_name_hindi:
+    - text: "कृपया अपने पिता का नाम लिखें। (उदाहरण: अब्दुल कादर)  
+            केवल अपने पिता का नाम लिखें, और कुछ नहीं।"
+  utter_ask_address_hindi:
+    - text: "कृपया अपना पता लिखें। (उदाहरण: दिल्ली, भारत)  
+            केवल अपना पता लिखें, और कुछ नहीं।"
+  utter_ask_dob_hindi:
+    - text: "कृपया अपनी जन्म तिथि लिखें। (उदाहरण: 12-03-1995)  
+            केवल अपनी जन्म तिथि लिखें, दिन-महीना-वर्ष के प्रारूप में।"
+  utter_ask_image_slot_hindi:
+    - text: "कृपया अपने दस्तावेज़ की छवि अपलोड करें (उदाहरण: NID, पासपोर्ट)।"
+  utter_registration_complete_hindi:
+    - text: "धन्यवाद! आपका रजिस्ट्रेशन पूरा हो गया है।"
+
+forms:
+  registration_form:
+    required_slots:
+      - name
+      - father_name
+      - address
+      - dob
+      - image_slot
+  registration_form_english:
+    required_slots:
+      - name_english
+      - father_name_english
+      - address_english
+      - dob_english
+      - image_slot_english
+  registration_form_chinese:
+    required_slots:
+      - name_chinese
+      - father_name_chinese
+      - address_chinese
+      - dob_chinese
+      - image_slot_chinese
+  registration_form_tamil:
+    required_slots:
+      - name_tamil
+      - father_name_tamil
+      - address_tamil
+      - dob_tamil
+      - image_slot_tamil
+  registration_form_arabic:
+    required_slots:
+      - name_arabic
+      - father_name_arabic
+      - address_arabic
+      - dob_arabic
+      - image_slot_arabic
+  registration_form_hindi:
+    required_slots:
+      - name_hindi
+      - father_name_hindi
+      - address_hindi
+      - dob_hindi
+      - image_slot_hindi
+
+actions:
+  - action_send_to_firebase
