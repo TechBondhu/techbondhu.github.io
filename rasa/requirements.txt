@@ -1,8 +1,5 @@
-# Rasa এবং সম্পর্কিত প্যাকেজ
 rasa==3.6.21
 rasa-sdk==3.6.2
-
-# Firebase এবং অন্যান্য ডিপেন্ডেন্সি
 firebase-admin==6.5.0
 sanic==21.12.2
 websockets>=10.0,<11.0
