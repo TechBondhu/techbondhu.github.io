@@ -3,9 +3,15 @@ from firebase_admin import credentials, db
 from rasa_sdk import Action
 from rasa_sdk.events import SlotSet
 import time
+import os
+import json
 
 # ফায়ারবেজ ইনিশিয়ালাইজ করা
-cred = credentials.Certificate("C:/Users/Md Shihabur Rahaman/Downloads/ocr/admissionformdb-firebase-adminsdk-fbsvc-8405202f56.json")
+firebase_credentials = os.getenv("FIREBASE_CREDENTIALS")
+if not firebase_credentials:
+    raise ValueError("FIREBASE_CREDENTIALS environment variable not set")
+
+cred = credentials.Certificate(json.loads(firebase_credentials))
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://admissionformdb-default-rtdb.asia-southeast1.firebasedatabase.app/'
 })
