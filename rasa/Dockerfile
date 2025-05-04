@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 5005 5055
 
 # Start both Rasa and Action Server
-CMD ["sh", "-c", "rasa run --enable-api --cors '*' --port 5005 --model 20250501-204026-online-codec.tar.gz & rasa run actions --actions actions --port 5055"]
+CMD ["sh", "-c", "rasa run --enable-api --cors '*' --port 5005 --model models/20250501-204026-online-codec.tar.gz & rasa run actions --actions actions --port 5055"]
