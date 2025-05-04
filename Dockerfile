@@ -12,7 +12,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY rasa/requirements.txt .
-RUN pip install --upgrade pip
 RUN pip install --no-cache-dir rasa==3.6.21 rasa-sdk==3.6.2
 RUN pip install --no-cache-dir -r requirements.txt
 
