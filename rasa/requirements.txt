@@ -1,5 +1,8 @@
+# Rasa এবং সম্পর্কিত প্যাকেজ
 rasa==3.6.21
 rasa-sdk==3.6.2
+
+# Firebase এবং অন্যান্য ডিপেন্ডেন্সি
 firebase-admin==6.5.0
 sanic==21.12.2
 websockets>=10.0,<11.0
@@ -24,7 +27,7 @@ CacheControl>=0.12.9,<0.13.0
 packaging>=20.0,<23.0
 terminaltables>=3.1.0,<3.2.0
 absl-py>=0.9,<0.16.0
-aiohttp>=3.6,!=3.7.4.post0,<3.9.0
+aiohttp>=3.8.0,<3.9.0  # সংশোধিত: Rasa 3.6.21 এর জন্য সঠিক সংস্করণ
 rocketchat_API>=0.6.31,<1.17.0
 sentry-sdk>=0.17.0,<1.10.0
 google-auth<2.20.0
