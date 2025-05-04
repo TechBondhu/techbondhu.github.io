@@ -234,9 +234,9 @@
             newChatIcon.addEventListener('click', debounce(() => startNewChat(), 300));
             closeSidebar.addEventListener('click', () => toggleSidebar());
             sidebarIcon.addEventListener('click', () => toggleSidebar());
-            sendBtn.addEventListener('click', debounce(() => sendMessage(), 300));
+            sendBtn.addEventListener('click', (e) => { e.preventDefault(); debounce(() => sendMessage(), 300)(); });
             userInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') debounce(() => sendMessage(), 300)();
+                if (e.key === 'Enter' && !e.repeat) debounce(() => sendMessage(), 300)();
             });
             uploadBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
@@ -376,9 +376,10 @@
                 try {
                     const response = await fetch(rasaEndpoint, { 
                         method: 'OPTIONS',
-                        signal: AbortSignal.timeout(10000) 
+                        signal: AbortSignal.timeout(15000) 
                     });
                     if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+                    console.log('Server status check successful:', response.status);
                     return true;
                 } catch (error) {
                     console.error('Server status check failed:', error);
@@ -397,11 +398,12 @@
                         method: 'POST',
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ reset: true }),
-                        signal: AbortSignal.timeout(10000)
+                        signal: AbortSignal.timeout(15000)
                     });
                     const data = await response.json();
                     currentSessionId = data.session_id;
                     saveToLocalStorage();
+                    console.log('Session reset successful, new sessionId:', currentSessionId);
                     return true;
                 } catch (error) {
                     console.error('Session reset failed:', error);
@@ -449,11 +451,12 @@
                 try {
                     const serverAvailable = await checkServerStatus();
                     if (!serverAvailable) throw new Error('Server not available');
+                    console.log('Sending request to Rasa with message:', userMessage, 'sessionId:', currentSessionId);
                     const response = await fetch(rasaEndpoint, {
                         method: "POST",
                         headers: { "Content-Type": "application/json", "Session-ID": currentSessionId || '' },
                         body: JSON.stringify({ sender: "user", message: userMessage }),
-                        signal: AbortSignal.timeout(10000)
+                        signal: AbortSignal.timeout(15000)
                     });
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     const data = await response.json();
@@ -500,7 +503,7 @@
                     const response = await fetch('http://localhost:5000/upload', {
                         method: "POST",
                         body: formData,
-                        signal: AbortSignal.timeout(10000)
+                        signal: AbortSignal.timeout(15000)
                     });
                     const data = await response.json();
                     if (data.url) {
@@ -515,7 +518,7 @@
                             method: "POST",
                             headers: { "Content-Type": "application/json", "Session-ID": currentSessionId || '' },
                             body: JSON.stringify({ sender: "user", message: imageUrl }),
-                            signal: AbortSignal.timeout(10000)
+                            signal: AbortSignal.timeout(15000)
                         });
                         const rasaData = await rasaResponse.json();
                         rasaData.forEach(entry => {
