@@ -21,8 +21,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy Rasa project files
 COPY rasa/ .
 
-# Expose Rasa and Action Server ports
-EXPOSE 5005 5055
+# Expose Rasa server port
+EXPOSE 5005
 
-# Start both Rasa and Action Server with specific model
-CMD ["sh", "-c", "rasa run --enable-api --cors '*' --port 5005 --model models/20250501-204026-online-codec.tar.gz & rasa run actions --actions actions --port 5055"]
+# Start Rasa server with correct model
+CMD ["rasa", "run", "--enable-api", "--cors", "*", "--port", "5005", "--model", "models/20250501-204026-online-codec.tar.gz"]
