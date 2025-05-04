@@ -4,8 +4,7 @@
 # https://rasa.com/docs/rasa/model-storage#fetching-models-from-a-server
 
 models:
- path: "/rasa/models/20250501-204026-online-codect.tar.gz"
-  # Note: In Render, the working directory is usually /app. Adjust if your setup is different.
+  path: "/rasa/models/20250501-204026-online-codect.tar.gz"
   wait_time_between_pulls: 10   # [optional](default: 100)
 
 # Server which runs your custom actions.
