@@ -1,7 +1,10 @@
+# Use official Python image
 FROM python:3.9-slim-bullseye
 
+# Set working directory
 WORKDIR /app
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
@@ -11,10 +14,15 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY rasa/requirements.txt .
-RUN pip install --no-cache-dir rasa==3.6.21 rasa-sdk==3.6.2
+# Upgrade pip and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY rasa/ .
-EXPOSE 5005 5055
-CMD ["sh", "-c", "rasa run --enable-api --cors '*' --port 5005 --model models/20250501-204026-online-codec.tar.gz & rasa run actions --actions actions --port 5055"]
+# Copy all project files
+COPY . .
+
+# Expose ports for Rasa API and Action Server
+EXPOSE 5005
+
+# Start both Rasa API and Action Server
+CMD ["sh", "-c", "rasa run --enable-api --cors '*' --port 5005 --model models/20250501-204026-online-codec.tar.gz & rasa run actions --actions actions --port 5055 & wait"]
