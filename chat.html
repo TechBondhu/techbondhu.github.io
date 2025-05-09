@@ -1086,9 +1086,8 @@
             const deleteCancelBtn = document.getElementById('deleteCancelBtn');
             const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
 
-            const rasaEndpoint = "https://rasa-service-v305.onrender.com/webhooks/rest/webhook";
-            const sessionEndpoint = "https://rasa-service-v305.onrender.com/sessions";
-            const flaskEndpoint = "http://localhost:5000/upload";
+            const rasaEndpoint = "http://localhost:5005/webhooks/rest/webhook";
+            const flaskUploadEndpoint = "http://localhost:5000/upload_image";
 
             let firstMessageSent = false;
             let chatHistory = [];
