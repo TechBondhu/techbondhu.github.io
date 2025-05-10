@@ -66,6 +66,7 @@
         .user-message, .bot-message { padding: 15px 20px; border-radius: 12px; max-width: 60%; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-size: 18px; margin-bottom: 10px; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
         .user-message { background-color: #f9f9f9; color: #1e3a8a; text-align: right; margin-left: auto; }
         .bot-message { background-color: #E5E7EB; color: #333; text-align: left; }
+        .image-preview { max-width: 200px; height: auto; border-radius: 10px; margin-top: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); cursor: pointer; }
         .input-area { display: flex; align-items: center; padding: 15px; background: transparent; position: relative; z-index: 2; width: 100%; margin-top: auto; }
         .input-wrapper { position: relative; display: flex; align-items: center; width: 100%; background: #fff; border: 1px solid #ccc; border-radius: 25px; padding: 10px 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
         #userInput { flex-grow: 1; padding: 10px 50px 10px 15px; font-size: 18px; border: none; border-radius: 20px; outline: none; background: transparent; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
@@ -73,8 +74,16 @@
         #sendBtn, #uploadBtn { position: absolute; right: 15px; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background-color 0.3s ease, transform 0.2s ease; }
         #sendBtn { width: 40px; height: 40px; border-radius: 50%; background-color: #1E3A8A; color: #fff; font-size: 18px; }
         #sendBtn:hover { background-color: #3B82F6; transform: scale(1.1); }
-        #uploadBtn { right: 65px; width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #1E3A8A, #3B82F6); color: #fff; font-size: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
-        #uploadBtn:hover { box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); transform: scale(1.1); }
+        #uploadBtn { right: 65px; width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #4B5EAA, #6B7280); color: #fff; font-size: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        #uploadBtn i { font-size: 16px; }
+        #uploadBtn:hover { background: linear-gradient(135deg, #6B7280, #4B5EAA); transform: scale(1.1); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); }
+        .preview-container { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; align-items: center; }
+        .preview-image { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .image-review-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 1000; }
+        .image-review-content { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; max-width: 90%; max-height: 90%; position: relative; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.18); }
+        .review-image { max-width: 500px; max-height: 500px; border-radius: 10px; }
+        .delete-image-btn { position: absolute; top: 10px; right: 10px; background: #EF4444; color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background 0.3s ease; }
+        .delete-image-btn:hover { background: #DC2626; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; width: 350px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff; text-align: center; animation: slideIn 0.3s ease-out; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
         @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -97,8 +106,8 @@
         .rename-modal-buttons .cancel:hover { background: #4B5563; transform: translateY(-2px); }
         .rename-modal-buttons .save { background: #3B82F6; color: #fff; }
         .rename-modal-buttons .save:hover { background: #2563EB; transform: translateY(-2px); }
-        @media (max-width: 768px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 10px; font-size: 20px; } .header-icons { left: 10px; gap: 10px; } .history-icon, .new-chat-icon, .home-icon { font-size: 20px; } .sidebar { width: 80%; max-width: 250px; padding: 15px; } .sidebar-header { padding-bottom: 8px; } .sidebar-icon { font-size: 20px; } .search-input { padding: 8px; font-size: 14px; } .history-item { padding: 10px; } .history-item p { font-size: 14px; } .history-item .timestamp { font-size: 10px; } .options i { font-size: 16px; } .dropdown { top: 35px; } .dropdown-item { padding: 6px 12px; font-size: 12px; } .chat-box { padding: 15px; gap: 15px; } .welcome-message h2 { font-size: 24px; margin-bottom: 15px; } .welcome-buttons button { padding: 8px 16px; font-size: 12px; } .user-message, .bot-message { max-width: 75%; padding: 12px 15px; font-size: 16px; margin-bottom: 8px; } .input-area { padding: 10px; } .input-wrapper { padding: 8px 12px; } #userInput { padding: 8px 45px 8px 12px; font-size: 16px; } #sendBtn { width: 35px; height: 35px; font-size: 16px; } #uploadBtn { right: 55px; width: 30px; height: 30px; font-size: 14px; } .modal-content, .rename-modal-content { width: 80%; max-width: 300px; padding: 20px; } .modal-content p { font-size: 14px; margin-bottom: 15px; } .modal-buttons button, .rename-modal-buttons button { padding: 8px 20px; font-size: 12px; } .rename-modal-content h3 { font-size: 18px; margin-bottom: 12px; } .rename-modal-content input { padding: 10px; font-size: 14px; margin-bottom: 15px; } }
-        @media (max-width: 480px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 8px; font-size: 18px; } .header-icons { left: 8px; gap: 8px; } .history-icon, .new-chat-icon, .home-icon { font-size: 18px; } .sidebar { width: 85%; max-width: 200px; padding: 10px; } .sidebar-header { padding-bottom: 6px; } .sidebar-icon { font-size: 18px; } .search-input { padding: 6px; font-size: 12px; } .history-item { padding: 8px; } .history-item p { font-size: 12px; } .history-item .timestamp { font-size: 8px; } .options i { font-size: 14px; } .dropdown { top: 30px; } .dropdown-item { padding: 5px 10px; font-size: 10px; } .chat-box { padding: 10px; gap: 10px; } .welcome-message { padding: 15px; } .welcome-message h2 { font-size: 20px; margin-bottom: 10px; } .welcome-buttons { gap: 8px; } .welcome-buttons button { padding: 6px 12px; font-size: 10px; } .welcome-buttons button i { margin-right: 3px; } .user-message, .bot-message { max-width: 80%; padding: 10px 12px; font-size: 14px; margin-bottom: 6px; } .input-area { padding: 8px; } .input-wrapper { padding: 6px 10px; } #userInput { padding: 6px 40px 6px 10px; font-size: 14px; } #sendBtn { width: 30px; height: 30px; font-size: 14px; } #uploadBtn { right: 45px; width: 28px; height: 28px; font-size: 12px; } .modal-content, .rename-modal-content { width: 90%; max-width: 250px; padding: 15px; } .modal-content p { font-size: 12px; margin-bottom: 12px; } .modal-buttons { gap: 10px; } .modal-buttons button, .rename-modal-buttons button { padding: 6px 15px; font-size: 10px; } .rename-modal-content h3 { font-size: 16px; margin-bottom: 10px; } .rename-modal-content input { padding: 8px; font-size: 12px; margin-bottom: 12px; } }
+        @media (max-width: 768px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 10px; font-size: 20px; } .header-icons { left: 10px; gap: 10px; } .history-icon, .new-chat-icon, .home-icon { font-size: 20px; } .sidebar { width: 80%; max-width: 250px; padding: 15px; } .sidebar-header { padding-bottom: 8px; } .sidebar-icon { font-size: 20px; } .search-input { padding: 8px; font-size: 14px; } .history-item { padding: 10px; } .history-item p { font-size: 14px; } .history-item .timestamp { font-size: 10px; } .options i { font-size: 16px; } .dropdown { top: 35px; } .dropdown-item { padding: 6px 12px; font-size: 12px; } .chat-box { padding: 15px; gap: 15px; } .welcome-message h2 { font-size: 24px; margin-bottom: 15px; } .welcome-buttons button { padding: 8px 16px; font-size: 12px; } .user-message, .bot-message { max-width: 75%; padding: 12px 15px; font-size: 16px; margin-bottom: 8px; } .image-preview { max-width: 150px; } .input-area { padding: 10px; } .input-wrapper { padding: 8px 12px; } #userInput { padding: 8px 45px 8px 12px; font-size: 16px; } #sendBtn { width: 35px; height: 35px; font-size: 16px; } #uploadBtn { right: 55px; width: 30px; height: 30px; font-size: 14px; } #uploadBtn i { font-size: 14px; } .preview-image { width: 30px; height: 30px; } .image-review-content { padding: 15px; } .review-image { max-width: 400px; max-height: 400px; } .modal-content, .rename-modal-content { width: 80%; max-width: 300px; padding: 20px; } .modal-content p { font-size: 14px; margin-bottom: 15px; } .modal-buttons button, .rename-modal-buttons button { padding: 8px 20px; font-size: 12px; } .rename-modal-content h3 { font-size: 18px; margin-bottom: 12px; } .rename-modal-content input { padding: 10px; font-size: 14px; margin-bottom: 15px; } }
+        @media (max-width: 480px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 8px; font-size: 18px; } .header-icons { left: 8px; gap: 8px; } .history-icon, .new-chat-icon, .home-icon { font-size: 18px; } .sidebar { width: 85%; max-width: 200px; padding: 10px; } .sidebar-header { padding-bottom: 6px; } .sidebar-icon { font-size: 18px; } .search-input { padding: 6px; font-size: 12px; } .history-item { padding: 8px; } .history-item p { font-size: 12px; } .history-item .timestamp { font-size: 8px; } .options i { font-size: 14px; } .dropdown { top: 30px; } .dropdown-item { padding: 5px 10px; font-size: 10px; } .chat-box { padding: 10px; gap: 10px; } .welcome-message { padding: 15px; } .welcome-message h2 { font-size: 20px; margin-bottom: 10px; } .welcome-buttons { gap: 8px; } .welcome-buttons button { padding: 6px 12px; font-size: 10px; } .welcome-buttons button i { margin-right: 3px; } .user-message, .bot-message { max-width: 80%; padding: 10px 12px; font-size: 14px; margin-bottom: 6px; } .image-preview { max-width: 120px; } .input-area { padding: 8px; } .input-wrapper { padding: 6px 10px; } #userInput { padding: 6px 40px 6px 10px; font-size: 14px; } #sendBtn { width: 30px; height: 30px; font-size: 14px; } #uploadBtn { right: 45px; width: 28px; height: 28px; font-size: 12px; } #uploadBtn i { font-size: 12px; } .preview-image { width: 25px; height: 25px; } .image-review-content { padding: 10px; } .review-image { max-width: 300px; max-height: 300px; } .modal-content, .rename-modal-content { width: 90%; max-width: 250px; padding: 15px; } .modal-content p { font-size: 12px; margin-bottom: 12px; } .modal-buttons { gap: 10px; } .modal-buttons button, .rename-modal-buttons button { padding: 6px 15px; font-size: 10px; } .rename-modal-content h3 { font-size: 16px; margin-bottom: 10px; } .rename-modal-content input { padding: 8px; font-size: 12px; margin-bottom: 12px; } }
     </style>
 </head>
 <body>
@@ -119,7 +128,7 @@
             <input type="text" class="search-input" id="searchInput" placeholder="Search chat history...">
             <div class="history-list" id="historyList">
                 <div class="history-item">
-                    <div class="history-item-content">
+                    <div class="image-item-content">
                         <p>Sample Chat 1</p>
                         <div class="timestamp">2025-05-09 10:00</div>
                     </div>
@@ -146,8 +155,11 @@
         </div>
         <div class="input-area">
             <div class="input-wrapper">
+                <div class="preview-container" id="previewContainer">
+                    <img id="previewImage" class="preview-image" src="" alt="Image Preview">
+                </div>
                 <input type="text" id="userInput" placeholder="Type your message...">
-                <button id="uploadBtn">+</button>
+                <button id="uploadBtn"><i class="fas fa-paperclip"></i></button>
                 <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
                 <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
             </div>
@@ -170,6 +182,12 @@
                 <button class="cancel" id="renameCancelBtn">Cancel</button>
                 <button class="save" id="renameSaveBtn">Save</button>
             </div>
+        </div>
+    </div>
+    <div class="image-review-modal" id="imageReviewModal">
+        <div class="image-review-content">
+            <button class="delete-image-btn" id="deleteImageBtn"><i class="fas fa-times"></i></button>
+            <img id="reviewImage" class="review-image" src="" alt="Image Review">
         </div>
     </div>
 
@@ -199,6 +217,13 @@
             const deleteCancelBtn = document.getElementById('deleteCancelBtn');
             const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
             const homeIcon = document.querySelector('.home-icon');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const imageReviewModal = document.getElementById('imageReviewModal');
+            const reviewImage = document.getElementById('reviewImage');
+            const deleteImageBtn = document.getElementById('deleteImageBtn');
+
+            let selectedFile = null;
 
             // Redirect to home page on home icon click
             homeIcon.addEventListener('click', () => {
@@ -218,38 +243,86 @@
                     userInput.value = '';
                     callRasaAPI(message);
                 }
+                if (selectedFile) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('user-message');
+                    const img = document.createElement('img');
+                    img.src = previewImage.src;
+                    img.classList.add('image-preview');
+                    img.addEventListener('click', () => openImageModal(img.src));
+                    messageDiv.appendChild(img);
+                    messagesDiv.appendChild(messageDiv);
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    if (welcomeMessage.style.display !== 'none') welcomeMessage.style.display = 'none';
+
+                    const formData = new FormData();
+                    formData.append('image', selectedFile);
+                    fetch('http://localhost:5000/upload-image', { method: 'POST', body: formData })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.image_url) {
+                                callRasaAPI(data.image_url);
+                                displayMessage(`আপনার ছবি আপলোড সফল হয়েছে! এটি আপনার ইমেজ লিঙ্ক: ${data.image_url}`, 'user');
+                            } else if (data.error) {
+                                displayMessage(`ত্রুটি: ${data.error}`, 'bot');
+                            }
+                        })
+                        .catch(error => {
+                            displayMessage('ইমেজ আপলোডে ত্রুটি হয়েছে। আবার চেষ্টা করুন।', 'bot');
+                            console.error('Upload Error:', error);
+                        });
+                    clearPreview();
+                }
             }
 
-            // Upload functionality
+            // Upload functionality with preview
             uploadBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
                 if (file) {
-                    const formData = new FormData();
-                    formData.append('image', file);
+                    selectedFile = file;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImage.src = e.target.result;
+                        previewContainer.style.display = 'flex';
+                        userInput.style.paddingLeft = '60px'; // Adjust input padding for preview
+                    };
+                    reader.readAsDataURL(file);
+                }
+                fileInput.value = '';
+            });
 
-                    // Flask API-কে ইমেজ আপলোডের জন্য কল
-                    fetch('http://localhost:5000/upload-image', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.image_url) {
-                            // Rasa-তে image_url পাঠানো
-                            callRasaAPI(data.image_url);
-                            displayMessage(`ইমেজ আপলোড হয়েছে: ${data.image_url}`, 'user');
-                        } else if (data.error) {
-                            displayMessage(`ত্রুটি: ${data.error}`, 'bot');
-                        }
-                    })
-                    .catch(error => {
-                        displayMessage('ইমেজ আপলোডে ত্রুটি হয়েছে। আবার চেষ্টা করুন।', 'bot');
-                        console.error('Upload Error:', error);
-                    });
-                    fileInput.value = '';
+            // Preview click to open review modal
+            previewImage.addEventListener('click', () => {
+                reviewImage.src = previewImage.src;
+                imageReviewModal.style.display = 'flex';
+            });
+
+            // Open image modal from chat
+            function openImageModal(imageSrc) {
+                reviewImage.src = imageSrc;
+                imageReviewModal.style.display = 'flex';
+            }
+
+            // Close review modal on click outside or delete
+            imageReviewModal.addEventListener('click', (e) => {
+                if (e.target === imageReviewModal || e.target === deleteImageBtn) {
+                    imageReviewModal.style.display = 'none';
                 }
             });
+
+            // Delete image from preview
+            deleteImageBtn.addEventListener('click', () => {
+                clearPreview();
+                imageReviewModal.style.display = 'none';
+            });
+
+            function clearPreview() {
+                selectedFile = null;
+                previewImage.src = '';
+                previewContainer.style.display = 'none';
+                userInput.style.paddingLeft = '15px';
+            }
 
             // Sidebar toggle
             historyIcon.addEventListener('click', toggleSidebar);
