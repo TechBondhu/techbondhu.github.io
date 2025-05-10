@@ -224,8 +224,31 @@
             uploadBtn.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
                 const file = fileInput.files[0];
-                if (file) displayMessage(`Uploaded: ${file.name}`, 'user');
-                fileInput.value = '';
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('image', file);
+
+                    // Flask API-কে ইমেজ আপলোডের জন্য কল
+                    fetch('http://localhost:5000/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.image_url) {
+                            // Rasa-তে image_url পাঠানো
+                            callRasaAPI(data.image_url);
+                            displayMessage(`ইমেজ আপলোড হয়েছে: ${data.image_url}`, 'user');
+                        } else if (data.error) {
+                            displayMessage(`ত্রুটি: ${data.error}`, 'bot');
+                        }
+                    })
+                    .catch(error => {
+                        displayMessage('ইমেজ আপলোডে ত্রুটি হয়েছে। আবার চেষ্টা করুন।', 'bot');
+                        console.error('Upload Error:', error);
+                    });
+                    fileInput.value = '';
+                }
             });
 
             // Sidebar toggle
@@ -297,7 +320,7 @@
                     },
                     error: (error) => {
                         removeLoading(loadingDiv);
-                        displayMessage('Error connecting to bot. Please try again.', 'bot');
+                        displayMessage('বটের সাথে সংযোগে ত্রুটি হয়েছে। আবার চেষ্টা করুন।', 'bot');
                         console.error('Rasa API Error:', error);
                     }
                 });
