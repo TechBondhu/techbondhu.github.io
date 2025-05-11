@@ -6,15 +6,18 @@
     <title>Formbondhu Chatbot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /* Previous styles remain unchanged */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Segoe UI", sans-serif; background-color: #E5E7EB; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
         .chat-container { width: 100vw; height: 100vh; background-color: #ffffff; color: #000000; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); transition: margin-left 0.3s ease, width 0.3s ease; position: relative; z-index: 1; }
         .chat-container.sidebar-open { margin-left: 300px; width: calc(100vw - 300px); }
         .header { background-color: #1E3A8A; color: #fff; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; border-bottom: 2px solid #ddd; position: relative; display: flex; justify-content: center; align-items: center; }
         .header-icons { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; gap: 15px; }
-        .history-icon, .new-chat-icon, .home-icon { font-size: 24px; color: #fff; cursor: pointer; transition: color 0.3s ease, transform 0.2s ease; }
-        .history-icon:hover, .new-chat-icon:hover, .home-icon:hover { color: #3B82F6; transform: scale(1.1); }
+        .header-right-icons { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; gap: 15px; }
+        .history-icon, .new-chat-icon, .home-icon, .settings-icon, .account-icon { font-size: 24px; color: #fff; cursor: pointer; transition: color 0.3s ease, transform 0.2s ease; }
+        .history-icon:hover, .new-chat-icon:hover, .home-icon:hover, .settings-icon:hover, .account-icon:hover { color: #3B82F6; transform: scale(1.1); }
         .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: linear-gradient(135deg, #1E3A8A, #3B82F6); color: #fff; padding: 20px; transition: left 0.3s ease, opacity 0.3s ease; opacity: 0; z-index: 10; display: flex; flex-direction: column; gap: 15px; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); overflow: hidden; }
         .sidebar.open { left: 0; opacity: 1; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
@@ -47,7 +50,7 @@
         @keyframes slideUp { from { transform: translate(-50%, -30%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
         .welcome-message h2 { font-size: 28px; color: #333; margin-bottom: 20px; }
         .welcome-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-        .welcome-buttons button { padding: 10px 20px; border: 1px solid #ccc; border-radius: 20px; background: #fff; color: #333; font-size: 14px; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; }
+        .welcome-buttons button { padding: 10px 20px; border: 1px solid #ccc; border-radius: 20px; background: #fff; color: #333; font-size: 14px; }
         .welcome-buttons button:hover { background-color: #f0f0f0; transform: scale(1.05); }
         .welcome-buttons button i { margin-right: 5px; }
         .welcome-buttons button:nth-child(1) { color: #FF6F61; }
@@ -63,13 +66,29 @@
         .dot:nth-child(2) { animation-delay: 0.3s; }
         .dot:nth-child(3) { animation-delay: 0.6s; }
         @keyframes glow { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px rgba(30, 58, 138, 0.6); } }
-        .user-message, .bot-message { padding: 15px 20px; border-radius: 12px; max-width: 60%; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-size: 18px; margin-bottom: 10px; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
+        .user-message, .bot-message { padding: 15px 20px; border-radius: 12px; max-width: 60%; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); font-size: 18px; margin-bottom: 10px; font-family: 'Tiro Bangla', serif; font-weight: 700; }
         .user-message { background-color: #f9f9f9; color: #1e3a8a; text-align: right; margin-left: auto; }
-        .bot-message { background-color: #E5E7EB; color: #333; text-align: left; }
+        .bot-message { background-color: #E5E7EB; color: #333; text-align: left; margin-right: auto; }
+        .review-card { background: linear-gradient(135deg, #e0e7ff, #ffffff); border-radius: 15px; padding: 20px; max-width: 60%; margin-right: auto; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); margin-bottom: 10px; }
+        .review-card h3 { font-size: 20px; color: #1E3A8A; margin-bottom: 15px; font-family: 'Tiro Bangla', serif; font-weight: 700; }
+        .review-content { display: flex; flex-direction: column; gap: 10px; }
+        .review-item { display: flex; flex-direction: column; gap: 5px; }
+        .review-item label { font-size: 16px; color: #333; font-weight: bold; }
+        .review-item p { font-size: 16px; color: #555; margin: 0; }
+        .review-item img { max-width: 100%; max-height: 300px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin-top: 5px; }
+        .review-buttons { display: flex; justify-content: space-between; margin-top: 15px; }
+        .edit-btn, .confirm-btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background-color 0.3s ease; }
+        .edit-btn { background: #3B82F6; color: #fff; }
+        .edit-btn:hover { background: #2563EB; }
+        .confirm-btn { background: #10B981; color: #fff; }
+        .confirm-btn:hover { background: #059669; }
+        .download-btn { padding: 10px 20px; border: none; border-radius: 20px; background: linear-gradient(135deg, #10B981, #059669); color: #fff; font-size: 14px; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; margin-top: 10px; }
+        .download-btn:hover { background: linear-gradient(135deg, #059669, #10B981); transform: scale(1.05); }
+        .edit-input { padding: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; width: 70%; margin-left: 5px; }
         .image-preview { max-width: 200px; height: auto; border-radius: 10px; margin-top: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); cursor: pointer; }
         .input-area { display: flex; align-items: center; padding: 15px; background: transparent; position: relative; z-index: 2; width: 100%; margin-top: auto; }
         .input-wrapper { position: relative; display: flex; align-items: center; width: 100%; background: #fff; border: 1px solid #ccc; border-radius: 25px; padding: 10px 15px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
-        #userInput { flex-grow: 1; padding: 10px 50px 10px 15px; font-size: 18px; border: none; border-radius: 20px; outline: none; background: transparent; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
+        #userInput { flex-grow: 1; padding: 10px 50px 10px 15px; font-size: 18px; border: none; border-radius: 20px; outline: none; background: transparent; font-family: 'Tiro Bangla', serif; font-weight: 700; }
         #userInput:focus { border: none; }
         #sendBtn, #uploadBtn { position: absolute; right: 15px; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: background-color 0.3s ease, transform 0.2s ease; }
         #sendBtn { width: 40px; height: 40px; border-radius: 50%; background-color: #1E3A8A; color: #fff; font-size: 18px; }
@@ -77,19 +96,35 @@
         #uploadBtn { right: 65px; width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #4B5EAA, #6B7280); color: #fff; font-size: 16px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
         #uploadBtn i { font-size: 16px; }
         #uploadBtn:hover { background: linear-gradient(135deg, #6B7280, #4B5EAA); transform: scale(1.1); box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); }
-        .preview-container { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; align-items: center; }
+        .preview-container { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: none; align-items: center; gap: 5px; }
         .preview-image { width: 40px; height: 40px; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        .edit-btn { padding: 5px 10px; border: none; border-radius: 5px; background: #3B82F6; color: #fff; font-size: 12px; cursor: pointer; transition: background 0.3s ease; }
+        .edit-btn:hover { background: #2563EB; }
         .image-review-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 1000; }
         .image-review-content { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; max-width: 90%; max-height: 90%; position: relative; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.18); }
         .review-image { max-width: 500px; max-height: 500px; border-radius: 10px; }
         .delete-image-btn { position: absolute; top: 10px; right: 10px; background: #EF4444; color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background 0.3s ease; }
         .delete-image-btn:hover { background: #DC2626; }
+        .edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .edit-modal-content { background: rgba(255, 255, 255, 0.95); border-radius: 15px; padding: 20px; width: 90%; max-width: 800px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); display: flex; gap: 20px; }
+        .edit-canvas-container { flex: 2; display: flex; justify-content: center; align-items: center; }
+        #editCanvas { border: 1px solid #ccc; max-width: 100%; max-height: 400px; }
+        .edit-controls { flex: 1; display: flex; flex-direction: column; gap: 15px; }
+        .edit-controls label { font-size: 14px; color: #333; margin-bottom: 5px; }
+        .edit-controls input[type="range"] { width: 100%; }
+        .edit-controls select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        .edit-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        .edit-buttons button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background 0.3s ease; }
+        .edit-buttons .cancel { background: #6B7280; color: #fff; }
+        .edit-buttons .cancel:hover { background: #4B5563; }
+        .edit-buttons .apply { background: #3B82F6; color: #fff; }
+        .edit-buttons .apply:hover { background: #2563EB; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; width: 350px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff; text-align: center; animation: slideIn 0.3s ease-out; font-family: 'Tiro+Bangla', serif; font-weight: 700; }
+        .modal-content { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 15px; padding: 25px; width: 350px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.18); color: #fff; text-align: center; animation: slideIn 0.3s ease-out; font-family: 'Tiro Bangla', serif; font-weight: 700; }
         @keyframes slideIn { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .modal-content p { font-size: 16px; margin-bottom: 20px; color: #fff; }
         .modal-buttons { display: flex; justify-content: space-between; }
-        .modal-buttons button { padding: 10px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: 'Tiro+Bangla', serif; font-weight: 700; transition: transform 0.2s ease, background 0.3s ease; }
+        .modal-buttons button { padding: 10px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: 'Tiro Bangla', serif; font-weight: 700; transition: transform 0.2s ease, background 0.3s ease; }
         .modal-buttons .cancel { background: #6B7280; color: #fff; }
         .modal-buttons .cancel:hover { background: #4B5563; transform: translateY(-2px); }
         .modal-buttons .confirm { background: #EF4444; color: #fff; }
@@ -101,13 +136,13 @@
         .rename-modal-content input:focus { background: rgba(255, 255, 255, 0.3); }
         .rename-modal-content input::placeholder { color: rgba(255, 255, 255, 0.7); }
         .rename-modal-buttons { display: flex; justify-content: space-between; }
-        .rename-modal-buttons button { padding: 10px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: 'Tiro+Bangla', serif; font-weight: 700; transition: transform 0.2s ease, background 0.3s ease; }
+        .rename-modal-buttons button { padding: 10px 25px; border: none; border-radius: 10px; cursor: pointer; font-size: 14px; font-family: 'Tiro Bangla', serif; font-weight: 700; transition: transform 0.2s ease, background 0.3s ease; }
         .rename-modal-buttons .cancel { background: #6B7280; color: #fff; }
         .rename-modal-buttons .cancel:hover { background: #4B5563; transform: translateY(-2px); }
         .rename-modal-buttons .save { background: #3B82F6; color: #fff; }
         .rename-modal-buttons .save:hover { background: #2563EB; transform: translateY(-2px); }
-        @media (max-width: 768px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 10px; font-size: 20px; } .header-icons { left: 10px; gap: 10px; } .history-icon, .new-chat-icon, .home-icon { font-size: 20px; } .sidebar { width: 80%; max-width: 250px; padding: 15px; } .sidebar-header { padding-bottom: 8px; } .sidebar-icon { font-size: 20px; } .search-input { padding: 8px; font-size: 14px; } .history-item { padding: 10px; } .history-item p { font-size: 14px; } .history-item .timestamp { font-size: 10px; } .options i { font-size: 16px; } .dropdown { top: 35px; } .dropdown-item { padding: 6px 12px; font-size: 12px; } .chat-box { padding: 15px; gap: 15px; } .welcome-message h2 { font-size: 24px; margin-bottom: 15px; } .welcome-buttons button { padding: 8px 16px; font-size: 12px; } .user-message, .bot-message { max-width: 75%; padding: 12px 15px; font-size: 16px; margin-bottom: 8px; } .image-preview { max-width: 150px; } .input-area { padding: 10px; } .input-wrapper { padding: 8px 12px; } #userInput { padding: 8px 45px 8px 12px; font-size: 16px; } #sendBtn { width: 35px; height: 35px; font-size: 16px; } #uploadBtn { right: 55px; width: 30px; height: 30px; font-size: 14px; } #uploadBtn i { font-size: 14px; } .preview-image { width: 30px; height: 30px; } .image-review-content { padding: 15px; } .review-image { max-width: 400px; max-height: 400px; } .modal-content, .rename-modal-content { width: 80%; max-width: 300px; padding: 20px; } .modal-content p { font-size: 14px; margin-bottom: 15px; } .modal-buttons button, .rename-modal-buttons button { padding: 8px 20px; font-size: 12px; } .rename-modal-content h3 { font-size: 18px; margin-bottom: 12px; } .rename-modal-content input { padding: 10px; font-size: 14px; margin-bottom: 15px; } }
-        @media (max-width: 480px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 8px; font-size: 18px; } .header-icons { left: 8px; gap: 8px; } .history-icon, .new-chat-icon, .home-icon { font-size: 18px; } .sidebar { width: 85%; max-width: 200px; padding: 10px; } .sidebar-header { padding-bottom: 6px; } .sidebar-icon { font-size: 18px; } .search-input { padding: 6px; font-size: 12px; } .history-item { padding: 8px; } .history-item p { font-size: 12px; } .history-item .timestamp { font-size: 8px; } .options i { font-size: 14px; } .dropdown { top: 30px; } .dropdown-item { padding: 5px 10px; font-size: 10px; } .chat-box { padding: 10px; gap: 10px; } .welcome-message { padding: 15px; } .welcome-message h2 { font-size: 20px; margin-bottom: 10px; } .welcome-buttons { gap: 8px; } .welcome-buttons button { padding: 6px 12px; font-size: 10px; } .welcome-buttons button i { margin-right: 3px; } .user-message, .bot-message { max-width: 80%; padding: 10px 12px; font-size: 14px; margin-bottom: 6px; } .image-preview { max-width: 120px; } .input-area { padding: 8px; } .input-wrapper { padding: 6px 10px; } #userInput { padding: 6px 40px 6px 10px; font-size: 14px; } #sendBtn { width: 30px; height: 30px; font-size: 14px; } #uploadBtn { right: 45px; width: 28px; height: 28px; font-size: 12px; } #uploadBtn i { font-size: 12px; } .preview-image { width: 25px; height: 25px; } .image-review-content { padding: 10px; } .review-image { max-width: 300px; max-height: 300px; } .modal-content, .rename-modal-content { width: 90%; max-width: 250px; padding: 15px; } .modal-content p { font-size: 12px; margin-bottom: 12px; } .modal-buttons { gap: 10px; } .modal-buttons button, .rename-modal-buttons button { padding: 6px 15px; font-size: 10px; } .rename-modal-content h3 { font-size: 16px; margin-bottom: 10px; } .rename-modal-content input { padding: 8px; font-size: 12px; margin-bottom: 12px; } }
+        @media (max-width: 768px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 10px; font-size: 20px; } .header-icons { left: 10px; gap: 10px; } .header-right-icons { right: 10px; gap: 10px; } .history-icon, .new-chat-icon, .home-icon, .settings-icon, .account-icon { font-size: 20px; } .sidebar { width: 80%; max-width: 250px; padding: 15px; } .sidebar-header { padding-bottom: 8px; } .sidebar-icon { font-size: 20px; } .search-input { padding: 8px; font-size: 14px; } .history-item { padding: 10px; } .history-item p { font-size: 14px; } .history-item .timestamp { font-size: 10px; } .options i { font-size: 16px; } .dropdown { top: 35px; } .dropdown-item { padding: 6px 12px; font-size: 12px; } .chat-box { padding: 15px; gap: 15px; } .welcome-message h2 { font-size: 24px; margin-bottom: 15px; } .welcome-buttons button { padding: 8px 16px; font-size: 12px; } .user-message, .bot-message { max-width: 75%; padding: 12px 15px; font-size: 16px; margin-bottom: 8px; } .review-card { max-width: 75%; padding: 15px; } .review-card h3 { font-size: 18px; margin-bottom: 12px; } .review-item label, .review-item p { font-size: 14px; } .review-item img { max-height: 200px; } .image-preview { max-width: 150px; } .input-area { padding: 10px; } .input-wrapper { padding: 8px 12px; } #userInput { padding: 8px 45px 8px 12px; font-size: 16px; } #sendBtn { width: 35px; height: 35px; font-size: 16px; } #uploadBtn { right: 55px; width: 30px; height: 30px; font-size: 14px; } #uploadBtn i { font-size: 14px; } .preview-image { width: 30px; height: 30px; } .image-review-content { padding: 15px; } .review-image { max-width: 400px; max-height: 400px; } .edit-modal-content { flex-direction: column; width: 80%; max-width: 600px; } .edit-canvas-container, .edit-controls { flex: none; width: 100%; } .modal-content, .rename-modal-content { width: 80%; max-width: 300px; padding: 20px; } .modal-content p { font-size: 14px; margin-bottom: 15px; } .modal-buttons button, .rename-modal-buttons button { padding: 8px 20px; font-size: 12px; } .rename-modal-content h3 { font-size: 18px; margin-bottom: 12px; } .rename-modal-content input { padding: 10px; font-size: 14px; margin-bottom: 15px; } }
+        @media (max-width: 480px) { .chat-container { width: 100vw; height: 100vh; } .chat-container.sidebar-open { margin-left: 0; width: 100vw; } .header { padding: 8px; font-size: 18px; } .header-icons { left: 8px; gap: 8px; } .header-right-icons { right: 8px; gap: 8px; } .history-icon, .new-chat-icon, .home-icon, .settings-icon, .account-icon { font-size: 18px; } .sidebar { width: 85%; max-width: 200px; padding: 10px; } .sidebar-header { padding-bottom: 6px; } .sidebar-icon { font-size: 18px; } .search-input { padding: 6px; font-size: 12px; } .history-item { padding: 8px; } .history-item p { font-size: 12px; } .history-item .timestamp { font-size: 8px; } .options i { font-size: 14px; } .dropdown { top: 30px; } .dropdown-item { padding: 5px 10px; font-size: 10px; } .chat-box { padding: 10px; gap: 10px; } .welcome-message { padding: 15px; } .welcome-message h2 { font-size: 20px; margin-bottom: 10px; } .welcome-buttons { gap: 8px; } .welcome-buttons button { padding: 6px 12px; font-size: 10px; } .welcome-buttons button i { margin-right: 3px; } .user-message, .bot-message { max-width: 80%; padding: 10px 12px; font-size: 14px; margin-bottom: 6px; } .review-card { max-width: 80%; padding: 12px; } .review-card h3 { font-size: 16px; margin-bottom: 10px; } .review-item label, .review-item p { font-size: 12px; } .review-item img { max-height: 150px; } .image-preview { max-width: 120px; } .input-area { padding: 8px; } .input-wrapper { padding: 6px 10px; } #userInput { padding: 6px 40px 6px 10px; font-size: 14px; } #sendBtn { width: 30px; height: 30px; font-size: 14px; } #uploadBtn { right: 45px; width: 28px; height: 28px; font-size: 12px; } #uploadBtn i { font-size: 12px; } .preview-image { width: 25px; height: 25px; } .image-review-content { padding: 10px; } .review-image { max-width: 300px; max-height: 300px; } .edit-modal-content { width: 90%; max-width: 400px; padding: 15px; } #editCanvas { max-height: 300px; } .modal-content, .rename-modal-content { width: 90%; max-width: 250px; padding: 15px; } .modal-content p { font-size: 12px; margin-bottom: 12px; } .modal-buttons { gap: 10px; } .modal-buttons button, .rename-modal-buttons button { padding: 6px 15px; font-size: 10px; } .rename-modal-content h3 { font-size: 16px; margin-bottom: 10px; } .rename-modal-content input { padding: 8px; font-size: 12px; margin-bottom: 12px; } }
     </style>
 </head>
 <body>
@@ -119,6 +154,10 @@
                 <i class="fas fa-pen-to-square new-chat-icon" id="newChatIcon"></i>
             </div>
             Formbondhu
+            <div class="header-right-icons">
+                <i class="fas fa-cog settings-icon" id="settingsIcon"></i>
+                <i class="fas fa-user account-icon" id="accountIcon"></i>
+            </div>
         </div>
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -128,7 +167,7 @@
             <input type="text" class="search-input" id="searchInput" placeholder="Search chat history...">
             <div class="history-list" id="historyList">
                 <div class="history-item">
-                    <div class="image-item-content">
+                    <div class="history-item-content">
                         <p>Sample Chat 1</p>
                         <div class="timestamp">2025-05-09 10:00</div>
                     </div>
@@ -157,6 +196,7 @@
             <div class="input-wrapper">
                 <div class="preview-container" id="previewContainer">
                     <img id="previewImage" class="preview-image" src="" alt="Image Preview">
+                    <button class="edit-btn" id="editBtn">Edit</button>
                 </div>
                 <input type="text" id="userInput" placeholder="Type your message...">
                 <button id="uploadBtn"><i class="fas fa-paperclip"></i></button>
@@ -190,6 +230,33 @@
             <img id="reviewImage" class="review-image" src="" alt="Image Review">
         </div>
     </div>
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <div class="edit-canvas-container">
+                <canvas id="editCanvas"></canvas>
+            </div>
+            <div class="edit-controls">
+                <label for="cropWidth">Crop Width:</label>
+                <input type="range" id="cropWidth" min="50" max="500" value="200">
+                <label for="cropHeight">Crop Height:</label>
+                <input type="range" id="cropHeight" min="50" max="500" value="200">
+                <label for="brightness">Brightness:</label>
+                <input type="range" id="brightness" min="-100" max="100" value="0">
+                <label for="contrast">Contrast:</label>
+                <input type="range" id="contrast" min="-100" max="100" value="0">
+                <label for="backgroundColor">Background Color:</label>
+                <select id="backgroundColor">
+                    <option value="white">White</option>
+                    <option value="gray">Gray</option>
+                    <option value="transparent">Transparent</option>
+                </select>
+                <div class="edit-buttons">
+                    <button class="cancel" id="editCancelBtn">Cancel</button>
+                    <button class="apply" id="editApplyBtn">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -217,17 +284,49 @@
             const deleteCancelBtn = document.getElementById('deleteCancelBtn');
             const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
             const homeIcon = document.querySelector('.home-icon');
+            const settingsIcon = document.getElementById('settingsIcon');
+            const accountIcon = document.getElementById('accountIcon');
             const previewContainer = document.getElementById('previewContainer');
             const previewImage = document.getElementById('previewImage');
+            const editBtn = document.getElementById('editBtn');
             const imageReviewModal = document.getElementById('imageReviewModal');
             const reviewImage = document.getElementById('reviewImage');
             const deleteImageBtn = document.getElementById('deleteImageBtn');
+            const editModal = document.getElementById('editModal');
+            const editCanvas = document.getElementById('editCanvas');
+            const cropWidth = document.getElementById('cropWidth');
+            const cropHeight = document.getElementById('cropHeight');
+            const brightness = document.getElementById('brightness');
+            const contrast = document.getElementById('contrast');
+            const backgroundColor = document.getElementById('backgroundColor');
+            const editCancelBtn = document.getElementById('editCancelBtn');
+            const editApplyBtn = document.getElementById('editApplyBtn');
 
             let selectedFile = null;
+            let editedImage = null;
+            const ctx = editCanvas.getContext('2d');
+            let image = new Image();
+            let cropRect = { x: 0, y: 0, width: 200, height: 200 };
+            let brightnessValue = 0;
+            let contrastValue = 0;
+            let bgColor = 'white';
+
+            // Initialize jsPDF
+            const { jsPDF } = window.jspdf;
 
             // Redirect to home page on home icon click
             homeIcon.addEventListener('click', () => {
                 window.location.href = 'index.html';
+            });
+
+            // Redirect to settings page on settings icon click
+            settingsIcon.addEventListener('click', () => {
+                window.location.href = 'settings.html';
+            });
+
+            // Redirect to account page on account icon click
+            accountIcon.addEventListener('click', () => {
+                window.location.href = 'account.html';
             });
 
             // Send message to Rasa
@@ -257,12 +356,14 @@
 
                     const formData = new FormData();
                     formData.append('image', selectedFile);
-                    fetch('http://localhost:5000/upload-image', { method: 'POST', body: formData })
+                    fetch('http://localhost:5000/upload-image', {
+                        method: 'POST',
+                        body: formData
+                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.image_url) {
                                 callRasaAPI(data.image_url);
-                                displayMessage(`আপনার ছবি আপলোড সফল হয়েছে! এটি আপনার ইমেজ লিঙ্ক: ${data.image_url}`, 'user');
                             } else if (data.error) {
                                 displayMessage(`ত্রুটি: ${data.error}`, 'bot');
                             }
@@ -285,7 +386,7 @@
                     reader.onload = (e) => {
                         previewImage.src = e.target.result;
                         previewContainer.style.display = 'flex';
-                        userInput.style.paddingLeft = '60px'; // Adjust input padding for preview
+                        userInput.style.paddingLeft = '110px'; // Adjust for preview and edit button
                     };
                     reader.readAsDataURL(file);
                 }
@@ -296,6 +397,84 @@
             previewImage.addEventListener('click', () => {
                 reviewImage.src = previewImage.src;
                 imageReviewModal.style.display = 'flex';
+            });
+
+            // Edit button click to open edit modal
+            editBtn.addEventListener('click', () => {
+                image.src = previewImage.src;
+                image.onload = () => {
+                    editCanvas.width = image.width;
+                    editCanvas.height = image.height;
+                    cropRect.width = Math.min(200, image.width);
+                    cropRect.height = Math.min(200, image.height);
+                    drawImage();
+                    editModal.style.display = 'flex';
+                };
+            });
+
+            // Canvas editing controls
+            cropWidth.addEventListener('input', () => {
+                cropRect.width = parseInt(cropWidth.value);
+                drawImage();
+            });
+
+            cropHeight.addEventListener('input', () => {
+                cropRect.height = parseInt(cropHeight.value);
+                drawImage();
+            });
+
+            brightness.addEventListener('input', () => {
+                brightnessValue = parseInt(brightness.value);
+                drawImage();
+            });
+
+            contrast.addEventListener('input', () => {
+                contrastValue = parseInt(contrast.value);
+                drawImage();
+            });
+
+            backgroundColor.addEventListener('change', () => {
+                bgColor = backgroundColor.value;
+                drawImage();
+            });
+
+            function drawImage() {
+                ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+                ctx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
+                ctx.fillRect(0, 0, editCanvas.width, editCanvas.height);
+
+                // Apply brightness and contrast
+                ctx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
+                ctx.drawImage(image, 0, 0);
+
+                // Draw crop rectangle
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
+                ctx.filter = 'none';
+            }
+
+            // Apply edited image
+            editApplyBtn.addEventListener('click', () => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = cropRect.width;
+                tempCanvas.height = cropRect.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
+                tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
+                tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
+                tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
+
+                editedImage = tempCanvas.toDataURL('image/jpeg');
+                previewImage.src = editedImage;
+
+                // Trigger review after editing
+                callRasaAPI("show_review");
+                editModal.style.display = 'none';
+            });
+
+            editCancelBtn.addEventListener('click', () => {
+                editModal.style.display = 'none';
             });
 
             // Open image modal from chat
@@ -319,6 +498,7 @@
 
             function clearPreview() {
                 selectedFile = null;
+                editedImage = null;
                 previewImage.src = '';
                 previewContainer.style.display = 'none';
                 userInput.style.paddingLeft = '15px';
@@ -351,6 +531,145 @@
                 if (welcomeMessage.style.display !== 'none') welcomeMessage.style.display = 'none';
             }
 
+            function displayReview(reviewData) {
+                const reviewCard = document.createElement('div');
+                reviewCard.classList.add('review-card');
+                reviewCard.setAttribute('data-editable', 'false');
+                reviewCard.setAttribute('data-id', Date.now());
+                reviewCard.innerHTML = '<h3>আপনার তথ্য রিভিউ</h3>';
+
+                const reviewContent = document.createElement('div');
+                reviewContent.classList.add('review-content');
+
+                for (const [key, value] of Object.entries(reviewData)) {
+                    const reviewItem = document.createElement('div');
+                    reviewItem.classList.add('review-item');
+                    reviewItem.setAttribute('data-key', key);
+
+                    const label = document.createElement('label');
+                    label.innerText = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ') + ':';
+                    reviewItem.appendChild(label);
+
+                    if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
+                        const img = document.createElement('img');
+                        img.src = value;
+                        reviewItem.appendChild(img);
+                    } else {
+                        const p = document.createElement('p');
+                        p.innerText = value;
+                        reviewItem.appendChild(p);
+                    }
+
+                    reviewContent.appendChild(reviewItem);
+                }
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'review-buttons';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.innerText = 'Edit';
+                editBtn.addEventListener('click', () => toggleEditMode(reviewCard, reviewData));
+
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'confirm-btn';
+                confirmBtn.innerText = 'Confirm';
+                confirmBtn.style.display = 'inline-block';
+                confirmBtn.addEventListener('click', () => {
+                    const updatedData = {};
+                    reviewContent.querySelectorAll('.review-item').forEach(item => {
+                        const key = item.getAttribute('data-key');
+                        const value = item.querySelector('p')?.innerText || item.querySelector('img')?.src;
+                        updatedData[key] = value;
+                    });
+
+                    // Send confirmed data to Rasa
+                    $.ajax({
+                        url: 'http://localhost:5005/webhooks/rest/webhook',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ 
+                            sender: 'user', 
+                            message: 'confirm_review',
+                            metadata: { review_data: updatedData }
+                        }),
+                        success: (data) => {
+                            displayMessage('আপনার তথ্য সফলভাবে কনফার্ম হয়েছে!', 'bot');
+                            
+                            // Generate PDF
+                            generatePDF(updatedData, reviewCard);
+
+                            data.forEach(response => {
+                                if (response.text) {
+                                    displayMessage(response.text, 'bot');
+                                }
+                                if (response.custom && response.custom.review_data) {
+                                    displayReview(response.custom.review_data);
+                                }
+                            });
+                        },
+                        error: (error) => {
+                            displayMessage('তথ্য কনফার্ম করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'bot');
+                            console.error('Rasa API Error:', error);
+                        }
+                    });
+                });
+
+                buttonContainer.appendChild(editBtn);
+                buttonContainer.appendChild(confirmBtn);
+
+                reviewCard.appendChild(reviewContent);
+                reviewCard.appendChild(buttonContainer);
+                messagesDiv.appendChild(reviewCard);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                if (welcomeMessage.style.display !== 'none') welcomeMessage.style.display = 'none';
+            }
+
+            function toggleEditMode(card, reviewData) {
+                const isEditable = card.getAttribute('data-editable') === 'true';
+                const reviewContent = card.querySelector('.review-content');
+                const editBtn = card.querySelector('.edit-btn');
+                const confirmBtn = card.querySelector('.confirm-btn');
+
+                if (!isEditable) {
+                    card.setAttribute('data-editable', 'true');
+                    editBtn.innerText = 'Save';
+                    confirmBtn.style.display = 'none';
+
+                    reviewContent.querySelectorAll('.review-item').forEach(item => {
+                        const key = item.getAttribute('data-key');
+                        const value = item.querySelector('p')?.innerText;
+                        if (value) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.value = value;
+                            input.className = 'edit-input';
+                            item.innerHTML = `<label>${key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}:</label>`;
+                            item.appendChild(input);
+                        }
+                    });
+                } else {
+                    const updatedData = { ...reviewData };
+                    reviewContent.querySelectorAll('.review-item').forEach(item => {
+                        const key = item.getAttribute('data-key');
+                        const input = item.querySelector('input');
+                        if (input) {
+                            const newValue = input.value.trim();
+                            updatedData[key] = newValue;
+                            item.innerHTML = `<label>${key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}:</label><p>${newValue}</p>`;
+                        } else {
+                            item.innerHTML = `<label>${key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ')}:</label><img src="${updatedData[key]}">`;
+                        }
+                    });
+
+                    card.setAttribute('data-editable', 'false');
+                    editBtn.innerText = 'Edit';
+                    confirmBtn.style.display = 'inline-block';
+
+                    console.log('Updated Review Data:', updatedData);
+                }
+            }
+
             function displayLoading() {
                 const loadingDiv = document.createElement('div');
                 loadingDiv.classList.add('loading');
@@ -364,19 +683,25 @@
                 if (loadingDiv) loadingDiv.remove();
             }
 
-            // Call Rasa API
-            function callRasaAPI(message) {
+            function callRasaAPI(message, metadata = {}) {
                 const loadingDiv = displayLoading();
+                const payload = { sender: 'user', message: message };
+                if (Object.keys(metadata).length > 0) {
+                    payload.metadata = metadata;
+                }
                 $.ajax({
                     url: 'http://localhost:5005/webhooks/rest/webhook',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({ sender: 'user', message: message }),
+                    data: JSON.stringify(payload),
                     success: (data) => {
                         removeLoading(loadingDiv);
                         data.forEach(response => {
                             if (response.text && !response.text.toLowerCase().includes('hi')) {
                                 displayMessage(response.text, 'bot');
+                            }
+                            if (response.custom && response.custom.review_data) {
+                                displayReview(response.custom.review_data);
                             }
                             if (response.buttons) {
                                 const buttonDiv = document.createElement('div');
@@ -389,6 +714,26 @@
                                 });
                                 messagesDiv.appendChild(buttonDiv);
                             }
+                            // PDF download button handling
+                            if (response.custom && response.custom.pdf_url) {
+                                const pdfButtonDiv = document.createElement('div');
+                                pdfButtonDiv.classList.add('welcome-buttons');
+                                const downloadBtn = document.createElement('button');
+                                downloadBtn.classList.add('download-btn');
+                                downloadBtn.innerText = 'Download PDF';
+                                downloadBtn.addEventListener('click', () => {
+                                    const pdfUrl = response.custom.pdf_url;
+                                    const link = document.createElement('a');
+                                    link.href = pdfUrl;
+                                    link.download = 'document.pdf';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                });
+                                pdfButtonDiv.appendChild(downloadBtn);
+                                messagesDiv.appendChild(pdfButtonDiv);
+                                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                            }
                         });
                     },
                     error: (error) => {
@@ -399,7 +744,95 @@
                 });
             }
 
-            // Modal functionality for history items
+            // Generate professional PDF
+            function generatePDF(reviewData, reviewCard) {
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Set font and styles
+                doc.setFont("helvetica");
+                doc.setFontSize(16);
+
+                // Stylish header
+                doc.setFillColor(30, 58, 138); // Dark blue
+                doc.rect(0, 0, 210, 40, 'F'); // Header background
+                doc.setTextColor(255, 255, 255);
+                doc.text("Formbondhu Submission", 20, 20);
+                doc.setFontSize(12);
+                doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
+
+                // Add border
+                doc.setDrawColor(30, 58, 138);
+                doc.setLineWidth(0.5);
+                doc.rect(10, 10, 190, 277); // Page border
+
+                // Reset text color for content
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(12);
+
+                // Add review data
+                let y = 50;
+                for (const [key, value] of Object.entries(reviewData)) {
+                    const label = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ');
+                    doc.setFont("helvetica", "bold");
+                    doc.text(`${label}:`, 20, y);
+                    doc.setFont("helvetica", "normal");
+
+                    if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
+                        // Handle image
+                        try {
+                            const imgData = value;
+                            doc.addImage(imgData, 'JPEG', 20, y + 5, 80, 60, undefined, 'FAST'); // Optimized for speed
+                            y += 70;
+                        } catch (error) {
+                            doc.text("Image could not be loaded", 20, y + 5);
+                            y += 10;
+                            console.error('PDF Image Error:', error);
+                        }
+                    } else {
+                        // Split text to fit within page width
+                        const lines = doc.splitTextToSize(value, 170);
+                        doc.text(lines, 20, y + 5);
+                        y += lines.length * 5 + 5;
+                    }
+                    y += 5; // Extra spacing
+                }
+
+                // Add footer
+                doc.setFillColor(229, 231, 235); // Light gray
+                doc.rect(0, 277, 210, 20, 'F');
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(10);
+                doc.text("Generated by Formbondhu - www.formbondhu.com", 20, 287);
+                doc.text("Page 1 of 1", 180, 287);
+
+                // Save PDF to a blob for download
+                const pdfBlob = doc.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                // Add download button to review card
+                const downloadButtonDiv = document.createElement('div');
+                downloadButtonDiv.classList.add('welcome-buttons');
+                const downloadBtn = document.createElement('button');
+                downloadBtn.classList.add('download-btn');
+                downloadBtn.innerText = 'Download PDF';
+                downloadBtn.addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.href = pdfUrl;
+                    link.download = 'formbondhu_submission.pdf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(pdfUrl); // Clean up
+                });
+                downloadButtonDiv.appendChild(downloadBtn);
+                reviewCard.appendChild(downloadButtonDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+
             const historyItems = document.querySelectorAll('.history-item');
             historyItems.forEach((item, index) => {
                 const optionIcon = item.querySelector(`#optionIcon-${index}`);
