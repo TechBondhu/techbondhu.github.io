@@ -6,9 +6,11 @@
     <title>Formbondhu Chatbot</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Previous styles remain unchanged except for welcome message and button updates */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -245,26 +247,213 @@
             .rename-modal-content input { padding: 8px; font-size: 12px; margin-bottom: 12px; } 
             .edit-btn, .confirm-btn, .download-btn { padding: 6px 12px; font-size: 10px; } 
         }
+                              /* More Options Button */
+.welcome-buttons button#moreOptionsBtn {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    background: #fff;
+    color: #6B7280;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.welcome-buttons button#moreOptionsBtn:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+.welcome-buttons button#moreOptionsBtn i {
+    margin-right: 5px;
+}
+
+/* Genres Modal */
+.genres-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.genres-modal-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 25px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: slideIn 0.3s ease-out;
+    font-family: 'Tiro Bangla', serif;
+    font-weight: 700;
+}
+.genres-modal-content h3 {
+    font-size: 24px;
+    color: #1E3A8A;
+    margin-bottom: 20px;
+}
+.genres-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+.genres-list::-webkit-scrollbar {
+    width: 8px;
+}
+.genres-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+.genres-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.genres-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+.genre-item {
+    padding: 12px;
+    background: linear-gradient(135deg, #3B82F6, #1E40AF);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+.genre-item i {
+    font-size: 18px;
+    color: #fff;
+}
+.genre-item span {
+    flex-grow: 1;
+}
+.genre-item:hover {
+    background: linear-gradient(135deg, #2563EB, #1E3A8A);
+    transform: translateY(-2px);
+}
+.genres-modal-buttons {
+    margin-top: 20px;
+}
+.genres-modal-buttons button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 10px;
+    background: #6B7280;
+    color: #fff;
+    font-size: 14px;
+    font-family: 'Tiro Bangla', serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+.genres-modal-buttons button:hover {
+    background: #4B5563;
+    transform: translateY(-2px);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .welcome-buttons button#moreOptionsBtn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+    .genres-modal-content {
+        width: 80%;
+        max-width: 400px;
+        padding: 20px;
+    }
+    .genres-modal-content h3 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+        max-height: 300px;
+        padding: 8px;
+    }
+    .genre-item {
+        padding: 10px;
+        font-size: 12px;
+    }
+    .genre-item i {
+        font-size: 16px;
+    }
+    .genres-modal-buttons button {
+        padding: 8px 20px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-buttons button#moreOptionsBtn {
+        padding: 6px 12px;
+        font-size: 10px;
+    }
+    .genres-modal-content {
+        width: 90%;
+        max-width: 300px;
+        padding: 15px;
+    }
+    .genres-modal-content h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+    .genres-list {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        max-height: 250px;
+        padding: 5px;
+    }
+    .genre-item {
+        padding: 8px;
+        font-size: 12px;
+    }
+    .genre-item i {
+        font-size: 14px;
+    }
+    .genres-modal-buttons button {
+        padding: 6px 15px;
+        font-size: 10px;
+    }
+}
+
+
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="header">
             <div class="header-icons">
-                <i class="fas fa-home home-icon"></i>
-                <i class="fas fa-bars history-icon" id="historyIcon"></i>
-                <i class="fas fa-pen-to-square new-chat-icon" id="newChatIcon"></i>
+                <i class="fas fa-home home-icon" title="Home" onclick="window.location.href='index.html'"></i>
+                <i class="fas fa-bars history-icon" id="historyIcon" title="Chat History"></i>
+                <i class="fas fa-pen-to-square new-chat-icon" id="newChatIcon" title="New Chat"></i>
             </div>
             Formbondhu
             <div class="header-right-icons">
-                <i class="fas fa-cog settings-icon" id="settingsIcon"></i>
-                <i class="fas fa-user account-icon" id="accountIcon"></i>
+                <i class="fas fa-cog settings-icon" id="settingsIcon" title="Settings" onclick="window.location.href='settings.html'"></i>
+                <i class="fas fa-user account-icon" id="accountIcon" title="Account" onclick="window.location.href='account.html'"></i>
             </div>
         </div>
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-bars sidebar-icon" id="sidebarIcon"></i>
-                <i class="fas fa-times" style="cursor: pointer; font-size: 20px;" id="closeSidebar"></i>
+                <i class="fas fa-bars sidebar-icon" id="sidebarIcon" title="Menu"></i>
+                <i class="fas fa-times" id="closeSidebar" title="Close Sidebar"></i>
             </div>
             <input type="text" class="search-input" id="searchInput" placeholder="Search chat history...">
             <div class="history-list" id="historyList"></div>
@@ -273,9 +462,10 @@
             <div class="welcome-message" id="welcomeMessage">
                 <h2>ফর্মবন্ধু আজকে কীভাবে আপনাকে সাহায্য করতে পারে?</h2>
                 <div class="welcome-buttons">
-                    <button><i class="fas fa-id-card"></i> এনআইডি আবেদন</button>
-                    <button><i class="fas fa-passport"></i> পাসপোর্ট আবেদন</button>
-                    <button><i class="fas fa-building"></i> কোম্পানি রেজিস্ট্রেশন</button>
+                    <button class="welcome-btn" data-genre="এনআইডি আবেদন"><i class="fas fa-id-card"></i> এনআইডি আবেদন</button>
+                    <button class="welcome-btn" data-genre="পাসপোর্ট আবেদন"><i class="fas fa-passport"></i> পাসপোর্ট আবেদন</button>
+                    <button class="welcome-btn" data-genre="কোম্পানি রেজিস্ট্রেশন"><i class="fas fa-building"></i> কোম্পানি রেজিস্ট্রেশন</button>
+                    <button id="moreOptionsBtn"><i class="fas fa-ellipsis-h"></i> More Options</button>
                 </div>
             </div>
             <div class="messages" id="messages"></div>
@@ -287,35 +477,35 @@
                     <button class="edit-btn" id="editBtn">Edit</button>
                 </div>
                 <input type="text" id="userInput" placeholder="Type your message...">
-                <button id="uploadBtn"><i class="fas fa-paperclip"></i></button>
+                <button id="uploadBtn" title="Upload Image"><i class="fas fa-paperclip"></i></button>
                 <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg">
-                <button id="sendBtn"><i class="fas fa-arrow-up"></i></button>
+                <button id="sendBtn" title="Send Message"><i class="fas fa-arrow-up"></i></button>
             </div>
         </div>
     </div>
     <div class="modal" id="deleteModal">
         <div class="modal-content">
-            <p>আপনি কি নিশ্চিত যে এই চ্যাট ডিলিট করতে চান? এটি পূর্বাবস্থায় ফেরত আনা যাবে না।</p>
+            <p>আপনি কি এই চ্যাটটি মুছতে চান?</p>
             <div class="modal-buttons">
-                <button class="cancel" id="deleteCancelBtn">বাতিল</button>
-                <button class="confirm" id="deleteConfirmBtn">ডিলিট</button>
+                <button class="cancel" id="cancelDelete">বাতিল</button>
+                <button class="confirm" id="confirmDelete">মুছুন</button>
             </div>
         </div>
     </div>
     <div class="rename-modal" id="renameModal">
         <div class="rename-modal-content">
-            <h3>Rename Chat</h3>
-            <input type="text" id="renameInput" placeholder="Enter new title">
+            <h3>চ্যাটের নাম পরিবর্তন করুন</h3>
+            <input type="text" id="renameInput" placeholder="নতুন নাম লিখুন...">
             <div class="rename-modal-buttons">
-                <button class="cancel" id="renameCancelBtn">Cancel</button>
-                <button class="save" id="renameSaveBtn">Save</button>
+                <button class="cancel" id="cancelRename">বাতিল</button>
+                <button class="save" id="saveRename">সংরক্ষণ</button>
             </div>
         </div>
     </div>
     <div class="image-review-modal" id="imageReviewModal">
         <div class="image-review-content">
-            <button class="delete-image-btn" id="deleteImageBtn"><i class="fas fa-times"></i></button>
-            <img id="reviewImage" class="review-image" src="" alt="Image Review">
+            <img id="reviewImage" class="review-image" src="" alt="Review Image">
+            <button class="delete-image-btn" id="deleteImageBtn"><i class="fas fa-trash"></i></button>
         </div>
     </div>
     <div class="edit-modal" id="editModal">
@@ -324,31 +514,50 @@
                 <canvas id="editCanvas"></canvas>
             </div>
             <div class="edit-controls">
+                <label for="cropX">Crop X:</label>
+                <input type="range" id="cropX" min="0" max="100" value="0">
+                <label for="cropY">Crop Y:</label>
+                <input type="range" id="cropY" min="0" max="100" value="0">
                 <label for="cropWidth">Crop Width:</label>
-                <input type="range" id="cropWidth" min="50" max="500" value="200">
+                <input type="range" id="cropWidth" min="10" max="100" value="100">
                 <label for="cropHeight">Crop Height:</label>
-                <input type="range" id="cropHeight" min="50" max="500" value="200">
+                <input type="range" id="cropHeight" min="10" max="100" value="100">
                 <label for="brightness">Brightness:</label>
-                <input type="range" id="brightness" min="-100" max="100" value="0">
+                <input type="range" id="brightness" min="0" max="200" value="100">
                 <label for="contrast">Contrast:</label>
-                <input type="range" id="contrast" min="-100" max="100" value="0">
-                <label for="backgroundColor">Background Color:</label>
-                <select id="backgroundColor">
+                <input type="range" id="contrast" min="0" max="200" value="100">
+                <label for="bgColor">Background Color:</label>
+                <select id="bgColor">
                     <option value="white">White</option>
                     <option value="gray">Gray</option>
                     <option value="transparent">Transparent</option>
                 </select>
                 <div class="edit-buttons">
-                    <button class="cancel" id="editCancelBtn">Cancel</button>
+                    <button class="cancel" id="cancelEdit">Cancel</button>
                     <button class="apply" id="editApplyBtn">Apply</button>
                 </div>
             </div>
         </div>
     </div>
+    <div class="genres-modal" id="genresModal">
+        <div class="genres-modal-content">
+            <h3>সকল সেবা</h3>
+            <div class="genres-list" id="genresList">
+                <!-- জনরা লিস্ট JavaScript দিয়ে ডায়নামিকভাবে যোগ হবে -->
+            </div>
+            <div class="genres-modal-buttons">
+                <button class="cancel" id="closeGenresModal">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
 
+    <script src="script.js"></script>
+
+ 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
     const messagesDiv = document.getElementById('messages');
@@ -367,10 +576,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteModal = document.getElementById('deleteModal');
     const renameModal = document.getElementById('renameModal');
     const renameInput = document.getElementById('renameInput');
-    const renameCancelBtn = document.getElementById('renameCancelBtn');
-    const renameSaveBtn = document.getElementById('renameSaveBtn');
-    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
-    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
+    const renameCancelBtn = document.getElementById('cancelRename');
+    const renameSaveBtn = document.getElementById('saveRename');
+    const deleteCancelBtn = document.getElementById('cancelDelete');
+    const deleteConfirmBtn = document.getElementById('confirmDelete');
     const homeIcon = document.querySelector('.home-icon');
     const settingsIcon = document.getElementById('settingsIcon');
     const accountIcon = document.getElementById('accountIcon');
@@ -382,14 +591,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteImageBtn = document.getElementById('deleteImageBtn');
     const editModal = document.getElementById('editModal');
     const editCanvas = document.getElementById('editCanvas');
+    const cropX = document.getElementById('cropX');
+    const cropY = document.getElementById('cropY');
     const cropWidth = document.getElementById('cropWidth');
     const cropHeight = document.getElementById('cropHeight');
     const brightness = document.getElementById('brightness');
     const contrast = document.getElementById('contrast');
-    const backgroundColor = document.getElementById('backgroundColor');
-    const editCancelBtn = document.getElementById('editCancelBtn');
+    const backgroundColor = document.getElementById('bgColor');
+    const editCancelBtn = document.getElementById('cancelEdit');
     const editApplyBtn = document.getElementById('editApplyBtn');
+    const moreOptionsBtn = document.getElementById('moreOptionsBtn');
+    const genresModal = document.getElementById('genresModal');
+    const closeGenresModal = document.getElementById('closeGenresModal');
+    const genresList = document.getElementById('genresList');
 
+    // Genres Data
+    const genres = [
+        { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card' },
+        { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport' },
+        { name: 'কোম্পানি রেজিস্ট্রেশন', icon: 'fas fa-building' },
+        { name: 'পেনশন আবেদন ফর্ম', icon: 'fas fa-money-check-alt' },
+        { name: 'টিআইএন (TIN) সার্টিফিকেট আবেদন', icon: 'fas fa-file-invoice' },
+        { name: 'ভূমি নামজারি (Mutation) আবেদনপত্র', icon: 'fas fa-map-marked-alt' },
+        { name: 'উপবৃত্তি বা শিক্ষাবৃত্তির আবেদন', icon: 'fas fa-graduation-cap' },
+        { name: 'জন্ম ও মৃত্যু নিবন্ধন', icon: 'fas fa-certificate' },
+        { name: 'ড্রাইভিং লাইসেন্স আবেদন', icon: 'fas fa-car' },
+        { name: 'নাগরিক সনদ (Citizen Certificate) আবেদন', icon: 'fas fa-user-check' },
+        { name: 'চারিত্রিক সনদপত্র (Character Certificate) আবেদন', icon: 'fas fa-award' },
+        { name: 'ট্রেড লাইসেন্স', icon: 'fas fa-store' },
+        { name: 'ভ্যাট রেজিস্ট্রেশন', icon: 'fas fa-calculator' },
+        { name: 'প্রপার্টি রেজিস্ট্রেশন', icon: 'fas fa-home' },
+        { name: 'ব্যাংক অ্যাকাউন্ট খোলা', icon: 'fas fa-university' }
+    ];
+
+    // State Variables
     let selectedFile = null;
     let editedImage = null;
     const ctx = editCanvas.getContext('2d');
@@ -403,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize jsPDF
     const { jsPDF } = window.jspdf;
 
-    // Firebase initialization
+    // Firebase Initialization
     const firebaseConfig = {
         apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
         authDomain: "admissionformdb.firebaseapp.com",
@@ -415,22 +650,12 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Redirect to home page on home icon click
-    homeIcon.addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
+    // Navigation Events
+    homeIcon.addEventListener('click', () => window.location.href = 'index.html');
+    settingsIcon.addEventListener('click', () => window.location.href = 'settings.html');
+    accountIcon.addEventListener('click', () => window.location.href = 'account.html');
 
-    // Redirect to settings page on settings icon click
-    settingsIcon.addEventListener('click', () => {
-        window.location.href = 'settings.html';
-    });
-
-    // Redirect to account page on account icon click
-    accountIcon.addEventListener('click', () => {
-        window.location.href = 'account.html';
-    });
-
-    // Send message to Rasa
+    // Message Sending
     sendBtn.addEventListener('click', sendMessage);
     userInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.repeat) sendMessage();
@@ -479,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Upload functionality with preview
+    // Image Upload and Preview
     uploadBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => {
         const file = fileInput.files[0];
@@ -496,13 +721,13 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.value = '';
     });
 
-    // Preview click to open review modal
+    // Image Review Modal
     previewImage.addEventListener('click', () => {
         reviewImage.src = previewImage.src;
         imageReviewModal.style.display = 'flex';
     });
 
-    // Edit button click to open edit modal
+    // Image Editing
     editBtn.addEventListener('click', () => {
         image.src = previewImage.src;
         image.onload = () => {
@@ -515,7 +740,17 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     });
 
-    // Canvas editing controls
+    // Canvas Editing Controls
+    cropX.addEventListener('input', () => {
+        cropRect.x = parseInt(cropX.value);
+        drawImage();
+    });
+
+    cropY.addEventListener('input', () => {
+        cropRect.y = parseInt(cropY.value);
+        drawImage();
+    });
+
     cropWidth.addEventListener('input', () => {
         cropRect.width = parseInt(cropWidth.value);
         drawImage();
@@ -555,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.filter = 'none';
     }
 
-    // Apply edited image
+    // Apply Edited Image
     editApplyBtn.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
@@ -601,6 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userInput.style.paddingLeft = '15px';
     }
 
+    // Sidebar and Chat History
     historyIcon.addEventListener('click', toggleSidebar);
     newChatIcon.addEventListener('click', startNewChat);
     closeSidebar.addEventListener('click', toggleSidebar);
@@ -690,87 +926,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 chat_id: currentChatId
             })
-            .then((docRef) => {
-                displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
+                .then((docRef) => {
+                    displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
+                    generatePDF(updatedData, reviewCard);
+                    reviewCard.setAttribute('data-confirmed', 'true');
+                    reviewCard.setAttribute('data-editable', 'false');
+                    editBtn.disabled = true;
+                    editBtn.style.display = 'none';
+                    confirmBtn.disabled = true;
+                    confirmBtn.style.display = 'none';
 
-                generatePDF(updatedData, reviewCard);
+                    buttonContainer.innerHTML = '';
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'download-btn';
+                    downloadBtn.innerText = 'Download PDF';
+                    downloadBtn.addEventListener('click', () => {
+                        const pdfUrl = reviewCard.getAttribute('data-pdf-url');
+                        if (pdfUrl) {
+                            const link = document.createElement('a');
+                            link.href = pdfUrl;
+                            link.download = 'formbondhu_submission.pdf';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    });
+                    buttonContainer.appendChild(downloadBtn);
 
-                reviewCard.setAttribute('data-confirmed', 'true');
-                reviewCard.setAttribute('data-editable', 'false');
-
-                editBtn.disabled = true;
-                editBtn.style.display = 'none';
-                confirmBtn.disabled = true;
-                confirmBtn.style.display = 'none';
-
-                buttonContainer.innerHTML = '';
-                const downloadBtn = document.createElement('button');
-                downloadBtn.className = 'download-btn';
-                downloadBtn.innerText = 'Download PDF';
-                downloadBtn.addEventListener('click', () => {
-                    const pdfUrl = reviewCard.getAttribute('data-pdf-url');
-                    if (pdfUrl) {
-                        const link = document.createElement('a');
-                        link.href = pdfUrl;
-                        link.download = 'formbondhu_submission.pdf';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
+                    $.ajax({
+                        url: 'http://localhost:5005/webhooks/rest/webhook',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            sender: 'user',
+                            message: 'confirm_review',
+                            metadata: { review_data: updatedData }
+                        }),
+                        success: (data) => {
+                            data.forEach(response => {
+                                if (response.text) {
+                                    displayMessage(response.text, 'bot');
+                                }
+                                if (response.custom && response.custom.review_data) {
+                                    displayReview(response.custom.review_data);
+                                }
+                            });
+                        },
+                        error: (error) => {
+                            displayMessage('তথ্য কনফার্ম করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'bot');
+                            console.error('Rasa API Error:', error);
+                        }
+                    });
+                })
+                .catch((error) => {
+                    displayMessage('ফায়ারবেজে তথ্য পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'bot');
+                    console.error('Firebase Error:', error);
                 });
-                buttonContainer.appendChild(downloadBtn);
-
-                $.ajax({
-                    url: 'http://localhost:5005/webhooks/rest/webhook',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ 
-                        sender: 'user', 
-                        message: 'confirm_review',
-                        metadata: { review_data: updatedData }
-                    }),
-                    success: (data) => {
-                        data.forEach(response => {
-                            if (response.text) {
-                                displayMessage(response.text, 'bot');
-                            }
-                            if (response.custom && response.custom.review_data) {
-                                displayReview(response.custom.review_data);
-                            }
-                        });
-                    },
-                    error: (error) => {
-                        displayMessage('তথ্য কনফার্ম করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'bot');
-                        console.error('Rasa API Error:', error);
-                    }
-                });
-            })
-            .catch((error) => {
-                displayMessage('ফায়ারবেজে তথ্য পাঠাতে সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'bot');
-                console.error('Firebase Error:', error);
-            });
         });
 
-        if (reviewCard.getAttribute('data-confirmed') === 'false') {
-            buttonContainer.appendChild(editBtn);
-            buttonContainer.appendChild(confirmBtn);
-        } else {
-            const downloadBtn = document.createElement('button');
-            downloadBtn.className = 'download-btn';
-            downloadBtn.innerText = 'Download PDF';
-            downloadBtn.addEventListener('click', () => {
-                const pdfUrl = reviewCard.getAttribute('data-pdf-url');
-                if (pdfUrl) {
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = 'formbondhu_submission.pdf';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
-            });
-            buttonContainer.appendChild(downloadBtn);
-        }
+        buttonContainer.appendChild(editBtn);
+        buttonContainer.appendChild(confirmBtn);
 
         reviewCard.appendChild(reviewContent);
         reviewCard.appendChild(buttonContainer);
@@ -855,7 +1070,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.setAttribute('data-editable', 'false');
             editBtn.innerText = 'Edit';
             confirmBtn.style.display = 'inline-block';
-            console.log('Updated Review Data:', updatedData);
         }
     }
 
@@ -922,18 +1136,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         doc.setFont("helvetica");
         doc.setFontSize(16);
-
         doc.setFillColor(30, 58, 138);
         doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(255, 255, 255);
         doc.text("Formbondhu Submission", 20, 20);
         doc.setFontSize(12);
         doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 30);
-
         doc.setDrawColor(30, 58, 138);
         doc.setLineWidth(0.5);
         doc.rect(10, 10, 190, 277);
-
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(12);
 
@@ -1076,15 +1287,46 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteModal.style.display = 'none';
     });
 
-    loadChatHistory();
+    // Genres Modal Functionality
+    function renderGenresList() {
+        genresList.innerHTML = '';
+        genres.forEach(genre => {
+            const genreItem = document.createElement('div');
+            genreItem.className = 'genre-item';
+            genreItem.innerHTML = `<i class="${genre.icon}"></i><span>${genre.name}</span>`;
+            genreItem.addEventListener('click', () => {
+                sendMessage(genre.name);
+                genresModal.style.display = 'none';
+            });
+            genresList.appendChild(genreItem);
+        });
+    }
 
-    document.querySelectorAll('.welcome-buttons button').forEach(button => {
+    function openGenresModal() {
+        renderGenresList();
+        genresModal.style.display = 'flex';
+    }
+
+    function closeGenresModalFunc() {
+        genresModal.style.display = 'none';
+    }
+
+    moreOptionsBtn.addEventListener('click', openGenresModal);
+    closeGenresModal.addEventListener('click', closeGenresModalFunc);
+
+    // Welcome Buttons
+    document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
         button.addEventListener('click', () => {
-            const text = button.textContent.replace(/[\s\n]+/g, ' ').trim();
-            sendMessage(text);
+            const genre = button.getAttribute('data-genre');
+            sendMessage(genre);
         });
     });
+
+    // Initialize
+    loadChatHistory();
 });
+ 
+
     </script>
 </body>
 </html>
