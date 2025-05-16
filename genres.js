@@ -100,20 +100,6 @@ const genres = [
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', intent: 'apply_organic_farming_job' }
 ];
 
-// UI-এ মোড ব্যানার আপডেট করার ফাংশন
-function updateGenreHeader(genreName) {
-    const modeBanner = document.getElementById('modeBanner');
-    if (modeBanner) {
-        modeBanner.textContent = `${genreName} মোড অন`;
-        modeBanner.style.display = 'block';
-    }
-}
-
-// ইনটেন্ট ট্রিগার করার ফাংশন (UI-এ না দেখিয়ে)
-function triggerIntent(intent) {
-    sendMessage(intent, false); // false মানে UI-এ দেখানো হবে না
-}
-
 const moreOptionsBtn = document.getElementById('moreOptionsBtn');
 const genresModal = document.getElementById('genresModal');
 const closeGenresModal = document.getElementById('closeGenresModal');
@@ -126,12 +112,16 @@ function renderGenresList() {
         genreItem.className = 'genre-item';
         genreItem.innerHTML = `<i class="${genre.icon}"></i><span>${genre.name}</span>`;
         genreItem.addEventListener('click', () => {
-            updateGenreHeader(genre.name); // মোড ব্যানার আপডেট
-            triggerIntent(genre.intent); // ইনটেন্ট ট্রিগার
+            triggerIntent(genre.message); // মেসেজ পাঠাও
             genresModal.style.display = 'none';
         });
         genresList.appendChild(genreItem);
     });
+}
+
+function triggerIntent(message) {
+    sendMessage(message, false); // মেসেজ পাঠাও, UI-এ দেখাবে না
+    // যদি UI-এ দেখাতে চাও, তাহলে sendMessage(message, true) ব্যবহার করো
 }
 
 function openGenresModal() {
@@ -152,8 +142,7 @@ document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button 
         const genreName = button.getAttribute('data-genre');
         const genre = genres.find(g => g.name === genreName);
         if (genre) {
-            updateGenreHeader(genre.name); // মোড ব্যানার আপডেট
-            triggerIntent(genre.intent); // ইনটেন্ট ট্রিগার
+            triggerIntent(genre.message); // মেসেজ পাঠাও
         }
     });
 });
