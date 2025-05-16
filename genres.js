@@ -120,7 +120,7 @@ function renderGenresList() {
 }
 
 function triggerIntent(message) {
-    sendMessage(message, false); // মেসেজ পাঠাও, UI-এ দেখাবে না
+    sendMessage(message, true); // মেসেজ পাঠাও, UI-এ দেখাবে না
     // যদি UI-এ দেখাতে চাও, তাহলে sendMessage(message, true) ব্যবহার করো
 }
 
