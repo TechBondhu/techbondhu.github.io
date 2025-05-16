@@ -1,10 +1,5 @@
-FROM python:3.8-slim
-
+FROM rasa/rasa:3.6.0-full
 WORKDIR /app
-
-COPY . .
-
-RUN pip install --upgrade pip
-RUN pip install -r app/requirements.txt
-
-CMD ["sh", "start.sh"]
+COPY . /app
+RUN pip install --no-cache-dir -r requirements.txt
+CMD ["run", "--enable-api", "--cors", "*", "--port", "$PORT"]
