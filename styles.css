@@ -416,4 +416,9 @@
         padding: 6px 15px;
         font-size: 10px;
     }
+
+    .fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
 }
