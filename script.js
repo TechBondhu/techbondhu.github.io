@@ -100,7 +100,6 @@ const genres = [
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
 
-
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
@@ -159,7 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let brightnessValue = 0;
     let contrastValue = 0;
     let bgColor = 'white';
-    let currentChatId = Date.now().toString();
+    // Generate unique chatId per tab using sessionStorage
+    let currentChatId = sessionStorage.getItem('chatId') || Date.now().toString();
+    sessionStorage.setItem('chatId', currentChatId); // Store chatId for this tab
 
     // Initialize jsPDF
     const { jsPDF } = window.jspdf;
@@ -434,7 +435,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startNewChat() {
-        currentChatId = Date.now().toString();
+        // Generate new chatId for new tab/session
+        currentChatId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('chatId', currentChatId); // Update chatId in sessionStorage
         messagesDiv.innerHTML = '';
         welcomeMessage.style.display = 'block';
         chatBox.classList.add('fade-in');
@@ -553,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
-                            sender: 'user',
+                            sender: currentChatId, // Use chatId as sender
                             message: 'confirm_review',
                             metadata: { review_data: updatedData }
                         }),
@@ -692,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function callRasaAPI(message, metadata = {}) {
         const typingDiv = showTypingIndicator();
-        const payload = { sender: 'user', message: message };
+        const payload = { sender: currentChatId, message: message }; // Use currentChatId as sender
         if (Object.keys(metadata).length > 0) {
             payload.metadata = metadata;
         }
@@ -850,10 +853,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentChatId = chatId;
             });
         });
+        // Ensure history is visible on new tab load
+        if (historyList.children.length > 0) {
+            sidebar.classList.add('open');
+            chatContainer.classList.add('sidebar-open');
+        }
     }
 
     function loadChat(chatId) {
         currentChatId = chatId;
+        sessionStorage.setItem('chatId', currentChatId); // Update sessionStorage with selected chatId
         const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
         const chat = chats[chatId];
         if (chat) {
@@ -864,6 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeMessage.style.display = 'none';
             sidebar.classList.remove('open');
             chatContainer.classList.remove('sidebar-open');
+            loadChatHistory(); // Refresh history list
         }
     }
 
