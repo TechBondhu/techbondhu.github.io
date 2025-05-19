@@ -807,18 +807,33 @@ document.addEventListener('DOMContentLoaded', () => {
         chats[currentChatId].messages.push({ text: message, sender: sender, time: new Date().toISOString() });
         localStorage.setItem('chatHistory', JSON.stringify(chats));
     }
+     // Utility: Get Message Preview (সাম্প্রতিক মেসেজের প্রিভিউ তৈরি)
+function getMessagePreview(messages) {
+    if (!messages || messages.length === 0) return 'No messages yet';
+    const lastMessage = messages[messages.length - 1];
+    const text = lastMessage.text;
+    // ইমেজ হলে প্রিভিউতে "[Image]" দেখাবে
+    if (text.startsWith('[Image')) return '[Image]';
+    // মেসেজ 30 অক্ষরের বেশি হলে কেটে ... যোগ করবে
+    return text.length > 30 ? sanitizeMessage(text.substring(0, 30)) + '...' : sanitizeMessage(text);
+}
 
-    function loadChatHistory() {
-        historyList.innerHTML = '';
-        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
-        Object.keys(chats).forEach(chatId => {
-            const chat = chats[chatId];
+    // Utility: Filter Chats by Search Query
+function filterChats(query) {
+    const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+    historyList.innerHTML = '';
+    Object.keys(chats).forEach(chatId => {
+        const chat = chats[chatId];
+        const titleMatch = chat.title.toLowerCase().includes(query.toLowerCase());
+        const messageMatch = chat.messages.some(msg => msg.text.toLowerCase().includes(query.toLowerCase()));
+        if (titleMatch || messageMatch) {
             const item = document.createElement('div');
             item.classList.add('history-item');
             item.setAttribute('data-chat-id', chatId);
             item.innerHTML = `
                 <div class="history-item-content">
                     <p>${sanitizeMessage(chat.title)}</p>
+                    <div class="preview">${getMessagePreview(chat.messages)}</div>
                     <div class="timestamp">${new Date(chat.timestamp).toLocaleString()}</div>
                 </div>
                 <div class="options">
@@ -852,32 +867,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteModal.style.display = 'flex';
                 currentChatId = chatId;
             });
-        });
-        // Ensure history is visible on new tab load
-        if (historyList.children.length > 0) {
-            sidebar.classList.add('open');
-            chatContainer.classList.add('sidebar-open');
         }
-    }
+    });
+// Update loadChatHistory to include preview
+function loadChatHistory() {
+    filterChats(''); // Initially load all chats
+}
 
-    function loadChat(chatId) {
-        currentChatId = chatId;
-        sessionStorage.setItem('chatId', currentChatId); // Update sessionStorage with selected chatId
-        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
-        const chat = chats[chatId];
-        if (chat) {
-            messagesDiv.innerHTML = '';
-            chat.messages.forEach(msg => {
+// Update loadChat to enhance UI loading
+function loadChat(chatId) {
+    currentChatId = chatId;
+    sessionStorage.setItem('chatId', currentChatId);
+    const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+    const chat = chats[chatId];
+    if (chat) {
+        messagesDiv.innerHTML = '';
+        chat.messages.forEach(msg => {
+            if (msg.sender === 'user' && msg.text.startsWith('[Image')) {
+                // ইমেজ মেসেজের জন্য
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('user-message', 'slide-in');
+                const img = document.createElement('img');
+                img.src = msg.text.match(/\[Image: (.+)\]/)?.[1] || '';
+                img.classList.add('image-preview');
+                img.addEventListener('click', () => openImageModal(img.src));
+                messageDiv.appendChild(img);
+                messagesDiv.appendChild(messageDiv);
+            } else {
                 displayMessage(msg.text, msg.sender);
-            });
-            welcomeMessage.style.display = 'none';
-            sidebar.classList.remove('open');
-            chatContainer.classList.remove('sidebar-open');
-            loadChatHistory(); // Refresh history list
-        }
+            }
+        });
+        welcomeMessage.style.display = 'none';
+        sidebar.classList.remove('open');
+        chatContainer.classList.remove('sidebar-open');
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        loadChatHistory(); // Refresh history list
     }
-
-    renameCancelBtn.addEventListener('click', () => renameModal.style.display = 'none');
     renameSaveBtn.addEventListener('click', () => {
         const newTitle = renameInput.value.trim();
         if (newTitle) {
