@@ -99,8 +99,8 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
-
-document.addEventListener('DOMContentLoaded', () => {
+ 
+ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
@@ -158,9 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let brightnessValue = 0;
     let contrastValue = 0;
     let bgColor = 'white';
-    // Generate unique chatId per tab using sessionStorage
     let currentChatId = sessionStorage.getItem('chatId') || Date.now().toString();
-    sessionStorage.setItem('chatId', currentChatId); // Store chatId for this tab
+    sessionStorage.setItem('chatId', currentChatId);
 
     // Initialize jsPDF
     const { jsPDF } = window.jspdf;
@@ -203,6 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return typingDiv;
     }
 
+    // Utility: Get Message Preview
+    function getMessagePreview(messages) {
+        if (!messages || messages.length === 0) return 'No messages yet';
+        const lastMessage = messages[messages.length - 1];
+        const text = lastMessage.text;
+        if (text.startsWith('[Image')) return '[Image]';
+        return text.length > 30 ? sanitizeMessage(text.substring(0, 30)) + '...' : sanitizeMessage(text);
+    }
+
     // Utility: Progressive Message Loading
     function displayProgressiveMessage(message, sender) {
         const messageDiv = document.createElement('div');
@@ -210,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesDiv.appendChild(messageDiv);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-        // Split message into words
         const words = message.split(' ');
         let currentIndex = 0;
 
@@ -218,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentIndex < words.length) {
                 messageDiv.innerHTML = sanitizeMessage(words.slice(0, currentIndex + 1).join(' '));
                 currentIndex++;
-                setTimeout(addNextWord, 100); // 100ms delay per word
+                setTimeout(addNextWord, 100);
             } else {
                 saveChatHistory(message, sender);
             }
@@ -279,11 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(data => {
                         if (data.image_url) {
                             callRasaAPI(data.image_url);
-                            saveChatHistory(`[Image: ${selectedFile.name}]`, 'user');
+                            saveChatHistory(`[Image: ${data.image_url}]`, 'user');
                         } else if (data.error) {
                             displayMessage(`ইমেজ আপলোডে ত্রুটি: ${sanitizeMessage(data.error)}`, 'bot');
                         }
-        
                     });
                 clearPreview();
             }
@@ -435,9 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startNewChat() {
-        // Generate new chatId for new tab/session
         currentChatId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-        sessionStorage.setItem('chatId', currentChatId); // Update chatId in sessionStorage
+        sessionStorage.setItem('chatId', currentChatId);
         messagesDiv.innerHTML = '';
         welcomeMessage.style.display = 'block';
         chatBox.classList.add('fade-in');
@@ -449,9 +454,26 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayMessage(message, sender) {
         if (sender === 'bot') {
             displayProgressiveMessage(sanitizeMessage(message), sender);
-        } else {
+        } else if (sender === 'user' && message.startsWith('[Image')) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('user-message', 'slide-in');
+            const img = document.createElement('img');
+            img.src = message.match(/\[Image: (.+)\]/)?.[1] || '';
+            img.classList.add('image-preview');
+            img.addEventListener('click', () => openImageModal(img.src));
+            messageDiv.appendChild(img);
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            if (welcomeMessage.style.display !== 'none') {
+                welcomeMessage.classList.add('fade-out');
+                setTimeout(() => {
+                    welcomeMessage.style.display = 'none';
+                    welcomeMessage.classList.remove('fade-out');
+                }, 300);
+            }
+        } else {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
             messageDiv.innerHTML = sanitizeMessage(message);
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -462,7 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     welcomeMessage.classList.remove('fade-out');
                 }, 300);
             }
-            saveChatHistory(message, sender);
         }
     }
 
@@ -556,7 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
-                            sender: currentChatId, // Use chatId as sender
+                            sender: currentChatId,
                             message: 'confirm_review',
                             metadata: { review_data: updatedData }
                         }),
@@ -677,25 +698,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function displayLoading() {
-        const loadingDiv = document.createElement('div');
-        loadingDiv.classList.add('loading', 'slide-in');
-        loadingDiv.innerHTML = 'Loading <span class="dot"></span><span class="dot"></span><span class="dot"></span>';
-        messagesDiv.appendChild(loadingDiv);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        return loadingDiv;
-    }
-
-    function removeLoading(loadingDiv) {
-        if (loadingDiv) {
-            loadingDiv.classList.add('slide-out');
-            setTimeout(() => loadingDiv.remove(), 300);
-        }
-    }
-
     function callRasaAPI(message, metadata = {}) {
         const typingDiv = showTypingIndicator();
-        const payload = { sender: currentChatId, message: message }; // Use currentChatId as sender
+        const payload = { sender: currentChatId, message: message };
         if (Object.keys(metadata).length > 0) {
             payload.metadata = metadata;
         }
@@ -738,7 +743,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Rasa API Error:', error.status, error.statusText, error.responseText);
                 }
             });
-        }, 500); // 500ms delay for professional feel
+        }, 500);
     }
 
     function generatePDF(reviewData, reviewCard) {
@@ -806,27 +811,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         chats[currentChatId].messages.push({ text: message, sender: sender, time: new Date().toISOString() });
         localStorage.setItem('chatHistory', JSON.stringify(chats));
+        loadChatHistory(); // Refresh history list after saving
     }
-     // Utility: Get Message Preview (সাম্প্রতিক মেসেজের প্রিভিউ তৈরি)
-function getMessagePreview(messages) {
-    if (!messages || messages.length === 0) return 'No messages yet';
-    const lastMessage = messages[messages.length - 1];
-    const text = lastMessage.text;
-    // ইমেজ হলে প্রিভিউতে "[Image]" দেখাবে
-    if (text.startsWith('[Image')) return '[Image]';
-    // মেসেজ 30 অক্ষরের বেশি হলে কেটে ... যোগ করবে
-    return text.length > 30 ? sanitizeMessage(text.substring(0, 30)) + '...' : sanitizeMessage(text);
-}
 
-    // Utility: Filter Chats by Search Query
-function filterChats(query) {
-    const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
-    historyList.innerHTML = '';
-    Object.keys(chats).forEach(chatId => {
-        const chat = chats[chatId];
-        const titleMatch = chat.title.toLowerCase().includes(query.toLowerCase());
-        const messageMatch = chat.messages.some(msg => msg.text.toLowerCase().includes(query.toLowerCase()));
-        if (titleMatch || messageMatch) {
+    function loadChatHistory() {
+        historyList.innerHTML = '';
+        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+        Object.keys(chats).sort((a, b) => new Date(chats[b].timestamp) - new Date(chats[a].timestamp)).forEach(chatId => {
+            const chat = chats[chatId];
             const item = document.createElement('div');
             item.classList.add('history-item');
             item.setAttribute('data-chat-id', chatId);
@@ -867,48 +859,90 @@ function filterChats(query) {
                 deleteModal.style.display = 'flex';
                 currentChatId = chatId;
             });
+        });
+        if (historyList.children.length > 0) {
+            sidebar.classList.add('open');
+            chatContainer.classList.add('sidebar-open');
         }
-    });
-// Update loadChatHistory to include preview
-function loadChatHistory() {
-    filterChats(''); // Initially load all chats
-}
+    }
 
-// Update loadChat to enhance UI loading
-function loadChat(chatId) {
-    currentChatId = chatId;
-    sessionStorage.setItem('chatId', currentChatId);
-    const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
-    const chat = chats[chatId];
-    if (chat) {
-        messagesDiv.innerHTML = '';
-        chat.messages.forEach(msg => {
-            if (msg.sender === 'user' && msg.text.startsWith('[Image')) {
-                // ইমেজ মেসেজের জন্য
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('user-message', 'slide-in');
-                const img = document.createElement('img');
-                img.src = msg.text.match(/\[Image: (.+)\]/)?.[1] || '';
-                img.classList.add('image-preview');
-                img.addEventListener('click', () => openImageModal(img.src));
-                messageDiv.appendChild(img);
-                messagesDiv.appendChild(messageDiv);
-            } else {
+    function loadChat(chatId) {
+        currentChatId = chatId;
+        sessionStorage.setItem('chatId', currentChatId);
+        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+        const chat = chats[chatId];
+        if (chat) {
+            messagesDiv.innerHTML = '';
+            chat.messages.forEach(msg => {
                 displayMessage(msg.text, msg.sender);
+            });
+            welcomeMessage.style.display = 'none';
+            sidebar.classList.remove('open');
+            chatContainer.classList.remove('sidebar-open');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+    }
+
+    function filterChats(query) {
+        historyList.innerHTML = '';
+        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+        Object.keys(chats).sort((a, b) => new Date(chats[b].timestamp) - new Date(chats[a].timestamp)).forEach(chatId => {
+            const chat = chats[chatId];
+            const titleMatch = chat.title.toLowerCase().includes(query.toLowerCase());
+            const messageMatch = chat.messages.some(msg => msg.text.toLowerCase().includes(query.toLowerCase()));
+            if (titleMatch || messageMatch) {
+                const item = document.createElement('div');
+                item.classList.add('history-item');
+                item.setAttribute('data-chat-id', chatId);
+                item.innerHTML = `
+                    <div class="history-item-content">
+                        <p>${sanitizeMessage(chat.title)}</p>
+                        <div class="preview">${getMessagePreview(chat.messages)}</div>
+                        <div class="timestamp">${new Date(chat.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="options">
+                        <i class="fas fa-ellipsis-v" id="optionIcon-${chatId}"></i>
+                    </div>
+                    <div class="dropdown" id="dropdown-${chatId}">
+                        <div class="dropdown-item rename-item-${chatId}">Rename</div>
+                        <div class="dropdown-item delete-item-${chatId}">Delete</div>
+                    </div>
+                `;
+                historyList.appendChild(item);
+
+                item.addEventListener('click', () => loadChat(chatId));
+                const optionIcon = item.querySelector(`#optionIcon-${chatId}`);
+                const dropdown = item.querySelector(`#dropdown-${chatId}`);
+                const renameItem = item.querySelector(`.rename-item-${chatId}`);
+                const deleteItem = item.querySelector(`.delete-item-${chatId}`);
+
+                optionIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+
+                renameItem.addEventListener('click', () => {
+                    renameModal.style.display = 'flex';
+                    renameInput.value = chat.title;
+                    currentChatId = chatId;
+                });
+
+                deleteItem.addEventListener('click', () => {
+                    deleteModal.style.display = 'flex';
+                    currentChatId = chatId;
+                });
             }
         });
-        welcomeMessage.style.display = 'none';
-        sidebar.classList.remove('open');
-        chatContainer.classList.remove('sidebar-open');
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        loadChatHistory(); // Refresh history list
     }
+
+    renameCancelBtn.addEventListener('click', () => renameModal.style.display = 'none');
     renameSaveBtn.addEventListener('click', () => {
         const newTitle = renameInput.value.trim();
         if (newTitle) {
             let chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
             if (chats[currentChatId]) {
                 chats[currentChatId].title = sanitizeMessage(newTitle);
+                chats[currentChatId].timestamp = new Date().toISOString(); // Update timestamp
                 localStorage.setItem('chatHistory', JSON.stringify(chats));
                 loadChatHistory();
             }
@@ -931,6 +965,10 @@ function loadChat(chatId) {
             }
         }
         deleteModal.style.display = 'none';
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        filterChats(e.target.value);
     });
 
     // Genres Modal Functionality
