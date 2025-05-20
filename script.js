@@ -99,7 +99,6 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
-
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
@@ -283,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else if (data.error) {
                             displayMessage(`ইমেজ আপলোডে ত্রুটি: ${sanitizeMessage(data.error)}`, 'bot');
                         }
-        
                     });
                 clearPreview();
             }
@@ -425,13 +423,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sidebar and Chat History
     historyIcon.addEventListener('click', toggleSidebar);
     newChatIcon.addEventListener('click', startNewChat);
-    closeSidebar.addEventListener('click', toggleSidebar);
+    closeSidebar.addEventListener('click', hideSidebar); // Updated to use hideSidebar
     sidebarIcon.addEventListener('click', toggleSidebar);
 
     function toggleSidebar() {
         sidebar.classList.toggle('open');
         chatContainer.classList.toggle('sidebar-open');
         loadChatHistory();
+    }
+
+    function hideSidebar() {
+        sidebar.classList.remove('open'); // Ensure sidebar is hidden
+        chatContainer.classList.remove('sidebar-open'); // Ensure chat container adjusts
     }
 
     function startNewChat() {
@@ -556,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
-                            sender: currentChatId, // Use chatId as sender
+                            sender: currentChatId,
                             message: 'confirm_review',
                             metadata: { review_data: updatedData }
                         }),
@@ -695,7 +698,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function callRasaAPI(message, metadata = {}) {
         const typingDiv = showTypingIndicator();
-        const payload = { sender: currentChatId, message: message }; // Use currentChatId as sender
+        const payload = { sender: currentChatId, message: message };
         if (Object.keys(metadata).length > 0) {
             payload.metadata = metadata;
         }
@@ -738,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Rasa API Error:', error.status, error.statusText, error.responseText);
                 }
             });
-        }, 500); // 500ms delay for professional feel
+        }, 500);
     }
 
     function generatePDF(reviewData, reviewCard) {
@@ -808,11 +811,13 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('chatHistory', JSON.stringify(chats));
     }
 
-    function loadChatHistory() {
-        historyList.innerHTML = '';
-        const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
-        Object.keys(chats).forEach(chatId => {
-            const chat = chats[chatId];
+function loadChatHistory() {
+    historyList.innerHTML = '';
+    const chats = JSON.parse(localStorage.getItem('chatHistory') || '{}');
+    Object.keys(chats).forEach(chatId => {
+        const chat = chats[chatId];
+        // চেক করুন chat আছে কিনা এবং title আছে কিনা
+        if (chat && chat.title) {
             const item = document.createElement('div');
             item.classList.add('history-item');
             item.setAttribute('data-chat-id', chatId);
@@ -852,13 +857,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 deleteModal.style.display = 'flex';
                 currentChatId = chatId;
             });
-        });
-        // Ensure history is visible on new tab load
-        if (historyList.children.length > 0) {
-            sidebar.classList.add('open');
-            chatContainer.classList.add('sidebar-open');
+        } else {
+            console.warn(`Chat with ID ${chatId} is missing or invalid. Skipping...`);
         }
+    });
+    // Ensure history is visible on new tab load
+    if (historyList.children.length > 0) {
+        sidebar.classList.add('open');
+        chatContainer.classList.add('sidebar-open');
     }
+}
 
     function loadChat(chatId) {
         currentChatId = chatId;
@@ -873,7 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
             welcomeMessage.style.display = 'none';
             sidebar.classList.remove('open');
             chatContainer.classList.remove('sidebar-open');
-            loadChatHistory(); // Refresh history list
+            loadChatHistory();
         }
     }
 
