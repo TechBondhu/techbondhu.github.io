@@ -99,7 +99,8 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
-document.addEventListener('DOMContentLoaded', () => {
+ 
+ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
@@ -327,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     })
                     .catch(error => {
-                        console.error('Image Upload Error:', error); // Error logged to console only, no user message
+                        console.error('Image Upload Error:', error);
                     });
                 clearPreview();
             }
@@ -356,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
                 reader.onerror = () => {
-                    console.error('ইমেজ লোড করতে সমস্যা হয়েছে।'); // Error logged to console only, no user message
+                    console.error('ইমেজ লোড করতে সমস্যা হয়েছে।');
                 };
                 reader.readAsDataURL(file);
             }
@@ -644,7 +645,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     updatedData[key] = value;
                 });
 
-                // ফায়ারবেজে ডেটা সেভ করা
                 await db.collection('submissions').add({
                     review_data: updatedData,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -652,14 +652,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
-                await generatePDF(updatedData, reviewCard); // await যোগ করা
+                await generatePDF(updatedData, reviewCard);
                 reviewCard.setAttribute('data-confirmed', 'true');
                 reviewCard.setAttribute('data-editable', 'false');
                 editBtn.disabled = true;
                 editBtn.style.display = 'none';
                 confirmBtn.style.display = 'none';
 
-                // ডাউনলোড বাটন তৈরি
                 buttonContainer.innerHTML = '';
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'download-btn ripple-btn';
@@ -756,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 img.src = e.target.result;
                             };
                             reader.onerror = () => {
-                                console.error('ইমেজ লোড করতে সমস্যা হয়েছে।'); // Error logged to console only, no user message
+                                console.error('ইমেজ লোড করতে সমস্যা হয়েছে।');
                             };
                             reader.readAsDataURL(file);
                         }
@@ -1069,6 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Genres Modal Functionality
     function renderGenresList() {
         if (genresList) {
             genresList.innerHTML = '';
