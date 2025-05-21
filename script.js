@@ -581,7 +581,7 @@ if (welcomeMessage.style.display !== 'none') {
         welcomeMessage.classList.remove('fade-out');
     }, 300);
 }
-}
+
 
     function toggleEditMode(card, reviewData) {
         if (card.getAttribute('data-confirmed') === 'true') {
