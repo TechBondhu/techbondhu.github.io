@@ -99,7 +99,7 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
@@ -192,11 +192,11 @@ const genres = [
         const div = document.createElement('div');
         div.textContent = message;
         return div.innerHTML
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/&/g, '&amp;');
+            .replace(/</g, '<')
+            .replace(/>/g, '>')
+            .replace(/"/g, '"')
+            .replace(/'/g, ''')
+            .replace(/&/g, '&');
     }
 
     // Utility: Show Typing Indicator
@@ -327,8 +327,7 @@ const genres = [
                         }
                     })
                     .catch(error => {
-                        displayMessage('ইমেজ আপলোডে ত্রুটি হয়েছে।', 'bot');
-                        console.error('Image Upload Error:', error);
+                        console.error('Image Upload Error:', error); // Error logged to console only, no user message
                     });
                 clearPreview();
             }
@@ -357,7 +356,7 @@ const genres = [
                     }
                 };
                 reader.onerror = () => {
-                    displayMessage('ইমেজ লোড করতে সমস্যা হয়েছে।', 'bot');
+                    console.error('ইমেজ লোড করতে সমস্যা হয়েছে।'); // Error logged to console only, no user message
                 };
                 reader.readAsDataURL(file);
             }
@@ -757,11 +756,9 @@ const genres = [
                                 img.src = e.target.result;
                             };
                             reader.onerror = () => {
-                                displayMessage('ইমেজ লোড করতে সমস্যা হয়েছে।', 'bot');
+                                console.error('ইমেজ লোড করতে সমস্যা হয়েছে।'); // Error logged to console only, no user message
                             };
                             reader.readAsDataURL(file);
-                        } else {
-                            displayMessage('কোনো ইমেজ সিলেক্ট করা হয়নি।', 'bot');
                         }
                     });
                 } else {
