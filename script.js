@@ -100,7 +100,7 @@ const genres = [
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
  
- document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const sendBtn = document.getElementById('sendBtn');
     const userInput = document.getElementById('userInput');
@@ -193,11 +193,11 @@ const genres = [
         const div = document.createElement('div');
         div.textContent = message;
         return div.innerHTML
-            .replace(/</g, '<')
-            .replace(/>/g, '>')
-            .replace(/"/g, '"')
-            .replace(/'/g, ''')
-            .replace(/&/g, '&');
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/&/g, '&amp;');
     }
 
     // Utility: Show Typing Indicator
@@ -328,6 +328,7 @@ const genres = [
                         }
                     })
                     .catch(error => {
+                        displayMessage('ইমেজ আপলোডে ত্রুটি হয়েছে।', 'bot');
                         console.error('Image Upload Error:', error);
                     });
                 clearPreview();
@@ -357,7 +358,7 @@ const genres = [
                     }
                 };
                 reader.onerror = () => {
-                    console.error('ইমেজ লোড করতে সমস্যা হয়েছে।');
+                    displayMessage('ইমেজ লোড করতে সমস্যা হয়েছে।', 'bot');
                 };
                 reader.readAsDataURL(file);
             }
@@ -645,6 +646,7 @@ const genres = [
                     updatedData[key] = value;
                 });
 
+                // ফায়ারবেজে ডেটা সেভ করা
                 await db.collection('submissions').add({
                     review_data: updatedData,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -652,13 +654,14 @@ const genres = [
                 });
 
                 displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
-                await generatePDF(updatedData, reviewCard);
+                await generatePDF(updatedData, reviewCard); // await যোগ করা
                 reviewCard.setAttribute('data-confirmed', 'true');
                 reviewCard.setAttribute('data-editable', 'false');
                 editBtn.disabled = true;
                 editBtn.style.display = 'none';
                 confirmBtn.style.display = 'none';
 
+                // ডাউনলোড বাটন তৈরি
                 buttonContainer.innerHTML = '';
                 const downloadBtn = document.createElement('button');
                 downloadBtn.className = 'download-btn ripple-btn';
@@ -755,9 +758,11 @@ const genres = [
                                 img.src = e.target.result;
                             };
                             reader.onerror = () => {
-                                console.error('ইমেজ লোড করতে সমস্যা হয়েছে।');
+                                displayMessage('ইমেজ লোড করতে সমস্যা হয়েছে।', 'bot');
                             };
                             reader.readAsDataURL(file);
+                        } else {
+                            displayMessage('কোনো ইমেজ সিলেক্ট করা হয়নি।', 'bot');
                         }
                     });
                 } else {
@@ -1069,6 +1074,12 @@ const genres = [
     }
 
     // Genres Modal Functionality
+    const genres = [
+        { name: 'Admission Form', message: 'I want to fill an admission form', icon: 'fas fa-file-alt' },
+        { name: 'Job Application', message: 'I want to fill a job application form', icon: 'fas fa-briefcase' },
+        { name: 'Passport Form', message: 'I want to fill a passport form', icon: 'fas fa-passport' }
+    ];
+
     function renderGenresList() {
         if (genresList) {
             genresList.innerHTML = '';
