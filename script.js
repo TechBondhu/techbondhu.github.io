@@ -556,8 +556,7 @@ downloadBtn.addEventListener('click', () => {
     }
 });
 buttonContainer.appendChild(downloadBtn);
-
-} catch (error) {
+ 
     let errorMessage = 'অজানা ত্রুটি ঘটেছে।';
     if (error.code && error.message) {
         errorMessage = `ফায়ারবেজে তথ্য পাঠাতে সমস্যা: ${error.message}`;
