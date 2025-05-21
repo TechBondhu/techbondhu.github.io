@@ -1073,13 +1073,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Genres Modal Functionality
-    const genres = [
-        { name: 'Admission Form', message: 'I want to fill an admission form', icon: 'fas fa-file-alt' },
-        { name: 'Job Application', message: 'I want to fill a job application form', icon: 'fas fa-briefcase' },
-        { name: 'Passport Form', message: 'I want to fill a passport form', icon: 'fas fa-passport' }
-    ];
-
     function renderGenresList() {
         if (genresList) {
             genresList.innerHTML = '';
