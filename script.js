@@ -528,7 +528,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chat_id: currentChatId
             })
                 .then((docRef) => {
-displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
+
+            displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
 generatePDF(updatedData, reviewCard);
 reviewCard.setAttribute('data-confirmed', 'true');
 reviewCard.setAttribute('data-editable', 'false');
