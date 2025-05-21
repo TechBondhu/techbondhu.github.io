@@ -528,78 +528,60 @@ document.addEventListener('DOMContentLoaded', () => {
                 chat_id: currentChatId
             })
                 .then((docRef) => {
-                    displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
-                    generatePDF(updatedData, reviewCard);
-                    reviewCard.setAttribute('data-confirmed', 'true');
-                    reviewCard.setAttribute('data-editable', 'false');
-                    editBtn.disabled = true;
-                    editBtn.style.display = 'none';
-                    confirmBtn.disabled = true;
-                    confirmBtn.style.display = 'none';
+displayMessage('আপনার তথ্য সফলভাবে ফায়ারবেজে পাঠানো হয়েছে!', 'bot');
+generatePDF(updatedData, reviewCard);
+reviewCard.setAttribute('data-confirmed', 'true');
+reviewCard.setAttribute('data-editable', 'false');
+editBtn.disabled = true;
+editBtn.style.display = 'none';
+confirmBtn.style.display = 'none';
 
-                    buttonContainer.innerHTML = '';
-                    const downloadBtn = document.createElement('button');
-                    downloadBtn.className = 'download-btn ripple-btn';
-                    downloadBtn.innerText = 'Download PDF';
-                    downloadBtn.addEventListener('click', () => {
-                        const pdfUrl = reviewCard.getAttribute('data-pdf-url');
-                        if (pdfUrl) {
-                            const link = document.createElement('a');
-                            link.href = pdfUrl;
-                            link.download = 'formbondhu_submission.pdf';
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        }
-                    });
-                    buttonContainer.appendChild(downloadBtn);
-
-                    $.ajax({
-                        url: 'http://localhost:5005/webhooks/rest/webhook',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            sender: currentChatId,
-                            message: 'confirm_review',
-                            metadata: { review_data: updatedData }
-                        }),
-                        success: (data) => {
-                            data.forEach(response => {
-                                if (response.text) {
-                                    displayMessage(sanitizeMessage(response.text), 'bot');
-                                }
-                                if (response.custom && response.custom.review_data) {
-                                    displayReview(response.custom.review_data);
-                                }
-                            });
-                        },
-                        error: (error) => {
-                            displayMessage('তথ্য কনফার্ম করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', 'bot');
-                            console.error('Rasa Confirm Review Error:', error);
-                        }
-                    });
-                })
-                .catch((error) => {
-                    displayMessage('ফায়ারবেজে তথ্য পাঠাতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।', 'bot');
-                    console.error('Firebase Submission Error:', error);
-                });
-        });
-
-        buttonContainer.appendChild(editBtn);
-        buttonContainer.appendChild(confirmBtn);
-
-        reviewCard.appendChild(reviewContent);
-        reviewCard.appendChild(buttonContainer);
-        messagesDiv.appendChild(reviewCard);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        if (welcomeMessage.style.display !== 'none') {
-            welcomeMessage.classList.add('fade-out');
-            setTimeout(() => {
-                welcomeMessage.style.display = 'none';
-                welcomeMessage.classList.remove('fade-out');
-            }, 300);
-        }
+// Clear and add download button
+buttonContainer.innerHTML = '';
+const downloadBtn = document.createElement('button');
+downloadBtn.className = 'download-btn ripple-btn';
+downloadBtn.innerText = 'Download PDF';
+downloadBtn.addEventListener('click', () => {
+    const pdfUrl = reviewCard.getAttribute('data-pdf-url');
+    if (pdfUrl) {
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = 'formbondhu_submission.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        displayMessage('পিডিএফ ডাউনলোডের জন্য URL পাওয়া যায়নি।', 'bot');
     }
+});
+buttonContainer.appendChild(downloadBtn);
+
+} catch (error) {
+    let errorMessage = 'অজানা ত্রুটি ঘটেছে।';
+    if (error.code && error.message) {
+        errorMessage = `ফায়ারবেজে তথ্য পাঠাতে সমস্যা: ${error.message}`;
+    }
+    displayMessage(errorMessage, 'bot');
+    console.error('Error in confirm button:', error);
+    confirmBtn.disabled = false; // Re-enable button on error
+}
+});
+
+buttonContainer.appendChild(editBtn);
+buttonContainer.appendChild(confirmBtn);
+
+reviewCard.appendChild(reviewContent);
+reviewCard.appendChild(buttonContainer);
+messagesDiv.appendChild(reviewCard);
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+if (welcomeMessage.style.display !== 'none') {
+    welcomeMessage.classList.add('fade-out');
+    setTimeout(() => {
+        welcomeMessage.style.display = 'none';
+        welcomeMessage.classList.remove('fade-out');
+    }, 300);
+}
+}
 
     function toggleEditMode(card, reviewData) {
         if (card.getAttribute('data-confirmed') === 'true') {
