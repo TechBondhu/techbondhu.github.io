@@ -564,7 +564,7 @@ buttonContainer.appendChild(downloadBtn);
     displayMessage(errorMessage, 'bot');
     console.error('Error in confirm button:', error);
     confirmBtn.disabled = false; // Re-enable button on error
-}
+
 });
 
 buttonContainer.appendChild(editBtn);
