@@ -14,20 +14,21 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="canonical" href="https://techbondhu.github.io">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Kalpurush&family=Hind+Siliguri:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Noto Sans Bengali', 'Kalpurush', 'Hind Siliguri', 'Poppins', sans-serif;
         }
 
         body {
             color: #333;
             overflow-x: hidden;
             background-color: #E5E7EB;
+            font-weight: 400;
         }
 
         /* Header */
@@ -52,7 +53,7 @@
 
         .logo {
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
             color: #1E3A8A;
         }
 
@@ -69,6 +70,7 @@
             text-decoration: none;
             color: #1E3A8A;
             font-size: 14px;
+            font-weight: 600;
             transition: color 0.3s;
         }
 
@@ -100,14 +102,18 @@
 
         .hero h1 {
             font-size: 40px;
+            font-weight: 700;
             margin-bottom: 15px;
+            line-height: 1.2;
             animation: fadeInDown 1s ease-out;
         }
 
         .hero p {
             font-size: 18px;
+            font-weight: 400;
             margin-bottom: 25px;
             max-width: 500px;
+            line-height: 1.6;
             animation: fadeInUp 1s ease-out;
         }
 
@@ -179,8 +185,10 @@
 
         .features h2 {
             font-size: 30px;
+            font-weight: 700;
             margin-bottom: 30px;
             color: #1E3A8A;
+            line-height: 1.2;
         }
 
         .feature-grid {
@@ -214,13 +222,17 @@
 
         .feature-card h3 {
             font-size: 20px;
+            font-weight: 700;
             margin-bottom: 10px;
             color: #1E3A8A;
+            line-height: 1.2;
         }
 
         .feature-card p {
             font-size: 14px;
+            font-weight: 400;
             color: #555;
+            line-height: 1.6;
         }
 
         /* Testimonial Section */
@@ -233,8 +245,10 @@
 
         .testimonials h2 {
             font-size: 30px;
+            font-weight: 700;
             margin-bottom: 30px;
             color: #1E3A8A;
+            line-height: 1.2;
         }
 
         .testimonial-grid {
@@ -258,14 +272,16 @@
 
         .testimonial-card p {
             font-size: 14px;
+            font-weight: 400;
             color: #555;
             margin-bottom: 10px;
+            line-height: 1.6;
         }
 
         .testimonial-card span {
             font-size: 12px;
-            color: #F59E0B;
             font-weight: 600;
+            color: #F59E0B;
         }
 
         /* Chatbot Widget */
@@ -284,6 +300,7 @@
             align-items: center;
             gap: 8px;
             font-size: 14px;
+            font-weight: 600;
             z-index: 2; /* Ensure it stays above other elements */
         }
 
@@ -303,6 +320,8 @@
 
         footer p {
             font-size: 12px;
+            font-weight: 400;
+            line-height: 1.6;
         }
 
         /* Responsive Design */
@@ -313,11 +332,13 @@
 
             .hero h1 {
                 font-size: 28px;
+                line-height: 1.3;
             }
 
             .hero p {
                 font-size: 14px;
                 max-width: 90%;
+                line-height: 1.5;
             }
 
             .hero .btn {
@@ -351,6 +372,7 @@
 
             nav ul li a {
                 font-size: 16px;
+                font-weight: 600;
             }
 
             .features, .testimonials {
@@ -359,6 +381,26 @@
 
             .features h2, .testimonials h2 {
                 font-size: 24px;
+                line-height: 1.3;
+            }
+
+            .feature-card h3 {
+                font-size: 18px;
+                line-height: 1.2;
+            }
+
+            .feature-card p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .testimonial-card p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            .testimonial-card span {
+                font-size: 11px;
             }
 
             .testimonials {
@@ -370,20 +412,61 @@
                 font-size: 12px;
                 bottom: 70px; /* Adjusted for smaller screens */
             }
+
+            footer p {
+                font-size: 11px;
+                line-height: 1.5;
+            }
         }
 
         @media (max-width: 480px) {
             .hero h1 {
                 font-size: 24px;
+                line-height: 1.3;
             }
 
             .hero p {
                 font-size: 12px;
+                line-height: 1.5;
             }
 
             .hero .btn {
                 padding: 6px 15px;
                 font-size: 12px;
+            }
+
+            .features h2, .testimonials h2 {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+
+            .feature-card h3 {
+                font-size: 16px;
+                line-height: 1.2;
+            }
+
+            .feature-card p {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .testimonial-card p {
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            .testimonial-card span {
+                font-size: 10px;
+            }
+
+            .chatbot-widget {
+                padding: 8px 12px;
+                font-size: 11px;
+            }
+
+            footer p {
+                font-size: 10px;
+                line-height: 1.5;
             }
         }
     </style>
@@ -463,7 +546,7 @@
 
     <!-- Footer -->
     <footer id="contact">
-        <p>© ২০২৫ ফর্মবন্ধু , সর্বস্বত্ব সংরক্ষিত।</p>
+        <p>© ২০২৫ ফর্মবন্ধু। সর্বস্বত্ব সংরক্ষিত।</p>
     </footer>
 
     <script>
