@@ -283,46 +283,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendMessage() {
-    const messageDiv = document.createElement('div');
-messageDiv.classList.add('user-message', 'slide-in');
-const img = document.createElement('img');
-img.src = previewImage?.src || '';
-img.classList.add('image-preview');
-img.addEventListener('click', () => openImageModal(img.src));
-messageDiv.appendChild(img);
-if (messagesDiv) {
-    messagesDiv.appendChild(messageDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-if (welcomeMessage && welcomeMessage.style.display !== 'none') {
-    welcomeMessage.classList.add('fade-out');
-    setTimeout(() => {
-        welcomeMessage.style.display = 'none';
-        welcomeMessage.classList.remove('fade-out');
-    }, 300);
-}
+        const message = userInput?.value.trim();
+        if (message) {
+            displayMessage(message, 'user');
+            callRasaAPI(message);
+            userInput.value = '';
+        } else if (selectedFile) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('user-message', 'slide-in');
+            const img = document.createElement('img');
+            img.src = previewImage?.src || '';
+            img.classList.add('image-preview');
+            img.addEventListener('click', () => openImageModal(img.src));
+            messageDiv.appendChild(img);
+            if (messagesDiv) {
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            if (welcomeMessage && welcomeMessage.style.display !== 'none') {
+                welcomeMessage.classList.add('fade-out');
+                setTimeout(() => {
+                    welcomeMessage.style.display = 'none';
+                    welcomeMessage.classList.remove('fade-out');
+                }, 300);
+            }
 
-const formData = new FormData();
-formData.append('image', selectedFile);
-fetch('http://localhost:5000/upload-image', {
-    method: 'POST',
-    body: formData
-})
-    .then(response => response.json())
-    .then(data => {
-        if (data.image_url) {
-            callRasaAPI(data.image_url);
-            saveChatHistory(`[Image: ${selectedFile.name}]`, 'user');
-        } else if (data.error) {
-            // Silently log the error instead of displaying it in the UI
-            console.error('Image Upload Error:', data.error);
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            fetch('http://localhost:5000/upload-image', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.image_url) {
+                        callRasaAPI(data.image_url);
+                        saveChatHistory(`[Image: ${selectedFile.name}]`, 'user');
+                    } else if (data.error) {
+                        console.error('Image Upload Error:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Image Upload Error:', error);
+                });
+            clearPreview();
         }
-    })
-    .catch(error => {
-        // Silently log the error instead of displaying it in the UI
-        console.error('Image Upload Error:', error);
-    });
-clearPreview();
+    }
 
     // Image Upload and Preview
     if (uploadBtn) {
