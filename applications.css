@@ -1,0 +1,284 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Tiro Bangla', 'Roboto', sans-serif;
+    background-color: #E5E7EB; /* Light gray background as per brand */
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #1E3A8A; /* Primary blue from brand */
+    color: #ffffff; /* White text */
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1E3A8A; /* Same primary blue for consistency */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Subtle divider */
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1.2rem; /* Original size maintained */
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    padding: 15px 20px;
+}
+
+.sidebar-menu li a {
+    color: #ffffff; /* White text */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1rem; /* Original size maintained */
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li.active a {
+    background-color: #3B82F6; /* Secondary blue on hover */
+    border-radius: 0; /* Rectangular shape */
+}
+
+.sidebar-close, .sidebar-toggle {
+    cursor: pointer;
+    font-size: 1.2rem; /* Original size maintained */
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 15px;
+    background-color: #f3f4f6; /* Light gray for main content area */
+    transform: translateY(-20px); /* Initial position for animation */
+    opacity: 0; /* Initial opacity for fade-in */
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1E3A8A; /* Primary blue for header */
+    color: #ffffff; /* White text */
+    padding: 10px 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header h2 {
+    margin: 0;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1.2rem; /* Original size maintained */
+}
+
+.header-right i {
+    font-size: 1.2rem; /* Original size maintained */
+    cursor: pointer;
+    color: #ffffff; /* White icon */
+}
+
+.header-right i:hover {
+    color: #3B82F6; /* Secondary blue on hover */
+}
+
+/* Table Container */
+.table-container {
+    background-color: #ffffff;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Filter */
+.filter-container {
+    position: relative;
+    max-width: 180px; /* Compact size */
+    margin-bottom: 10px;
+}
+
+.filter-container .filter-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    color: #3B82F6; /* Vibrant blue */
+}
+
+#statusFilter {
+    padding: 6px 8px 6px 28px;
+    border: 1px solid #1E3A8A;
+    border-radius: 0; /* Rectangular shape */
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 0.9rem; /* Original size maintained */
+    background-color: #ffffff; /* Solid white background */
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    width: 100%;
+    -webkit-appearance: none; /* Remove default browser styling for consistency */
+    -moz-appearance: none;
+    appearance: none;
+}
+
+#statusFilter:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+    transform: scale(1.02);
+}
+
+/* Table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #E5E7EB;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    border-right: 1px solid #E5E7EB;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 0.9rem; /* Original size maintained */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+th:last-child, td:last-child {
+    border-right: none;
+}
+
+th {
+    background-color: #3B82F6;
+    color: #ffffff;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.action-btn {
+    background-color: #3B82F6;
+    color: #ffffff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 0; /* Rectangular shape */
+    cursor: pointer;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 0.8rem; /* Original size maintained */
+    text-decoration: none;
+    margin-right: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.action-btn:hover {
+    background-color: #1E3A8A;
+    transform: scale(1.05);
+}
+
+/* Loading Animation */
+.loading {
+    display: none;
+    text-align: center;
+    padding: 15px;
+    font-family: 'Tiro Bangla', sans-serif;
+    color: #1E3A8A;
+    font-size: 0.9rem; /* Original size maintained */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+    }
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    .main-content {
+        padding: 10px;
+    }
+    .filter-container {
+        max-width: 150px;
+    }
+    .header {
+        padding: 8px 10px;
+    }
+    .header h2 {
+        font-size: 1rem;
+    }
+    .header-right i, .sidebar-toggle {
+        font-size: 1rem;
+    }
+    table {
+        display: table;
+        width: 100%;
+        overflow-x: auto; /* Horizontal scroll for small screens */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    }
+    th, td {
+        font-size: 0.8rem; /* Smaller font size for mobile */
+        padding: 8px;
+    }
+    .table-container {
+        padding: 10px;
+    }
+    .action-btn {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-container {
+        max-width: 120px;
+    }
+    th, td {
+        font-size: 0.7rem; /* Even smaller for very small screens */
+        padding: 6px;
+    }
+    .header h2 {
+        font-size: 0.9rem;
+    }
+    .header-right i, .sidebar-toggle {
+        font-size: 0.9rem;
+    }
+    .sidebar {
+        width: 200px; /* Slightly narrower sidebar on very small screens */
+    }
+    .action-btn {
+        padding: 3px 6px;
+        font-size: 0.6rem;
+    }
+}
+
+/* Cross-browser compatibility */
+@-moz-document url-prefix() {
+    #statusFilter {
+        text-indent: 0.01px; /* Firefox fix for select styling */
+        text-overflow: '';
+    }
+}
