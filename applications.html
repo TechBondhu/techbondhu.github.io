@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আবেদন তালিকা</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Tiro+Bangla:wght@700&display=swap">
+    <link rel="stylesheet" href="applications.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>ফর্মবন্ধু ড্যাশবোর্ড</h3>
+                <i class="fas fa-times sidebar-close" id="closeSidebar" title="Close Sidebar"></i>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-gauge-high"></i> ড্যাশবোর্ড</a></li>
+                <li class="active"><a href="applications.html"><i class="fas fa-list"></i> আবেদন তালিকা</a></li>
+                <li><a href="notifications.html"><i class="fas fa-bell"></i> নোটিফিকেশন</a></li>
+                <li><a href="help.html"><i class="fas fa-question-circle"></i> সহায়তা</a></li>
+                <li><a href="payment.html"><i class="fas fa-credit-card"></i> পেমেন্ট ইতিহাস</a></li>
+                <li><a href="status.html"><i class="fas fa-tasks"></i> স্ট্যাটাস ট্র্যাকার</a></li>
+                <li><a href="datareview.html"><i class="fas fa-file-alt"></i> ডেটা পর্যালোচনা</a></li>
+                <li><a href="analytics.html"><i class="fas fa-chart-line"></i> ইউজার অ্যানালিটিক্স</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <i class="fas fa-bars sidebar-toggle" id="sidebarToggle" title="Menu"></i>
+                <h2>আবেদন তালিকা</h2>
+                <div class="header-right">
+                    <i class="fas fa-user account-icon" title="Account" onclick="window.location.href='account.html'"></i>
+                </div>
+            </div>
+            <div class="content">
+                <div class="table-container">
+                    <div class="filter-container">
+                        <i class="fas fa-sliders filter-icon"></i>
+                        <select id="statusFilter" aria-label="স্ট্যাটাস ফিল্টার">
+                            <option value="all">সব</option>
+                            <option value="pending">পেন্ডিং</option>
+                            <option value="completed">কমপ্লিটেড</option>
+                            <option value="rejected">রিজেক্টেড</option>
+                        </select>
+                    </div>
+                    <table id="applicationTable">
+                        <thead>
+                            <tr>
+                                <th data-label="আবেদন আইডি">আবেদন আইডি</th>
+                                <th data-label="ধরন">ধরন</th>
+                                <th data-label="জমার তারিখ">জমার তারিখ</th>
+                                <th data-label="অ্যাকশন">বিস্তারিত</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="loading" class="loading">লোড হচ্ছে...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle functionality
+        $(document).ready(function() {
+            $('#sidebarToggle').click(function() {
+                $('#sidebar').addClass('active');
+            });
+            $('#closeSidebar').click(function() {
+                $('#sidebar').removeClass('active');
+            });
+
+            // Page load animation
+            $(window).on('load', function() {
+                $('.main-content').hide().fadeIn(800).css('transform', 'translateY(0)').css('opacity', '1');
+            });
+        });
+    </script>
+</body>
+</html>
