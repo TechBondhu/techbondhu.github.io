@@ -6,42 +6,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="ফর্মবন্ধু নোটিফিকেশন পেজ">
     <title>নোটিফিকেশন</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Tiro+Bangla:wght@700&display=swap">
     <link rel="stylesheet" href="notifications.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h3>ফর্মবন্ধু ড্যাশবোর্ড</h3>
-                <i class="fas fa-times sidebar-close" id="closeSidebar" title="Close Sidebar"></i>
-            </div>
-            <ul class="sidebar-menu">
-                <li><a href="dashboard.html"><i class="fas fa-gauge-high"></i> ড্যাশবোর্ড</a></li>
-                <li><a href="applications.html"><i class="fas fa-list"></i> আবেদন তালিকা</a></li>
-                <li class="active"><a href="notifications.html"><i class="fas fa-bell"></i> নোটিফিকেশন</a></li>
-                <li><a href="help.html"><i class="fas fa-question-circle"></i> সহায়তা</a></li>
-                <li><a href="payment.html"><i class="fas fa-credit-card"></i> পেমেন্ট ইতিহাস</a></li>
-                <li><a href="status.html"><i class="fas fa-tasks"></i> স্ট্যাটাস ট্র্যাকার</a></li>
-                <li><a href="datareview.html"><i class="fas fa-file-alt"></i> ডেটা পর্যালোচনা</a></li>
-                <li><a href="analytics.html"><i class="fas fa-chart-line"></i> ইউজার অ্যানালিটিক্স</a></li>
-            </ul>
-        </div>
-
         <!-- Main Content -->
         <div class="main-content">
             <div class="header">
-                <i class="fas fa-bars sidebar-toggle" id="sidebarToggle" title="Menu"></i>
                 <h2><i class="fas fa-bell"></i> নোটিফিকেশন</h2>
                 <div class="header-right">
-                    <i class="fas fa-user account-icon" title="Account" onclick="window.location.href='account.html'"></i>
+                    <i class="fas fa-cog settings-icon" title="Account" onclick="window.location.href='settings.html'"></i>
                 </div>
             </div>
             <div class="content">
                 <div class="notification-area">
-                    <p><i class="fas fa-bell"></i> নোটিফিকেশন এলাকা (পরে ডাটা যোগ হবে)</p>
+                    <ul class="notification-list">
+                        <li class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h3>আবেদন গৃহীত</h3>
+                                <p>আপনার আবেদন #12345 সফলভাবে গৃহীত হয়েছে।</p>
+                                <span class="notification-time">২ ঘণ্টা আগে</span>
+                            </div>
+                            <a href="#" class="action-btn">বিস্তারিত দেখুন</a>
+                        </li>
+                        <li class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h3>আবেদন প্রত্যাখ্যাত</h3>
+                                <p>আবেদন #12346 এর জন্য অতিরিক্ত নথি প্রয়োজন।</p>
+                                <span class="notification-time">১ দিন আগে</span>
+                            </div>
+                            <a href="#" class="action-btn">বিস্তারিত দেখুন</a>
+                        </li>
+                        <li class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h3>পেমেন্ট সফল</h3>
+                                <p>আপনার পেমেন্ট #7890 ($50) সফলভাবে সম্পন্ন হয়েছে।</p>
+                                <span class="notification-time">৩ দিন আগে</span>
+                            </div>
+                            <a href="#" class="action-btn">বিস্তারিত দেখুন</a>
+                        </li>
+                        <li class="notification-item">
+                            <div class="notification-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h3>নতুন আপডেট উপলব্ধ</h3>
+                                <p>ফর্মবন্ধু অ্যাপে নতুন ফিচার যোগ হয়েছে।</p>
+                                <span class="notification-time">৫ দিন আগে</span>
+                            </div>
+                            <a href="#" class="action-btn">বিস্তারিত দেখুন</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <!-- Footer -->
@@ -50,5 +77,6 @@
             </div>
         </div>
     </div>
+    <script src="main.js"></script>
 </body>
 </html>
