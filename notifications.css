@@ -101,6 +101,14 @@ body {
     font-family: 'Tiro Bangla', sans-serif;
     font-size: 1.4rem;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+}
+
+.header h2 i {
+    color: #ffffff;
+    font-size: 1.4rem;
 }
 
 .header-right i {
@@ -117,7 +125,7 @@ body {
 /* Content */
 .content {
     flex: 1;
-    padding: 20px;
+    padding: 0;
     background: transparent;
 }
 
@@ -132,8 +140,23 @@ body {
     font-family: 'Tiro Bangla', sans-serif;
     font-size: 1.1rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    flex: 1; /* Ensure it takes available space */
-    min-height: calc(100vh - 120px); /* Ensure it reaches footer */
+    flex: 1; /* Take full available space */
+    min-height: calc(100vh - 135px); /* Adjust for header (60px) and footer (75px) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-area p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between icon and text */
+}
+
+.notification-area i {
+    color: #1E3A8A; /* Match brand color */
+    font-size: 1.2rem;
 }
 
 /* Footer */
@@ -148,6 +171,7 @@ body {
     border-radius: 5px;
     width: 100%;
     z-index: 900;
+    min-height: 50px; /* Ensure footer has minimum height */
 }
 
 /* Responsive Design */
@@ -167,25 +191,29 @@ body {
     .header h2 {
         font-size: 1.2rem;
     }
-    .header-right i, .sidebar-toggle {
+    .header h2 i {
         font-size: 1.2rem;
     }
-    .content {
-        padding: 15px;
+    .header-right i, .sidebar-toggle {
+        font-size: 1.2rem;
     }
     .notification-area {
         padding: 15px;
         font-size: 1rem;
-        min-height: calc(100vh - 100px); /* Adjust for smaller header and footer */
+        min-height: calc(100vh - 110px); /* Adjust for mobile header and footer */
     }
     .footer {
         padding: 8px;
         font-size: 0.85rem;
+        min-height: 40px;
     }
 }
 
 @media (max-width: 480px) {
     .header h2 {
+        font-size: 1rem;
+    }
+    .header h2 i {
         font-size: 1rem;
     }
     .header-right i, .sidebar-toggle {
@@ -194,24 +222,22 @@ body {
     .sidebar {
         width: 200px;
     }
-    .content {
-        padding: 10px;
-    }
     .notification-area {
         padding: 10px;
         font-size: 0.9rem;
-        min-height: calc(100vh - 90px);
+        min-height: calc(100vh - 100px); /* Adjust for smaller header and footer */
     }
     .footer {
         padding: 6px;
         font-size: 0.8rem;
+        min-height: 35px;
     }
 }
 
 /* Cross-browser compatibility */
 @supports (-webkit-overflow-scrolling: touch) {
     body {
-        -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+        -webkit-overflow-scrolling: touch;
     }
 }
 
@@ -223,6 +249,6 @@ body {
 }
 
 /* Performance optimization */
-*:not(.main-content, .sidebar-menu li a, .header-right i) {
+*:not(.main-content, .sidebar-menu li a, .header-right i, .notification-area i) {
     transition: none !important;
 }
