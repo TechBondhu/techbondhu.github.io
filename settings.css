@@ -1,0 +1,263 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', 'Tiro Bangla', sans-serif;
+    background-color: #E5E7EB;
+    overflow-x: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* Sidebar (Copied exactly from notifications sidebar design) */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #1E3A8A, #2A5298);
+    color: #ffffff;
+    transition: transform 0.3s ease;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    transform: translateX(-100%);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+.sidebar-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1E3A8A;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1.2rem;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    padding: 15px 20px;
+}
+
+.sidebar-menu li a {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar-menu li a:hover,
+.sidebar-menu li.active a {
+    background: linear-gradient(90deg, #3B82F6, #60A5FA);
+    color: #ffffff;
+    border-radius: 0;
+    transform: translateX(5px);
+}
+
+.sidebar-close, .sidebar-toggle {
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f3f4f6;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1E3A8A;
+    color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header h2 {
+    margin: 0;
+    font-family: 'Tiro Bangla', sans-serif;
+}
+
+.header .sidebar-toggle {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.header .sidebar-toggle:hover {
+    color: #3B82F6;
+}
+
+.header-right i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #ffffff;
+}
+
+.header-right i:hover {
+    color: #3B82F6;
+}
+
+.header-right .account-icon {
+    margin-left: 15px;
+}
+
+/* Content */
+.content {
+    margin-top: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.content h3 {
+    color: #1E3A8A;
+    font-family: 'Tiro Bangla', sans-serif;
+}
+
+.card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card i {
+    font-size: 2rem;
+    color: #3B82F6;
+    margin-bottom: 10px;
+}
+
+.card h4 {
+    margin: 10px 0;
+    font-family: 'Tiro Bangla', sans-serif;
+    color: #1E3A8A;
+}
+
+.card p {
+    margin: 0;
+    color: #6B7280;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: 100vh;
+    }
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    .main-content {
+        padding: 10px;
+    }
+    .header {
+        padding: 10px 15px;
+    }
+    .header h2 {
+        font-size: 1.2rem;
+    }
+    .header .sidebar-toggle,
+    .header-right i {
+        font-size: 1.2rem;
+    }
+    .card-grid {
+        flex-direction: column;
+    }
+    .card {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h2 {
+        font-size: 1rem;
+    }
+    .header .sidebar-toggle,
+    .header-right i {
+        font-size: 1rem;
+    }
+    .sidebar {
+        width: 100%;
+        height: 100vh;
+    }
+    .main-content {
+        padding: 5px;
+    }
+    .card-grid {
+        flex-direction: column;
+    }
+    .card {
+        width: 100%;
+    }
+}
