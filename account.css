@@ -61,22 +61,36 @@ body {
 
 .header-right {
     display: flex;
-    gap: 15px;
+    align-items: center;
 }
 
-.header-right i {
-    font-size: 1.4rem;
+.new-chat-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    border-radius: 50%;
     cursor: pointer;
-    color: #ffffff;
+    transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.new-chat-btn:hover {
+    background-color: #3B82F6;
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.new-chat-btn .new-chat-icon {
+    font-size: 1.4rem;
+    color: #3B82F6;
     transition: color 0.3s ease;
 }
 
-.header-right i:hover {
-    color: #60A5FA;
-}
-
-.header-right .new-chat-icon {
-    font-size: 1.4rem;
+.new-chat-btn:hover .new-chat-icon {
+    color: #ffffff;
 }
 
 /* Content */
@@ -155,7 +169,14 @@ body {
     .header h2 {
         font-size: 1.2rem;
     }
-    .account-icon, .header-right i {
+    .account-icon {
+        font-size: 1.2rem;
+    }
+    .new-chat-btn {
+        width: 36px;
+        height: 36px;
+    }
+    .new-chat-btn .new-chat-icon {
         font-size: 1.2rem;
     }
     .content {
@@ -186,7 +207,14 @@ body {
     .header h2 {
         font-size: 1rem;
     }
-    .account-icon, .header-right i {
+    .account-icon {
+        font-size: 1rem;
+    }
+    .new-chat-btn {
+        width: 32px;
+        height: 32px;
+    }
+    .new-chat-btn .new-chat-icon {
         font-size: 1rem;
     }
     .content {
