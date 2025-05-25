@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভাষা ও থিম</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="language.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="header">
+                <a href="account.html" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+                <h2>ভাষা ও থিম</h2>
+                <div class="header-right">
+                    <i class="fas fa-sign-out-alt" title="লগআউট" onclick="window.location.href='logout.html'"></i>
+                </div>
+            </div>
+            <div class="content">
+                <form class="language-form">
+                    <div class="form-group">
+                        <label for="language">ভাষা নির্বাচন</label>
+                        <select id="language">
+                            <option value="bn" selected>বাংলা</option>
+                            <option value="en">ইংরেজি</option>
+                        </select>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="theme">থিম</label>
+                        <input type="checkbox" id="theme">
+                        <span class="toggle-label">লাইট/ডার্ক মোড</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="fontSize">ফন্ট সাইজ</label>
+                        <input type="range" id="fontSize" min="12" max="20" value="16">
+                        <span class="font-size-value">16px</span>
+                    </div>
+                    <button type="submit" class="submit-btn">সংরক্ষণ করুন</button>
+                </form>
+            </div>
+            <div class="footer">
+                <p>© ২০২৫ ফর্মবন্ধু | সব স্বত্ব সংরক্ষিত</p>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
