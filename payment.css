@@ -1,0 +1,304 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: 'Tiro Bangla', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
+    overscroll-behavior: none;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #1E3A8A, #2A5298);
+    color: #ffffff;
+    padding: 15px 25px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 0;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-icon {
+    font-size: 1.4rem;
+}
+
+.header h2 {
+    margin: 0;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1.4rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header-right i {
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+.header-right i:hover {
+    color: #60A5FA;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    padding: 20px;
+    background: transparent;
+}
+
+.table-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+#paymentTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#paymentTable th, #paymentTable td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #E5E7EB;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 0.9rem;
+}
+
+#paymentTable th {
+    background-color: #3B82F6;
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#paymentTable tr:hover {
+    background-color: #F5F5F5;
+}
+
+.status-success {
+    color: #10B981;
+    font-weight: 500;
+}
+
+.status-pending {
+    color: #FBBF24;
+    font-weight: 500;
+}
+
+.status-failed {
+    color: #EF4444;
+    font-weight: 500;
+}
+
+.detail-btn {
+    background-color: #3B82F6;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.detail-btn:hover {
+    background-color: #1E3A8A;
+    transform: scale(1.05);
+}
+
+.loading {
+    text-align: center;
+    color: #3B82F6;
+    font-family: 'Tiro Bangla', sans-serif;
+    font-size: 1rem;
+    margin-top: 20px;
+    display: none;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 15px 25px;
+    background-color: #1E3A8A;
+    color: #ffffff;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    width: 100%;
+    z-index: 900;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 15px;
+    }
+    .header h2 {
+        font-size: 1.2rem;
+    }
+    .header-icon, .header-right i {
+        font-size: 1.2rem;
+    }
+    .content {
+        padding: 15px;
+    }
+    .table-container {
+        padding: 0;
+        max-height: none;
+        overflow-y: visible;
+        background: transparent;
+        box-shadow: none;
+    }
+    #paymentTable {
+        display: block;
+    }
+    #paymentTable thead {
+        display: none;
+    }
+    #paymentTable tbody {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+    #paymentTable tr {
+        display: block;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        animation: fadeIn 0.5s ease-in;
+    }
+    #paymentTable tr:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    #paymentTable td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #E5E7EB;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #paymentTable td:last-child {
+        border-bottom: none;
+    }
+    #paymentTable td:before {
+        content: attr(data-label);
+        font-weight: 500;
+        color: #1E3A8A;
+        flex: 1;
+    }
+    #paymentTable td:not(:last-child) {
+        justify-content: space-between;
+    }
+    .detail-btn {
+        max-width: 200px; /* বাটনের সাইজ সীমিত করা */
+        width: auto; /* 100% থেকে অটো */
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        margin-top: 15px; /* নিচে অতিরিক্ত স্পেস */
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .footer {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+        position: fixed;
+        bottom: 0;
+        min-height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h2 {
+        font-size: 1rem;
+    }
+    .header-icon, .header-right i {
+        font-size: 1rem;
+    }
+    .content {
+        padding: 10px;
+    }
+    .table-container {
+        padding: 0;
+    }
+    #paymentTable tr {
+        padding: 10px;
+    }
+    #paymentTable td {
+        font-size: 0.85rem;
+    }
+    .detail-btn {
+        max-width: 180px; /* ছোট স্ক্রিনে বাটন সাইজ কম */
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    .footer {
+        font-size: 0.8rem;
+        min-height: 45px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cross-browser compatibility */
+@supports (-webkit-overflow-scrolling: touch) {
+    .table-container {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@-moz-document url-prefix() {
+    .table-container {
+        text-indent: 0.01px;
+        text-overflow: '';
+    }
+}
+
+/* Performance optimization */
+*:not(.main-content, .header-right i, .detail-btn, #paymentTable tr) {
+    transition: none !important;
+}
