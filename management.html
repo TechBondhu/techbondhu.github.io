@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাকাউন্ট ম্যানেজমেন্ট</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="management.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="main-content">
+            <div class="header">
+                <a href="account.html" class="back-icon"><i class="fas fa-arrow-left"></i></a>
+                <h2>অ্যাকাউন্ট ম্যানেজমেন্ট</h2>
+                <div class="header-right">
+                    <i class="fas fa-sign-out-alt" title="লগআউট" onclick="window.location.href='logout.html'"></i>
+                </div>
+            </div>
+            <div class="content">
+                <form class="management-form">
+                    <div class="form-group">
+                        <label>ডাটা এক্সপোর্ট</label>
+                        <p>আপনার আবেদন এবং পেমেন্ট ইতিহাস ডাউনলোড করুন</p>
+                        <button type="button" class="action-btn" onclick="exportData()">এক্সপোর্ট করুন</button>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label for="privacy">ডাটা শেয়ারিং</label>
+                        <input type="checkbox" id="privacy">
+                        <span class="toggle-label">তৃতীয় পক্ষের সাথে শেয়ার করুন</span>
+                    </div>
+                    <div class="form-group">
+                        <label>অ্যাকাউন্ট ডিলিট</label>
+                        <p>এই অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলুন</p>
+                        <button type="button" class="action-btn delete-btn" onclick="deleteAccount()">অ্যাকাউন্ট মুছুন</button>
+                    </div>
+                    <button type="submit" class="submit-btn">সংরক্ষণ করুন</button>
+                </form>
+            </div>
+            <div class="footer">
+                <p>© ২০২৫ ফর্মবন্ধু | সব স্বত্ব সংরক্ষিত</p>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
