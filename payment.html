@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="ফর্মবন্ধু পেমেন্ট ইতিহাস পেজ">
+    <title>পেমেন্ট ইতিহাস</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Tiro+Bangla:wght@700&display=swap">
+    <link rel="stylesheet" href="payment.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <i class="fas fa-wallet header-icon"></i>
+                    <h2>পেমেন্ট ইতিহাস</h2>
+                </div>
+                <div class="header-right">
+                    <i class="fas fa-cog" title="Account" onclick="window.location.href='settings.html'"></i>
+                </div>
+            </div>
+            <div class="content">
+                <div class="table-container">
+                    <table id="paymentTable">
+                        <thead>
+                            <tr>
+                                <th data-label="পেমেন্ট আইডি">পেমেন্ট আইডি</th>
+                                <th data-label="পরিমাণ">পরিমাণ</th>
+                                <th data-label="মেথড">মেথড</th>
+                                <th data-label="তারিখ">তারিখ</th>
+                                <th data-label="স্ট্যাটাস">স্ট্যাটাস</th>
+                                <th data-label="বিস্তারিত">বিস্তারিত</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentTableBody">
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY001</td>
+                                <td data-label="পরিমাণ">৳৫,০০০</td>
+                                <td data-label="মেথড">বিকাশ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-২৪</td>
+                                <td data-label="স্ট্যাটাস" class="status-success">সফল</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY002</td>
+                                <td data-label="পরিমাণ">৳৩,৫০০</td>
+                                <td data-label="মেথড">নগদ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-২৩</td>
+                                <td data-label="স্ট্যাটাস" class="status-pending">পেন্ডিং</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY003</td>
+                                <td data-label="পরিমাণ">৳২,০০০</td>
+                                <td data-label="মেথড">রকেট</td>
+                                <td data-label="তারিখ">২০২৫-০৫-২২</td>
+                                <td data-label="স্ট্যাটাস" class="status-failed">ব্যর্থ</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY004</td>
+                                <td data-label="পরিমাণ">৳৭,০০০</td>
+                                <td data-label="মেথড">বিকাশ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-২০</td>
+                                <td data-label="স্ট্যাটাস" class="status-success">সফল</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY005</td>
+                                <td data-label="পরিমাণ">৳৪,৫০০</td>
+                                <td data-label="মেথড">নগদ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-১৮</td>
+                                <td data-label="স্ট্যাটাস" class="status-pending">পেন্ডিং</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY006</td>
+                                <td data-label="পরিমাণ">৳১,৫০০</td>
+                                <td data-label="মেথড">রকেট</td>
+                                <td data-label="তারিখ">২০২৫-০৫-১৫</td>
+                                <td data-label="স্ট্যাটাস" class="status-failed">ব্যর্থ</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY007</td>
+                                <td data-label="পরিমাণ">৳৬,০০০</td>
+                                <td data-label="মেথড">বিকাশ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-১২</td>
+                                <td data-label="স্ট্যাটাস" class="status-success">সফল</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY008</td>
+                                <td data-label="পরিমাণ">৳৩,০০০</td>
+                                <td data-label="মেথড">নগদ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-১০</td>
+                                <td data-label="স্ট্যাটাস" class="status-pending">পেন্ডিং</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY009</td>
+                                <td data-label="পরিমাণ">৳২,৫০০</td>
+                                <td data-label="মেথড">রকেট</td>
+                                <td data-label="তারিখ">২০২৫-০৫-০৮</td>
+                                <td data-label="স্ট্যাটাস" class="status-failed">ব্যর্থ</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                            <tr>
+                                <td data-label="পেমেন্ট আইডি">PAY010</td>
+                                <td data-label="পরিমাণ">৳৪,০০০</td>
+                                <td data-label="মেথড">বিকাশ</td>
+                                <td data-label="তারিখ">২০২৫-০৫-০৫</td>
+                                <td data-label="স্ট্যাটাস" class="status-success">সফল</td>
+                                <td data-label="বিস্তারিত"><button class="detail-btn" onclick="window.location.href='datareview.html'">বিস্তারিত</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="loading" class="loading">লোড হচ্ছে...</div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="footer">
+                <p>© ২০২৫ ফর্মবন্ধু | সব স্বত্ব সংরক্ষিত</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
