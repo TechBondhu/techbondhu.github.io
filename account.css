@@ -36,11 +36,32 @@ body {
     box-sizing: border-box;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .header h2 {
     margin: 0;
     font-family: 'Tiro Bangla', sans-serif;
     font-size: 1.5rem;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.account-icon {
+    font-size: 1.4rem;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+.account-icon:hover {
+    color: #60A5FA;
+}
+
+.header-right {
+    display: flex;
+    gap: 15px;
 }
 
 .header-right i {
@@ -52,6 +73,10 @@ body {
 
 .header-right i:hover {
     color: #60A5FA;
+}
+
+.header-right .new-chat-icon {
+    font-size: 1.4rem;
 }
 
 /* Content */
@@ -130,7 +155,7 @@ body {
     .header h2 {
         font-size: 1.2rem;
     }
-    .header-right i {
+    .account-icon, .header-right i {
         font-size: 1.2rem;
     }
     .content {
@@ -161,7 +186,7 @@ body {
     .header h2 {
         font-size: 1rem;
     }
-    .header-right i {
+    .account-icon, .header-right i {
         font-size: 1rem;
     }
     .content {
