@@ -40,11 +40,47 @@ body {
     padding: 15px;
     font-size: 24px;
     font-weight: 700;
-    text-align: center;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: gap 0.3s ease;
+}
+.header-brand.active .brand-logo {
+    transform: translateX(-10px);
+}
+.brand-logo {
+    font-size: 24px;
+    font-weight: 700;
+    transition: transform 0.3s ease;
+}
+.dynamic-text {
+    font-size: 16px;
+    opacity: 0;
+    background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+    color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+    border: none; /* বর্ডার নেই */
+    border-radius: 12px;
+    padding: 5px 10px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dynamic-text.active {
+    opacity: 1;
+    transform: translateY(0);
+    animation: floatIn 0.5s ease-out;
+}
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 .header-icons {
     position: absolute;
@@ -244,10 +280,6 @@ body {
 }
 .chat-box.fade-in {
     animation: fadeIn 0.5s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
 }
 .welcome-message {
     position: absolute;
@@ -1062,16 +1094,16 @@ body {
     transition: background 0.3s ease, transform 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 8px; /* Reduced gap for better spacing */
-    justify-content: flex-start; /* Align items to the left for natural spacing */
+    gap: 8px;
+    justify-content: flex-start;
 }
 .genre-item i {
     font-size: 18px;
     color: #fff;
 }
 .genre-item span {
-    display: inline-block; /* Remove flex to prevent over-stretching */
-    text-align: left; /* Ensure text aligns naturally */
+    display: inline-block;
+    text-align: left;
 }
 .genre-item:hover {
     background: linear-gradient(135deg, #2563EB, #1E3A8A);
@@ -1157,6 +1189,20 @@ body {
     .header {
         padding: 10px;
         font-size: 20px;
+    }
+    .header-brand {
+        gap: 8px;
+    }
+    .header-brand.active .brand-logo {
+        transform: translateX(-8px);
+    }
+    .brand-logo {
+        font-size: 20px;
+    }
+    .dynamic-text {
+        font-size: 14px;
+        padding: 4px 8px;
+        max-width: 100px;
     }
     .header-icons {
         left: 10px;
@@ -1375,8 +1421,8 @@ body {
     .genre-item {
         padding: 10px;
         font-size: 12px;
-        gap: 8px; /* Consistent gap for mobile */
-        justify-content: flex-start; /* Align items to the left */
+        gap: 8px;
+        justify-content: flex-start;
     }
     .genre-item i {
         font-size: 16px;
@@ -1402,6 +1448,20 @@ body {
     .header {
         padding: 8px;
         font-size: 18px;
+    }
+    .header-brand {
+        gap: 6px;
+    }
+    .header-brand.active .brand-logo {
+        transform: translateX(-6px);
+    }
+    .brand-logo {
+        font-size: 18px;
+    }
+    .dynamic-text {
+        font-size: 12px;
+        padding: 3px 6px;
+        max-width: 80px;
     }
     .header-icons {
         left: 8px;
@@ -1618,8 +1678,8 @@ body {
     .genre-item {
         padding: 8px;
         font-size: 12px;
-        gap: 6px; /* Adjusted gap for smaller screens */
-        justify-content: flex-start; /* Align items to the left */
+        gap: 6px;
+        justify-content: flex-start;
     }
     .genre-item i {
         font-size: 14px;
@@ -1627,5 +1687,31 @@ body {
     .genres-modal-buttons button {
         padding: 6px 15px;
         font-size: 10px;
+    }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .dynamic-text {
+        font-size: 14px;
+        padding: 4px 8px;
+        max-width: 100px;
+        background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+        color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+        border: none; /* বর্ডার নেই */
+    }
+}
+
+@media (max-width: 480px) {
+    .dynamic-text {
+        font-size: 12px;
+        padding: 3px 6px;
+        max-width: 80px;
+        background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+        color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+        border: none; /* বর্ডার নেই */
     }
 }
