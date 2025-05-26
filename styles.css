@@ -45,29 +45,25 @@ body {
     justify-content: center;
     align-items: center;
 }
-
 .header-brand {
     display: flex;
     align-items: center;
     gap: 10px;
     transition: gap 0.3s ease;
 }
-
 .header-brand.active .brand-logo {
-    animation: slideLeft 0.5s ease-out forwards; /* নতুন বামে সরার এনিমেশন */
+    transform: translateX(-10px);
 }
-
 .brand-logo {
     font-size: 24px;
     font-weight: 700;
     transition: transform 0.3s ease;
 }
-
 .dynamic-text {
     font-size: 16px;
     opacity: 0;
     background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
-    color: #1E3A8A; /* নীল টেক্সট কালার */
+    color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
     border: none; /* বর্ডার নেই */
     border-radius: 12px;
     padding: 5px 10px;
@@ -77,35 +73,15 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .dynamic-text.active {
     opacity: 1;
-    animation: slideInFromRight 0.5s ease-out 0.2s forwards; /* ডান থেকে সামনে আসার এনিমেশন, 0.2s ডিলে */
+    transform: translateY(0);
+    animation: floatIn 0.5s ease-out;
 }
-
-@keyframes slideLeft {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(-20px); /* বামে সরবে */
-        opacity: 0.7; /* সামান্য ফেইড */
-    }
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes slideInFromRight {
-    from {
-        transform: translateX(20px); /* ডান থেকে শুরু */
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0); /* মূল জায়গায় আসবে */
-        opacity: 1;
-    }
-}
-
- 
 .header-icons {
     position: absolute;
     left: 15px;
