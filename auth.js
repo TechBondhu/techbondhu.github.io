@@ -3,15 +3,16 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, up
 import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 import { GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { FacebookAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { RecaptchaVerifier } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
 // Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
-  authDomain: "admissionformdb.firebaseapp.com",
-  projectId: "admissionformdb",
-  storageBucket: "admissionformdb.firebasestorage.app",
-  messagingSenderId: "398052082157",
-  appId: "1:398052082157:web:0bc02d66cbdf55dd2567e4",
+    apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
+    authDomain: "admissionformdb.firebaseapp.com",
+    projectId: "admissionformdb",
+    storageBucket: "admissionformdb.firebasestorage.app",
+    messagingSenderId: "398052082157",
+    appId: "1:398052082157:web:0bc02d66cbdf55dd2567e4",
 };
 
 // Initialize Firebase
@@ -44,7 +45,7 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     const confirmPassword = document.getElementById('confirmPassword').value;
 
     if (password !== confirmPassword) {
-        displayError('পাসওয়ার্ড মিলছে না।');
+        displayError('পাসওয়ার্ড মিলছে না। দয়া করে পুনরায় চেষ্টা করুন।');
         return;
     }
 
@@ -53,16 +54,28 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         const user = userCredential.user;
         await updateProfile(user, { displayName });
 
-        await setDoc(doc(db, 'users', user.uid), {
-            displayName,
-            email: emailOrPhone,
+        // Generate and save verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        console.log('Generated Verification Code:', verificationCode); // Debugging
+        await setDoc(doc(db, 'verificationCodes', emailOrPhone), {
+            code: verificationCode,
             createdAt: serverTimestamp()
         });
 
-        // Redirect to login page after signup
-        window.location.href = 'login.html';
+        // Display code to user for testing (in real app, send via email/SMS)
+        displaySuccess(`সাইন আপ সফল! আপনার ভেরিফিকেশন কোড: ${verificationCode}. এখন ভেরিফিকেশন পেজে যান।`);
+        
+        // Redirect to verification page
+        setTimeout(() => {
+            window.location.href = `verify-code.html?email=${encodeURIComponent(emailOrPhone)}`;
+        }, 2000); // Delay to show success message
     } catch (error) {
-        displayError(error.message);
+        if (error.code === 'auth/email-already-in-use') {
+            displayError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য ইমেইল ব্যবহার করুন।');
+        } else {
+            displayError('সাইন আপ করতে সমস্যা হয়েছে: ' + error.message);
+            console.error('Signup Error:', error); // Debugging
+        }
     }
 });
 
@@ -74,7 +87,6 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
 
     try {
         await signInWithEmailAndPassword(auth, emailOrPhone, password);
-        // Redirect to chat page after login
         window.location.href = 'chat.html';
     } catch (error) {
         displayError(error.message);
@@ -102,7 +114,7 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
             console.log(`Verification Code for ${emailOrPhone}: ${code}`);
             displaySuccess('ভেরিফিকেশন কোড আপনার ইমেইলে পাঠানো হয়েছে।');
         } else {
-            const phoneNumber = '+88' + emailOrPhone; // Assuming Bangladesh country code
+            const phoneNumber = '+88' + emailOrPhone;
             const appVerifier = new RecaptchaVerifier('sendCodeForm', {
                 'size': 'invisible'
             }, auth);
