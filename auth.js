@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail, updatePassword, applyActionCode } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 import { GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { FacebookAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
@@ -36,6 +36,24 @@ function displaySuccess(message) {
     }
 }
 
+// Handle verification link (for login after email verification)
+window.addEventListener('load', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode');
+
+    if (mode === 'verifyEmail') {
+        try {
+            await applyActionCode(auth, oobCode);
+            window.location.href = 'login.html';
+        } catch (error) {
+            displayError('ইমেইল যাচাই করতে সমস্যা হয়েছে: ' + error.message);
+        }
+    } else if (mode === 'resetPassword') {
+        window.location.href = 'update-password.html';
+    }
+});
+
 // Sign Up Functionality
 document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -61,12 +79,12 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         const user = userCredential.user;
         await updateProfile(user, { displayName });
 
-        // Send email verification link
         await sendEmailVerification(user);
-        displaySuccess('সাইন আপ সফল! আপনার ইমেইলে ভেরিফিকেশন লিংক পাঠানো হয়েছে। লিংকটি ক্লিক করে অ্যাকাউন্টটি যাচাই করুন।');
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 5000);
+        displaySuccess('আপনার মেইলে ভেরিফিকেশন লিংক পাঠানো হয়েছে, সেখানে ক্লিক করুন।');
+
+        signupButton.disabled = false;
+        signupButton.textContent = 'সাইন আপ';
+        document.getElementById('signupForm').reset();
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
             displayError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য ইমেইল ব্যবহার করুন।');
@@ -100,11 +118,8 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
     try {
         if (emailOrPhone.includes('@')) {
             await sendPasswordResetEmail(auth, emailOrPhone);
-            displaySuccess('পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে। লিংকটি ক্লিক করে পাসওয়ার্ড আপডেট করুন।');
-            document.getElementById('sendCodeForm').style.display = 'none';
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 5000);
+            displaySuccess('আপনার মেইলে ভেরিফিকেশন লিঙ্�ক পাঠানো হয়েছে, সেখানে ক্লিক করুন।');
+            document.getElementById('sendCodeForm').reset();
         } else {
             displayError('ফোন নম্বরের জন্য এই ফিচারটি সমর্থিত নয়।');
         }
