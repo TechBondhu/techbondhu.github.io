@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup, PhoneAuthProvider, signInWithCredential, updatePassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 import { GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { FacebookAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
@@ -40,7 +40,6 @@ function displaySuccess(message) {
 document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Disable the signup button
     const signupButton = document.querySelector('#signupForm button[type="submit"]');
     signupButton.disabled = true;
     signupButton.textContent = 'প্রক্রিয়াকরণ হচ্ছে...';
@@ -62,20 +61,12 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         const user = userCredential.user;
         await updateProfile(user, { displayName });
 
-        // Generate and save verification code
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        await setDoc(doc(db, 'verificationCodes', emailOrPhone), {
-            code: verificationCode,
-            createdAt: serverTimestamp()
-        });
-
-        // Display success message
-        displaySuccess('সাইন আপ সফল! আপনার ইমেইলে ভেরিফিকেশন কোড পাঠানো হয়েছে।');
-
-        // Redirect to verification page
+        // Send email verification link
+        await sendEmailVerification(user);
+        displaySuccess('সাইন আপ সফল! আপনার ইমেইলে ভেরিফিকেশন লিংক পাঠানো হয়েছে। লিংকটি ক্লিক করে অ্যাকাউন্টটি যাচাই করুন।');
         setTimeout(() => {
-            window.location.href = `verify-code.html?email=${encodeURIComponent(emailOrPhone)}`;
-        }, 2000);
+            window.location.href = 'login.html';
+        }, 5000);
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
             displayError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য ইমেইল ব্যবহার করুন।');
@@ -101,65 +92,31 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     }
 });
 
-// Password Reset Functionality - Send Verification Code
-let verificationId = '';
-let emailForReset = '';
-
+// Password Reset Functionality - Send Verification Link
 document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const emailOrPhone = document.getElementById('emailOrPhone').value;
 
     try {
         if (emailOrPhone.includes('@')) {
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            emailForReset = emailOrPhone;
-
-            await setDoc(doc(db, 'passwordResetCodes', emailOrPhone), {
-                code,
-                createdAt: serverTimestamp()
-            });
-
-            displaySuccess('ভেরিফিকেশন কোড আপনার ইমেইলে পাঠানো হয়েছে।');
+            await sendPasswordResetEmail(auth, emailOrPhone);
+            displaySuccess('পাসওয়ার্ড রিসেট লিংক আপনার ইমেইলে পাঠানো হয়েছে। লিংকটি ক্লিক করে পাসওয়ার্ড আপডেট করুন।');
+            document.getElementById('sendCodeForm').style.display = 'none';
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 5000);
         } else {
-            const phoneNumber = '+88' + emailOrPhone;
-            const appVerifier = new RecaptchaVerifier('sendCodeForm', {
-                'size': 'invisible'
-            }, auth);
-
-            const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-            verificationId = result.verificationId;
-            displaySuccess('ভেরিফিকেশন কোড আপনার ফোনে পাঠানো হয়েছে।');
+            displayError('ফোন নম্বরের জন্য এই ফিচারটি সমর্থিত নয়।');
         }
-
-        document.getElementById('sendCodeForm').style.display = 'none';
-        document.getElementById('verifyCodeForm').style.display = 'block';
     } catch (error) {
         displayError(error.message);
     }
 });
 
-// Verify Code and Redirect to Update Password
+// Verify Code and Redirect to Update Password (Not needed for link-based reset)
 document.getElementById('verifyCodeForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const code = document.getElementById('verificationCode').value;
-
-    try {
-        if (emailForReset) {
-            const codeDoc = await getDoc(doc(db, 'passwordResetCodes', emailForReset));
-            if (!codeDoc.exists() || codeDoc.data().code !== code) {
-                throw new Error('ভুল কোড। দয়া করে সঠিক কোডটি লিখুন।');
-            }
-
-            await deleteDoc(doc(db, 'passwordResetCodes', emailOrReset));
-            window.location.href = `update-password.html?email=${encodeURIComponent(emailForReset)}`;
-        } else {
-            const credential = PhoneAuthProvider.credential(verificationId, code);
-            await signInWithCredential(auth, credential);
-            window.location.href = 'update-password.html';
-        }
-    } catch (error) {
-        displayError(error.message);
-    }
+    displayError('পাসওয়ার্ড রিসেটের জন্য লিংক ব্যবহার করুন।');
 });
 
 // Update Password Functionality
@@ -179,7 +136,6 @@ document.getElementById('updatePasswordForm')?.addEventListener('submit', async 
             throw new Error('ইউজার লগইন করা নেই। দয়া করে লগইন করুন।');
         }
         await updatePassword(user, newPassword);
-
         displaySuccess('পাসওয়ার্ড সফলভাবে আপডেট হয়েছে।');
         setTimeout(() => {
             window.location.href = 'login.html';
@@ -195,13 +151,11 @@ document.getElementById('googleSignUp')?.addEventListener('click', async () => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-
         await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
             createdAt: serverTimestamp()
         }, { merge: true });
-
         window.location.href = 'login.html';
     } catch (error) {
         displayError(error.message);
@@ -224,13 +178,11 @@ document.getElementById('facebookSignUp')?.addEventListener('click', async () =>
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-
         await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
             createdAt: serverTimestamp()
         }, { merge: true });
-
         window.location.href = 'login.html';
     } catch (error) {
         displayError(error.message);
