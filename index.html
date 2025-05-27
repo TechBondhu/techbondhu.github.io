@@ -507,6 +507,7 @@
                     <li><a href="#testimonials" onclick="smoothScroll('testimonials')">প্রশংসাপত্র</a></li>
                     <li><a href="javascript:void(0)" onclick="redirectToChat(event)">চ্যাটবট</a></li>
                     <li><a href="#contact" onclick="smoothScroll('contact')">যোগাযোগ</a></li>
+                    <li><a href="signup.html">সাইন আপ</a></li>
                 </ul>
             </nav>
         </div>
@@ -516,7 +517,7 @@
     <section class="hero" id="home">
         <h1>ফর্মবন্ধুর সাথে আবেদন প্রক্রিয়ায় বিপ্লব আনুন</h1>
         <p>আমাদের এআই-চালিত চ্যাটবট প্ল্যাটফর্মের মাধ্যমে তাৎক্ষণিক আবেদনের ভবিষ্যৎ অভিজ্ঞতা অর্জন করুন।</p>
-        <a href="javascript:void(0)" class="btn" onclick="redirectToChat(event)">শুরু করুন</a>
+        <a href="javascript:void(0)" class="btn" id="startBtn">শুরু করুন</a>
     </section>
 
     <!-- Features Section -->
@@ -561,7 +562,7 @@
     </section>
 
     <!-- Chatbot Widget -->
-    <div class="chatbot-widget" onclick="redirectToChat(event)">
+    <div class="chatbot-widget" id="useChatbotBtn">
         <i class="fas fa-comment"></i> আমাদের চ্যাটবট ব্যবহার করুন
     </div>
 
@@ -588,6 +589,27 @@
             event.preventDefault();
             window.location.replace('chat.html');
         }
+
+        // Check login status and redirect accordingly
+        firebase.auth().onAuthStateChanged((user) => {
+            const startBtn = document.getElementById('startBtn');
+            const useChatbotBtn = document.getElementById('useChatbotBtn');
+
+            if (user) {
+                // User is logged in, redirect to chat.html
+                startBtn.onclick = () => window.location.href = 'chat.html';
+                useChatbotBtn.onclick = () => window.location.href = 'chat.html';
+            } else {
+                // User is not logged in, redirect to signup.html
+                startBtn.onclick = () => window.location.href = 'signup.html';
+                useChatbotBtn.onclick = () => window.location.href = 'signup.html';
+            }
+        });
     </script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="auth.js"></script>
 </body>
 </html>
