@@ -20,7 +20,7 @@
     <link rel="preload" href="fonts/tiro-bangla.woff2" as="font" type="font/woff2" crossorigin>
     <style>
         /* Tiro Bangla ফন্ট সংজ্ঞায়িত করা */
-        @font-face {
+ @font-face {
             font-family: 'Tiro Bangla';
             src: url('fonts/tiro-bangla.woff2') format('woff2'),
                  url('fonts/tiro-bangla.woff') format('woff');
@@ -224,7 +224,7 @@
             border-radius: 10px;
             transition: transform 0.3s, box-shadow 0.3s;
             opacity: 0;
-            animation: fadeInUp 0.8s ease-out forwards;
+            animation: fadeInUp 0 ascended: 0.8s ease-out forwards;
         }
 
         .feature-card:nth-child(2) { animation-delay: 0.2s; }
@@ -498,7 +498,7 @@
         <div class="nav-container">
             <div class="logo">ফর্মবন্ধু</div>
             <nav>
-                <div class="hamburger" onclick="toggleMenu()">
+                <div class="hamburger">
                     <i class="fas fa-bars"></i>
                 </div>
                 <ul id="navMenu">
@@ -588,7 +588,7 @@
         // Smooth Scroll Function
         function smoothScroll(sectionId) {
             document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-            toggleMenu();
+            toggleMenu(); // Close menu after clicking a link on mobile
         }
 
         // Redirect to Chatbot Page
@@ -597,6 +597,12 @@
             window.location.replace('chat.html');
         }
 
+        // Add event listener for hamburger menu
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('.hamburger');
+            hamburger.addEventListener('click', toggleMenu);
+        });
+
         // Check login status and redirect accordingly
         auth.onAuthStateChanged((user) => {
             const startBtn = document.getElementById('startBtn');
@@ -604,24 +610,24 @@
 
             if (user) {
                 // User is logged in, redirect to chat.html
-                startBtn.onclick = (event) => {
+                startBtn.addEventListener('click', (event) => {
                     event.preventDefault();
                     window.location.replace('chat.html');
-                };
-                useChatbotBtn.onclick = (event) => {
+                });
+                useChatbotBtn.addEventListener('click', (event) => {
                     event.preventDefault();
                     window.location.replace('chat.html');
-                };
+                });
             } else {
                 // User is not logged in (new user), redirect to signup.html
-                startBtn.onclick = (event) => {
+                startBtn.addEventListener('click', (event) => {
                     event.preventDefault();
                     window.location.replace('signup.html');
-                };
-                useChatbotBtn.onclick = (event) => {
+                });
+                useChatbotBtn.addEventListener('click', (event) => {
                     event.preventDefault();
                     window.location.replace('signup.html');
-                };
+                });
             }
         });
     </script>
