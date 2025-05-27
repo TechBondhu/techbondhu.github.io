@@ -13,101 +13,228 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-document.addEventListener('DOMContentLoaded', () => {
-    const signupForm = document.getElementById('signupForm');
-    const errorMessage = document.getElementById('error-message');
-    const googleSignUp = document.getElementById('googleSignUp');
-    const facebookSignUp = document.getElementById('facebookSignUp');
+// Utility to display error messages
+function displayError(message) {
+    const errorMessageElement = document.getElementById('error-message');
+    if (errorMessageElement) {
+        errorMessageElement.textContent = message;
+    }
+}
 
-    // Email/Phone Signup
-    if (signupForm) {
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const displayName = document.getElementById('displayName').value;
-            const emailOrPhone = document.getElementById('emailOrPhone').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+// Utility to display success messages
+function displaySuccess(message) {
+    const successMessageElement = document.getElementById('success-message');
+    if (successMessageElement) {
+        successMessageElement.textContent = message;
+    }
+}
 
-            if (password !== confirmPassword) {
-                errorMessage.textContent = 'পাসওয়ার্ড মিলছে না।';
-                errorMessage.style.display = 'block';
-                return;
-            }
+// Sign Up Functionality
+document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const displayName = document.getElementById('displayName').value;
+    const emailOrPhone = document.getElementById('emailOrPhone').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
 
-            try {
-                let userCredential;
-                if (emailOrPhone.includes('@')) {
-                    // Email Signup
-                    userCredential = await auth.createUserWithEmailAndPassword(emailOrPhone, password);
-                } else {
-                    // Phone Signup (requires reCAPTCHA, simplified for prototype)
-                    errorMessage.textContent = 'ফোন নম্বর সাইন আপ এখনো সাপোর্টেড নয়। ইমেইল ব্যবহার করুন।';
-                    errorMessage.style.display = 'block';
-                    return;
-                }
-
-                const user = userCredential.user;
-                await user.updateProfile({ displayName });
-
-                // Save user data to Firestore
-                await db.collection('users').doc(user.uid).set({
-                    displayName,
-                    email: emailOrPhone.includes('@') ? emailOrPhone : null,
-                    phoneNumber: !emailOrPhone.includes('@') ? emailOrPhone : null,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                window.location.href = 'login.html';
-            } catch (error) {
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
-            }
-        });
+    if (password !== confirmPassword) {
+        displayError('পাসওয়ার্ড মিলছে না।');
+        return;
     }
 
-    // Google Signup
-    if (googleSignUp) {
-        googleSignUp.addEventListener('click', async () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
+    try {
+        const userCredential = await auth.createUserWithEmailAndPassword(emailOrPhone, password);
+        const user = userCredential.user;
+        await user.updateProfile({ displayName });
 
-                // Save user data to Firestore
-                await db.collection('users').doc(user.uid).set({
-                    displayName: user.displayName,
-                    email: user.email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-
-                window.location.href = 'index.html';
-            } catch (error) {
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
-            }
+        await db.collection('users').doc(user.uid).set({
+            displayName,
+            email: emailOrPhone,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Login Functionality
+document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailOrPhone = document.getElementById('emailOrPhone').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        await auth.signInWithEmailAndPassword(emailOrPhone, password);
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Password Reset Functionality - Send Verification Code
+let verificationId = '';
+let emailForReset = '';
+
+document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailOrPhone = document.getElementById('emailOrPhone').value;
+
+    try {
+        if (emailOrPhone.includes('@')) {
+            // Handle Email Verification (Custom Code Generation)
+            const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+            emailForReset = emailOrPhone;
+
+            // Save the code temporarily in Firestore
+            await db.collection('passwordResetCodes').doc(emailOrPhone).set({
+                code,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // In a real app, you would send this code via email using a backend service
+            console.log(`Verification Code for ${emailOrPhone}: ${code}`);
+            displaySuccess('ভেরিফিকেশন কোড আপনার ইমেইলে পাঠানো হয়েছে।');
+        } else {
+            // Handle Phone Verification (SMS)
+            const phoneNumber = emailOrPhone;
+            const appVerifier = new firebase.auth.RecaptchaVerifier('sendCodeForm', {
+                'size': 'invisible'
+            });
+
+            const result = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+            verificationId = result.verificationId;
+            displaySuccess('ভেরিফিকেশন কোড আপনার ফোনে পাঠানো হয়েছে।');
+        }
+
+        document.getElementById('sendCodeForm').style.display = 'none';
+        document.getElementById('verifyCodeForm').style.display = 'block';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Verify Code and Redirect to Update Password
+document.getElementById('verifyCodeForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = document.getElementById('verificationCode').value;
+
+    try {
+        if (emailForReset) {
+            // Verify Email Code
+            const codeDoc = await db.collection('passwordResetCodes').doc(emailForReset).get();
+            if (!codeDoc.exists || codeDoc.data().code !== code) {
+                throw new Error('ভুল কোড। দয়া করে সঠিক কোডটি লিখুন।');
+            }
+
+            // Delete the code after verification
+            await db.collection('passwordResetCodes').doc(emailForReset).delete();
+
+            // Redirect to update password page with email in URL
+            window.location.href = `update-password.html?email=${encodeURIComponent(emailForReset)}`;
+        } else {
+            // Verify Phone Code
+            const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
+            await auth.signInWithCredential(credential);
+            window.location.href = 'update-password.html';
+        }
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Update Password Functionality
+document.getElementById('updatePasswordForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+    if (newPassword !== confirmNewPassword) {
+        displayError('পাসওয়ার্ড মিলছে না।');
+        return;
     }
 
-    // Facebook Signup
-    if (facebookSignUp) {
-        facebookSignUp.addEventListener('click', async () => {
-            const provider = new firebase.auth.FacebookAuthProvider();
-            try {
-                const result = await auth.signInWithPopup(provider);
-                const user = result.user;
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
 
-                // Save user data to Firestore
-                await db.collection('users').doc(user.uid).set({
-                    displayName: user.displayName,
-                    email: user.email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-
-                window.location.href = 'index.html';
-            } catch (error) {
-                errorMessage.textContent = error.message;
-                errorMessage.style.display = 'block';
+        if (email) {
+            // For email-based reset, we need to sign in the user first
+            const user = auth.currentUser;
+            if (!user) {
+                throw new Error('ইউজার লগইন করা নেই। দয়া করে লগইন করুন।');
             }
-        });
+            await user.updatePassword(newPassword);
+        } else {
+            // For phone-based reset, user is already signed in
+            const user = auth.currentUser;
+            await user.updatePassword(newPassword);
+        }
+
+        displaySuccess('পাসওয়ার্ড সফলভাবে আপডেট হয়েছে।');
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Google Sign-In
+document.getElementById('googleSignUp')?.addEventListener('click', async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        await db.collection('users').doc(user.uid).set({
+            displayName: user.displayName,
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+document.getElementById('googleSignIn')?.addEventListener('click', async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+        await auth.signInWithPopup(provider);
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+// Facebook Sign-In
+document.getElementById('facebookSignUp')?.addEventListener('click', async () => {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        await db.collection('users').doc(user.uid).set({
+            displayName: user.displayName,
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
+    }
+});
+
+document.getElementById('facebookSignIn')?.addEventListener('click', async () => {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    try {
+        await auth.signInWithPopup(provider);
+        window.location.href = 'index.html';
+    } catch (error) {
+        displayError(error.message);
     }
 });
