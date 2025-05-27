@@ -597,12 +597,24 @@
 
             if (user) {
                 // User is logged in, redirect to chat.html
-                startBtn.onclick = () => window.location.href = 'chat.html';
-                useChatbotBtn.onclick = () => window.location.href = 'chat.html';
+                startBtn.onclick = (event) => {
+                    event.preventDefault();
+                    window.location.replace('chat.html');
+                };
+                useChatbotBtn.onclick = (event) => {
+                    event.preventDefault();
+                    window.location.replace('chat.html');
+                };
             } else {
-                // User is not logged in, redirect to signup.html
-                startBtn.onclick = () => window.location.href = 'signup.html';
-                useChatbotBtn.onclick = () => window.location.href = 'signup.html';
+                // User is not logged in (new user), redirect to signup.html
+                startBtn.onclick = (event) => {
+                    event.preventDefault();
+                    window.location.replace('signup.html');
+                };
+                useChatbotBtn.onclick = (event) => {
+                    event.preventDefault();
+                    window.location.replace('signup.html');
+                };
             }
         });
     </script>
