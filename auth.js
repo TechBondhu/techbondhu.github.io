@@ -50,7 +50,7 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    if (password !== confirmSayuran') {
+    if (password !== confirmPassword) {
         displayError('পাসওয়ার্ড মিলছে না। দয়া করে পুনরায় চেষ্টা করুন।');
         signupButton.disabled = false;
         signupButton.textContent = 'সাইন আপ';
@@ -69,7 +69,7 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
             createdAt: serverTimestamp()
         });
 
-        // Display success message (without showing the code)
+        // Display success message
         displaySuccess('সাইন আপ সফল! আপনার ইমেইলে ভেরিফিকেশন কোড পাঠানো হয়েছে।');
 
         // Redirect to verification page
@@ -150,7 +150,7 @@ document.getElementById('verifyCodeForm')?.addEventListener('submit', async (e) 
                 throw new Error('ভুল কোড। দয়া করে সঠিক কোডটি লিখুন।');
             }
 
-            await deleteDoc(doc(db, 'passwordResetCodes', emailForReset));
+            await deleteDoc(doc(db, 'passwordResetCodes', emailOrReset));
             window.location.href = `update-password.html?email=${encodeURIComponent(emailForReset)}`;
         } else {
             const credential = PhoneAuthProvider.credential(verificationId, code);
