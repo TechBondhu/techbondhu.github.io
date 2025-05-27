@@ -39,13 +39,21 @@ function displaySuccess(message) {
 // Sign Up Functionality
 document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    // Disable the signup button
+    const signupButton = document.querySelector('#signupForm button[type="submit"]');
+    signupButton.disabled = true;
+    signupButton.textContent = 'প্রক্রিয়াকরণ হচ্ছে...';
+
     const displayName = document.getElementById('displayName').value;
     const emailOrPhone = document.getElementById('emailOrPhone').value;
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
 
-    if (password !== confirmPassword) {
+    if (password !== confirmSayuran') {
         displayError('পাসওয়ার্ড মিলছে না। দয়া করে পুনরায় চেষ্টা করুন।');
+        signupButton.disabled = false;
+        signupButton.textContent = 'সাইন আপ';
         return;
     }
 
@@ -56,26 +64,26 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
 
         // Generate and save verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log('Generated Verification Code:', verificationCode); // Debugging
         await setDoc(doc(db, 'verificationCodes', emailOrPhone), {
             code: verificationCode,
             createdAt: serverTimestamp()
         });
 
-        // Display code to user for testing (in real app, send via email/SMS)
-        displaySuccess(`সাইন আপ সফল! আপনার ভেরিফিকেশন কোড: ${verificationCode}. এখন ভেরিফিকেশন পেজে যান।`);
-        
+        // Display success message (without showing the code)
+        displaySuccess('সাইন আপ সফল! আপনার ইমেইলে ভেরিফিকেশন কোড পাঠানো হয়েছে।');
+
         // Redirect to verification page
         setTimeout(() => {
             window.location.href = `verify-code.html?email=${encodeURIComponent(emailOrPhone)}`;
-        }, 2000); // Delay to show success message
+        }, 2000);
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
             displayError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য ইমেইল ব্যবহার করুন।');
         } else {
             displayError('সাইন আপ করতে সমস্যা হয়েছে: ' + error.message);
-            console.error('Signup Error:', error); // Debugging
         }
+        signupButton.disabled = false;
+        signupButton.textContent = 'সাইন আপ';
     }
 });
 
@@ -111,7 +119,6 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
                 createdAt: serverTimestamp()
             });
 
-            console.log(`Verification Code for ${emailOrPhone}: ${code}`);
             displaySuccess('ভেরিফিকেশন কোড আপনার ইমেইলে পাঠানো হয়েছে।');
         } else {
             const phoneNumber = '+88' + emailOrPhone;
