@@ -1,3 +1,9 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, signInWithPopup, PhoneAuthProvider, signInWithCredential, updatePassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, serverTimestamp, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+import { GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+import { FacebookAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+
 // Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
@@ -9,9 +15,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Utility to display error messages
 function displayError(message) {
@@ -43,14 +49,14 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
     }
 
     try {
-        const userCredential = await auth.createUserWithEmailAndPassword(emailOrPhone, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, emailOrPhone, password);
         const user = userCredential.user;
-        await user.updateProfile({ displayName });
+        await updateProfile(user, { displayName });
 
-        await db.collection('users').doc(user.uid).set({
+        await setDoc(doc(db, 'users', user.uid), {
             displayName,
             email: emailOrPhone,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: serverTimestamp()
         });
 
         // Redirect to login page after signup
@@ -67,7 +73,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
 
     try {
-        await auth.signInWithEmailAndPassword(emailOrPhone, password);
+        await signInWithEmailAndPassword(auth, emailOrPhone, password);
         // Redirect to chat page after login
         window.location.href = 'chat.html';
     } catch (error) {
@@ -88,20 +94,20 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             emailForReset = emailOrPhone;
 
-            await db.collection('passwordResetCodes').doc(emailOrPhone).set({
+            await setDoc(doc(db, 'passwordResetCodes', emailOrPhone), {
                 code,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: serverTimestamp()
             });
 
             console.log(`Verification Code for ${emailOrPhone}: ${code}`);
             displaySuccess('ভেরিফিকেশন কোড আপনার ইমেইলে পাঠানো হয়েছে।');
         } else {
-            const phoneNumber = emailOrPhone;
-            const appVerifier = new firebase.auth.RecaptchaVerifier('sendCodeForm', {
+            const phoneNumber = '+88' + emailOrPhone; // Assuming Bangladesh country code
+            const appVerifier = new RecaptchaVerifier('sendCodeForm', {
                 'size': 'invisible'
-            });
+            }, auth);
 
-            const result = await auth.signInWithPhoneNumber(phoneNumber, appVerifier);
+            const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
             verificationId = result.verificationId;
             displaySuccess('ভেরিফিকেশন কোড আপনার ফোনে পাঠানো হয়েছে।');
         }
@@ -120,16 +126,16 @@ document.getElementById('verifyCodeForm')?.addEventListener('submit', async (e) 
 
     try {
         if (emailForReset) {
-            const codeDoc = await db.collection('passwordResetCodes').doc(emailForReset).get();
-            if (!codeDoc.exists || codeDoc.data().code !== code) {
+            const codeDoc = await getDoc(doc(db, 'passwordResetCodes', emailForReset));
+            if (!codeDoc.exists() || codeDoc.data().code !== code) {
                 throw new Error('ভুল কোড। দয়া করে সঠিক কোডটি লিখুন।');
             }
 
-            await db.collection('passwordResetCodes').doc(emailForReset).delete();
+            await deleteDoc(doc(db, 'passwordResetCodes', emailForReset));
             window.location.href = `update-password.html?email=${encodeURIComponent(emailForReset)}`;
         } else {
-            const credential = firebase.auth.PhoneAuthProvider.credential(verificationId, code);
-            await auth.signInWithCredential(credential);
+            const credential = PhoneAuthProvider.credential(verificationId, code);
+            await signInWithCredential(auth, credential);
             window.location.href = 'update-password.html';
         }
     } catch (error) {
@@ -149,19 +155,11 @@ document.getElementById('updatePasswordForm')?.addEventListener('submit', async 
     }
 
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const email = urlParams.get('email');
-
-        if (email) {
-            const user = auth.currentUser;
-            if (!user) {
-                throw new Error('ইউজার লগইন করা নেই। দয়া করে লগইন করুন।');
-            }
-            await user.updatePassword(newPassword);
-        } else {
-            const user = auth.currentUser;
-            await user.updatePassword(newPassword);
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error('ইউজার লগইন করা নেই। দয়া করে লগইন করুন।');
         }
+        await updatePassword(user, newPassword);
 
         displaySuccess('পাসওয়ার্ড সফলভাবে আপডেট হয়েছে।');
         setTimeout(() => {
@@ -174,15 +172,15 @@ document.getElementById('updatePasswordForm')?.addEventListener('submit', async 
 
 // Google Sign-In
 document.getElementById('googleSignUp')?.addEventListener('click', async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     try {
-        const result = await auth.signInWithPopup(provider);
+        const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        await db.collection('users').doc(user.uid).set({
+        await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: serverTimestamp()
         }, { merge: true });
 
         window.location.href = 'login.html';
@@ -192,9 +190,9 @@ document.getElementById('googleSignUp')?.addEventListener('click', async () => {
 });
 
 document.getElementById('googleSignIn')?.addEventListener('click', async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     try {
-        await auth.signInWithPopup(provider);
+        await signInWithPopup(auth, provider);
         window.location.href = 'chat.html';
     } catch (error) {
         displayError(error.message);
@@ -203,15 +201,15 @@ document.getElementById('googleSignIn')?.addEventListener('click', async () => {
 
 // Facebook Sign-In
 document.getElementById('facebookSignUp')?.addEventListener('click', async () => {
-    const provider = new firebase.auth.FacebookAuthProvider();
+    const provider = new FacebookAuthProvider();
     try {
-        const result = await auth.signInWithPopup(provider);
+        const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        await db.collection('users').doc(user.uid).set({
+        await setDoc(doc(db, 'users', user.uid), {
             displayName: user.displayName,
             email: user.email,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: serverTimestamp()
         }, { merge: true });
 
         window.location.href = 'login.html';
@@ -221,11 +219,14 @@ document.getElementById('facebookSignUp')?.addEventListener('click', async () =>
 });
 
 document.getElementById('facebookSignIn')?.addEventListener('click', async () => {
-    const provider = new firebase.auth.FacebookAuthProvider();
+    const provider = new FacebookAuthProvider();
     try {
-        await auth.signInWithPopup(provider);
+        await signInWithPopup(auth, provider);
         window.location.href = 'chat.html';
     } catch (error) {
         displayError(error.message);
     }
 });
+
+// Export auth and db for use in other files
+export { auth, db };
