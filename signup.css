@@ -11,7 +11,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
     margin: 0;
 }
 
@@ -20,46 +20,46 @@ body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 100vh;
+    height: 100vh;
     background: linear-gradient(135deg, #1E3A8A, #10B981);
 }
 
 .auth-box {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
-    padding: 30px;
+    padding: 40px;
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
 .auth-box h2 {
-    font-size: 24px;
+    font-size: 28px;
     color: #1E3A8A;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-weight: 700;
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     text-align: left;
 }
 
 .input-group label {
-    font-size: 16px;
+    font-size: 18px;
     color: #333;
     font-weight: 700;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .input-group input {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: 1px solid #D1D5DB;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 18px;
     outline: none;
     background: #FFF;
     transition: border 0.3s ease;
@@ -72,12 +72,12 @@ body {
 
 .auth-btn {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     background: linear-gradient(135deg, #10B981, #1E3A8A);
     color: #FFF;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 18px;
     font-family: 'Tiro Bangla', serif;
     font-weight: 700;
     cursor: pointer;
@@ -90,21 +90,21 @@ body {
 }
 
 .social-login {
-    margin: 20px 0;
+    margin: 25px 0;
 }
 
 .social-login p {
-    font-size: 14px;
+    font-size: 16px;
     color: #6B7280;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .social-btn {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: none;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 18px;
     font-family: 'Tiro Bangla', serif;
     font-weight: 700;
     cursor: pointer;
@@ -112,7 +112,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     transition: transform 0.2s ease;
 }
 
@@ -140,7 +140,7 @@ body {
 }
 
 .auth-link {
-    font-size: 14px;
+    font-size: 16px;
     color: #6B7280;
 }
 
@@ -156,34 +156,100 @@ body {
 
 .error-message {
     color: #EF4444;
-    font-size: 14px;
-    margin-top: 10px;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+/* Responsive Design */
+@media (min-width: 1024px) {
+    .auth-box {
+        max-width: 600px;
+        padding: 50px;
+    }
+    .auth-box h2 {
+        font-size: 32px;
+        margin-bottom: 30px;
+    }
+    .input-group label {
+        font-size: 20px;
+    }
+    .input-group input {
+        padding: 16px;
+        font-size: 20px;
+    }
+    .auth-btn, .social-btn {
+        padding: 16px;
+        font-size: 20px;
+    }
+    .social-login p {
+        font-size: 18px;
+    }
+    .auth-link {
+        font-size: 18px;
+    }
+    .error-message {
+        font-size: 18px;
+    }
 }
 
 @media (max-width: 768px) {
     .auth-box {
-        padding: 20px;
         max-width: 350px;
+        padding: 25px;
     }
     .auth-box h2 {
-        font-size: 20px;
+        font-size: 22px;
+        margin-bottom: 20px;
     }
-    .input-group input, .auth-btn, .social-btn {
-        padding: 10px;
+    .input-group label {
+        font-size: 16px;
+    }
+    .input-group input {
+        padding: 12px;
+        font-size: 16px;
+    }
+    .auth-btn, .social-btn {
+        padding: 12px;
+        font-size: 16px;
+    }
+    .social-login p {
+        font-size: 14px;
+    }
+    .auth-link {
+        font-size: 14px;
+    }
+    .error-message {
         font-size: 14px;
     }
 }
 
 @media (max-width: 480px) {
     .auth-box {
-        padding: 15px;
         max-width: 300px;
+        padding: 20px;
     }
     .auth-box h2 {
-        font-size: 18px;
+        font-size: 20px;
+        margin-bottom: 15px;
     }
-    .input-group input, .auth-btn, .social-btn {
-        padding: 8px;
+    .input-group label {
+        font-size: 14px;
+    }
+    .input-group input {
+        padding: 10px;
+        font-size: 14px;
+    }
+    .auth-btn, .social-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+    .social-login p {
+        font-size: 12px;
+    }
+    .auth-link {
+        font-size: 12px;
+    }
+    .error-message {
         font-size: 12px;
     }
 }
