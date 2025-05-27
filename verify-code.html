@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভেরিফিকেশন - ফর্মবন্ধু</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="brand-header">
+        <h1>ফর্মবন্ধু - ভেরিফিকেশন</h1>
+    </header>
+    <div class="auth-container">
+        <div class="auth-box">
+            <form id="verifyForm">
+                <div class="input-group">
+                    <label for="verificationCode">ভেরিফিকেশন কোড</label>
+                    <input type="text" id="verificationCode" placeholder="কোড লিখুন" required>
+                </div>
+                <button type="submit" class="auth-btn">ভেরিফাই করুন</button>
+            </form>
+            <p class="auth-link"><a href="login.html">লগইন পেজে ফিরে যান</a></p>
+            <p id="success-message" class="success-message"></p>
+            <p id="error-message" class="error-message"></p>
+        </div>
+    </div>
+    <!-- Firebase SDK -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module">
+        document.getElementById('verifyForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const verificationCode = document.getElementById('verificationCode').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            try {
+                const codeDoc = await db.collection('verificationCodes').doc(email).get();
+                if (!codeDoc.exists() || codeDoc.data().code !== verificationCode) {
+                    errorMessage.textContent = 'আপনার ভুল, দয়া করে সঠিক কোডটি লিখুন।';
+                    successMessage.textContent = '';
+                } else {
+                    await db.collection('verificationCodes').doc(email).delete();
+                    successMessage.textContent = 'ভেরিফিকেশন সফল! আপনি লগইন পেজে যাচ্ছেন...';
+                    errorMessage.textContent = '';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            } catch (error) {
+                errorMessage.textContent = 'কোড ভেরিফাই করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+                successMessage.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
