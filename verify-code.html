@@ -32,6 +32,8 @@
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module">
+        import { db } from './auth.js';
+
         document.getElementById('verifyForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const verificationCode = document.getElementById('verificationCode').value;
@@ -40,13 +42,18 @@
             const errorMessage = document.getElementById('error-message');
             const successMessage = document.getElementById('success-message');
 
+            if (!email) {
+                errorMessage.textContent = 'ইমেইল প্যারামিটার পাওয়া যায়নি।';
+                return;
+            }
+
             try {
-                const codeDoc = await db.collection('verificationCodes').doc(email).get();
+                const codeDoc = await getDoc(doc(db, 'verificationCodes', email));
                 if (!codeDoc.exists() || codeDoc.data().code !== verificationCode) {
-                    errorMessage.textContent = 'আপনার ভুল, দয়া করে সঠিক কোডটি লিখুন।';
+                    errorMessage.textContent = 'আপনার কোড সঠিক নয়। দয়া করে সঠিক কোডটি লিখুন।';
                     successMessage.textContent = '';
                 } else {
-                    await db.collection('verificationCodes').doc(email).delete();
+                    await deleteDoc(doc(db, 'verificationCodes', email));
                     successMessage.textContent = 'ভেরিফিকেশন সফল! আপনি লগইন পেজে যাচ্ছেন...';
                     errorMessage.textContent = '';
                     setTimeout(() => {
@@ -54,7 +61,7 @@
                     }, 2000);
                 }
             } catch (error) {
-                errorMessage.textContent = 'কোড ভেরিফাই করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+                errorMessage.textContent = 'কোড ভেরিফাই করতে সমস্যা হয়েছে: ' + error.message;
                 successMessage.textContent = '';
             }
         });
