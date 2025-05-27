@@ -45,7 +45,7 @@ window.addEventListener('load', async () => {
     if (mode === 'verifyEmail') {
         try {
             await applyActionCode(auth, oobCode);
-            window.location.href = 'login.html';
+            displaySuccess('ইমেইল সফলভাবে যাচাই হয়েছে। এখন লগইন করুন।');
         } catch (error) {
             displayError('ইমেইল যাচাই করতে সমস্যা হয়েছে: ' + error.message);
         }
@@ -80,11 +80,15 @@ document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         await updateProfile(user, { displayName });
 
         await sendEmailVerification(user);
-        displaySuccess('আপনার মেইলে ভেরিফিকেশন লিংক পাঠানো হয়েছে, সেখানে ক্লিক করুন।');
+        displaySuccess('আপনার মেইলে নোটিফিকেশন পাঠানো হয়েছে, ইমেইল কনফার্ম করুন।');
 
         signupButton.disabled = false;
         signupButton.textContent = 'সাইন আপ';
         document.getElementById('signupForm').reset();
+
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 3000);
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
             displayError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে। অনুগ্রহ করে অন্য ইমেইল ব্যবহার করুন।');
@@ -118,7 +122,7 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
     try {
         if (emailOrPhone.includes('@')) {
             await sendPasswordResetEmail(auth, emailOrPhone);
-            displaySuccess('আপনার মেইলে ভেরিফিকেশন লিঙ্�ক পাঠানো হয়েছে, সেখানে ক্লিক করুন।');
+            displaySuccess('আপনার মেইলে ইমেইল পাঠানো হয়েছে, সেখানে ভেরিফাই করুন।');
             document.getElementById('sendCodeForm').reset();
         } else {
             displayError('ফোন নম্বরের জন্য এই ফিচারটি সমর্থিত নয়।');
@@ -126,12 +130,6 @@ document.getElementById('sendCodeForm')?.addEventListener('submit', async (e) =>
     } catch (error) {
         displayError(error.message);
     }
-});
-
-// Verify Code and Redirect to Update Password (Not needed for link-based reset)
-document.getElementById('verifyCodeForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    displayError('পাসওয়ার্ড রিসেটের জন্য লিংক ব্যবহার করুন।');
 });
 
 // Update Password Functionality
