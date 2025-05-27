@@ -62,9 +62,9 @@ body {
 .dynamic-text {
     font-size: 16px;
     opacity: 0;
-    background: #FFFFFF;
-    color: #1E3A8A;
-    border: none;
+    background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+    color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+    border: none; /* বর্ডার নেই */
     border-radius: 12px;
     padding: 5px 10px;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -730,18 +730,6 @@ body {
     display: none;
     align-items: center;
     gap: 5px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 8px;
-    padding: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    animation: fadeInPreview 0.3s ease-out;
-}
-@keyframes fadeInPreview {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.preview-container.fade-in {
-    animation: fadeInPreview 0.3s ease-out;
 }
 .preview-image {
     width: 40px;
@@ -1185,59 +1173,6 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
-.drag-drop-indicator {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 450px;
-    height: 250px;
-    background: linear-gradient(135deg, #1E3A8A, #3B82F6);
-    border: 3px dashed #FFFFFF;
-    border-radius: 20px;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 0;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.drag-drop-indicator::before {
-    content: '\f03e'; /* Font Awesome image icon */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 60px;
-    color: #FFFFFF;
-    opacity: 0.8;
-    animation: pulse 1.5s infinite ease-in-out;
-}
-.drag-drop-indicator.active {
-    display: flex;
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.05);
-    animation: floatIn 0.5s ease-out;
-}
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-}
-@keyframes floatIn {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -40%) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1.05);
-    }
-}
-#sendBtn:disabled {
-    cursor: not-allowed;
-}
 @media (max-width: 768px) {
     .chat-container {
         width: 100vw;
@@ -1496,13 +1431,6 @@ body {
         padding: 8px 20px;
         font-size: 12px;
     }
-    .drag-drop-indicator {
-        width: 350px;
-        height: 200px;
-    }
-    .drag-drop-indicator::before {
-        font-size: 50px;
-    }
 }
 @media (max-width: 480px) {
     .chat-container {
@@ -1677,6 +1605,9 @@ body {
         width: 25px;
         height: 25px;
     }
+    .button-container {
+        gap: 6px;
+    }
     .image-review-content {
         padding: 10px;
     }
@@ -1688,10 +1619,6 @@ body {
         width: 90%;
         max-width: 400px;
         padding: 15px;
-    }
-    .edit-canvas-container, .edit-controls {
-        flex: none;
-        width: 100%;
     }
     #editCanvas {
         max-height: 300px;
@@ -1761,15 +1688,30 @@ body {
         padding: 6px 15px;
         font-size: 10px;
     }
-    .drag-drop-indicator {
-        width: 300px;
-        height: 150px;
-    }
-    .drag-drop-indicator::before {
-        font-size: 40px;
-    }
 }
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(5px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .dynamic-text {
+        font-size: 14px;
+        padding: 4px 8px;
+        max-width: 100px;
+        background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+        color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+        border: none; /* বর্ডার নেই */
+    }
+}
+
+@media (max-width: 480px) {
+    .dynamic-text {
+        font-size: 12px;
+        padding: 3px 6px;
+        max-width: 80px;
+        background: #FFFFFF; /* Pure White ব্যাকগ্রাউন্ড */
+        color: #1E3A8A; /* নীল টেক্সট কালার (ব্র্যান্ড মানানসই) */
+        border: none; /* বর্ডার নেই */
+    }
 }
