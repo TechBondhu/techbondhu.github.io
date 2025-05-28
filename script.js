@@ -1,5 +1,3 @@
-// script.js
-
 // Firebase SDK চেক
 if (typeof firebase === 'undefined') {
     console.error("Firebase SDK লোড হয়নি। index.html-এ Firebase CDN যোগ করুন।");
@@ -55,7 +53,6 @@ function hideWelcomeMessage() {
     }
 }
 
-
 // DOMContentLoaded ইভেন্ট
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
@@ -64,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const messagesDiv = document.getElementById('messages');
     const uploadBtn = document.getElementById('uploadBtn');
     const fileInput = document.getElementById('fileInput');
-    const welcomeMessage = document.getElementById('welcomeMessage');
     const previewContainer = document.getElementById('previewContainer');
     const previewImage = document.getElementById('previewImage');
     const editModal = document.getElementById('editModal');
@@ -350,6 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             imageReviewModal.style.display = 'block';
         }
     }
+    
 
     if (imageReviewModal) {
         imageReviewModal.addEventListener('click', (e) => {
@@ -642,7 +639,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // Genres Data
+   // Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
@@ -744,7 +741,6 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
-
 
     function renderGenresList() {
         if (genresList) {
