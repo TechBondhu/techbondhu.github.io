@@ -92,9 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let contrastValue = 0;
     let bgColor = 'white';
 
-    // Initialize jsPDF
-    const { jsPDF } = window.jspdf;
-
     // Setup Chat History Event Handlers from chatHistory.js
     setupChatHistoryEventHandlers();
 
@@ -462,7 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (pdfUrl) {
                         const link = document.createElement('a');
                         link.href = pdfUrl;
-                        link.download = 'formbondhu_submission.pdf';
+                        const serverFileName = decodeURIComponent(pdfUrl.split('/').pop()); // Cloudinary URL থেকে ফাইলের নাম
+                        link.download = serverFileName; // সার্ভারের নাম, যা .pdf ধারণ করে
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
@@ -580,6 +578,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function generatePDF(reviewData, reviewCard) {
+        // Use form_type from reviewData if available, otherwise default to 'generic'
+        const formType = reviewData.form_type || 'generic';
+
+        // Filter text-only data
+        const textOnlyData = {};
+        for (const [key, value] of Object.entries(reviewData)) {
+            if (typeof value !== 'string' || !(value.startsWith('http') || value.startsWith('data:image'))) {
+                textOnlyData[key] = value;
+            } else {
+                textOnlyData[key] = '[Image omitted]';
+            }
+        }
+
+        // Prepare data for the Flask endpoint
+        const payload = {
+            reviewData: textOnlyData,
+            formType: formType
+        };
+
+        // Call Flask /generate-pdf endpoint
+        fetch('http://localhost:5000/generate-pdf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.pdf_url) {
+                // Store PDF URL in review card for download
+                reviewCard.setAttribute('data-pdf-url', data.pdf_url);
+                displayMessage('পিডিএফ সফলভাবে তৈরি হয়েছে এবং ক্লাউডিনারিতে আপলোড করা হয়েছে!', 'bot');
+                saveChatHistory('পিডিএফ সফলভাবে তৈরি হয়েছে।', 'bot');
+
+                // Update review card buttons
+                const buttonContainer = reviewCard.querySelector('.review-buttons');
+                buttonContainer.innerHTML = '';
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'download-btn ripple-btn';
+                downloadBtn.innerText = 'Download PDF';
+                downloadBtn.addEventListener('click', () => {
+                    const pdfUrl = reviewCard.getAttribute('data-pdf-url');
+                    if (pdfUrl) {
+                        const link = document.createElement('a');
+                        link.href = pdfUrl;
+                        const serverFileName = decodeURIComponent(pdfUrl.split('/').pop()); // Cloudinary URL থেকে ফাইলের নাম
+                        link.download = serverFileName; // সার্ভারের নাম, যা .pdf ধারণ করে
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    } else {
+                        displayMessage('পিডিএফ ডাউনলোডের জন্য URL পাওয়া যায়নি।', 'bot');
+                    }
+                });
+                buttonContainer.appendChild(downloadBtn);
+            } else {
+                throw new Error(data.error || 'PDF generation failed');
+            }
+        })
+        .catch(error => {
+            console.error('PDF Generation Error:', error);
+            displayMessage(`পিডিএফ তৈরিতে সমস্যা: ${error.message}`, 'bot');
+            saveChatHistory(`পিডিএফ তৈরিতে সমস্যা: ${error.message}`, 'bot');
+        });
+    }
+
     function callRasaAPI(message, metadata = {}) {
         const typingDiv = showTypingIndicator();
         const payload = { sender: currentChatId, message: message };
@@ -597,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         typingDiv.remove();
                         if (!data || data.length === 0) {
                             displayMessage('কোনো প্রতিক্রিয়া পাওয়া যায়নি। দয়া করে আবার চেষ্টা করুন।', 'bot');
-                            saveChatHistory('কোনো প্রতিক্রিয়া পাওয়া যায়নি।', 'bot'); // ফলব্যতি হ্যান্ডলিং
+                            saveChatHistory('কোনো প্রতিক্রিয়া পাওয়া যায়নি।', 'bot'); // ফলব্যাক হ্যান্ডলিং
                             return;
                         }
                         data.forEach(response => {
@@ -639,6 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
+ 
    // Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
