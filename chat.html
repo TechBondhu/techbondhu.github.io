@@ -7,10 +7,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="drag-drop.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <!-- এটি যোগ করো -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
@@ -60,8 +63,11 @@
                     <button id="uploadBtn" title="Upload Image"><i class="fas fa-paperclip"></i></button>
                     <button id="sendBtn" title="Send Message"><i class="fas fa-arrow-up"></i></button>
                 </div>
-                <!-- Drag and Drop Indicator -->
-                <div class="drag-drop-indicator" id="dragDropIndicator"></div>
+                <!-- Drag and Drop Overlay -->
+                <div class="drag-drop-overlay" id="dragDropOverlay">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>এখানে ছবি ড্রপ করুন</p>
+                </div>
             </div>
         </div>
     </div>
@@ -90,10 +96,6 @@
             <button class="delete-image-btn" id="deleteImageBtn"><i class="fas fa-trash"></i></button>
         </div>
     </div>
-
-            </div>
-        </div>
-    </div>
     <div class="genres-modal" id="genresModal">
         <div class="genres-modal-content">
             <h3><i class="fas fa-list-check"></i> সকল সেবা</h3>
@@ -103,9 +105,27 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
-    <script src="drag-drop.js"></script>
-    <script src="dyna_script.js"></script>
-    <script src="pdfGenerator.js"></script>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal" style="display: none;">
+        <canvas id="editCanvas"></canvas>
+        <div class="edit-controls">
+            <label>Crop X: <input type="range" id="cropX" min="0" max="500" value="0"></label>
+            <label>Crop Y: <input type="range" id="cropY" min="0" max="500" value="0"></label>
+            <label>Crop Width: <input type="range" id="cropWidth" min="0" max="500" value="200"></label>
+            <label>Crop Height: <input type="range" id="cropHeight" min="0" max="500" value="200"></label>
+            <label>Brightness: <input type="range" id="brightness" min="-100" max="100" value="0"></label>
+            <label>Contrast: <input type="range" id="contrast" min="-100" max="100" value="0"></label>
+            <label>Background Color: <input type="color" id="bgColor" value="#ffffff"></label>
+            <button id="cancelEdit">বাতিল</button>
+            <button id="editApplyBtn">পরিবর্তন প্রয়োগ করুন</button>
+        </div>
+    </div>
+
+    <!-- Script tags with type="module" -->
+    <script type="module" src="chat.js"></script>
+    <script type="module" src="drag-drop.js"></script>
+    <script type="module" src="dyna_script.js"></script>
+    <script type="module" src="pdfGenerator.js"></script>
 </body>
 </html>
