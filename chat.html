@@ -11,7 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <!-- এটি যোগ করো -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.min.js"></script>
 </head>
@@ -65,10 +65,8 @@
                 </div>
                 <!-- Drag and Drop Overlay -->
                 <div class="drag-drop-overlay" id="dragDropOverlay">
-                    <div class="overlay-content">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                        <p>এখানে ছবি ড্রপ করুন</p>
-                    </div>
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>এখানে ছবি ড্রপ করুন</p>
                 </div>
             </div>
         </div>
@@ -107,6 +105,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Edit Modal -->
     <div class="modal" id="editModal" style="display: none;">
         <canvas id="editCanvas"></canvas>
         <div class="edit-controls">
@@ -118,12 +118,14 @@
             <label>Contrast: <input type="range" id="contrast" min="-100" max="100" value="0"></label>
             <label>Background Color: <input type="color" id="bgColor" value="#ffffff"></label>
             <button id="cancelEdit">বাতিল</button>
-            <button id="editApplyBtn">পরিবর্তন প্রয়োগ</button>
+            <button id="editApplyBtn">পরিবর্তন প্রয়োগ করুন</button>
         </div>
     </div>
 
+    <!-- Script tags with type="module" -->
     <script type="module" src="chat.js"></script>
+    <script type="module" src="drag-drop.js"></script>
     <script type="module" src="dyna_script.js"></script>
-    <script type="module" src="pdfgenerator.js"></script>
+    <script type="module" src="pdfGenerator.js"></script>
 </body>
 </html>
