@@ -330,9 +330,6 @@ body {
 .welcome-buttons button:nth-child(1) {
     color: #FF6F61;
 }
-.welcome-buttons button:nth-child(2) {
-    color: #6B7280;
-}
 .welcome-buttons button:nth-child(3) {
     color: #F59E0B;
 }
