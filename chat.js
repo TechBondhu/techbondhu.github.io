@@ -206,7 +206,19 @@ function displayMessage(message, sender) {
     if (!elements.messagesDiv) return;
     const messageDiv = document.createElement('div');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
-    messageDiv.innerHTML = sanitizeMessage(message);
+
+    // নতুন ফাংশনালিটি: যদি message ইমেজ URL হয়, তাহলে <img> রেন্ডার করুন (ইনলাইন ইমেজ)
+    if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
+        const img = document.createElement('img');
+        img.src = message;
+        img.classList.add('chat-image');  // CSS-এ যোগ করুন: .chat-image { max-width: 300px; border-radius: 8px; }
+        img.alt = 'Uploaded Image';
+        img.addEventListener('click', () => openImageModal(message));
+        messageDiv.appendChild(img);
+    } else {
+        messageDiv.innerHTML = sanitizeMessage(message);
+    }
+
     elements.messagesDiv.appendChild(messageDiv);
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
@@ -462,17 +474,25 @@ function sendMessage() {
 
         const formData = new FormData();
         formData.append('image', selectedFile);
-        fetch('http://localhost:5000/upload-image', { method: 'POST', body: formData })
-            .then(response => response.json())
+        fetch('http://localhost:5000/upload', { 
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('API response not OK: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.image_url) {
-                    callRasaAPI(data.image_url);
-                    saveChatHistory(`[Image: ${selectedFile.name}]`, 'user');
+                if (data.url) {  
+                    callRasaAPI(data.url);  
+                    saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');  
                 } else {
-                    showErrorMessage('ইমেজ আপলোডে সমস্যা।');
+                    showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + (data.error || 'Unknown error'));
                 }
             })
-            .catch(() => showErrorMessage('ইমেজ আপলোডে সমস্যা।'));
+            .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message));
         clearPreview();
         hideWelcomeMessage();
     }
