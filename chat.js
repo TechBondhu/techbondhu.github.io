@@ -5,7 +5,7 @@
  */
 
 // Firebase SDK Check
-if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
+if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in chat.html");
 
 // Firebase Config
 const firebaseConfig = {
