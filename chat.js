@@ -620,6 +620,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             currentUserUid = user.uid;
             loadChatHistory();
+            if (currentChatId) {
+                loadMessages(currentChatId);
+            } else {
+                startNewChat(); // Automatically start a new chat if none exists
+            }
         } else {
             auth.signInAnonymously().catch(error => showErrorMessage('Authentication error: ' + error.message));
         }
