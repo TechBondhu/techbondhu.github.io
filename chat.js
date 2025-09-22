@@ -1,11 +1,10 @@
 /**
  * Combined chat functionality for handling Firebase, chat history, and UI interactions.
  * Merged from script.js and chatHistory.js, with duplicates removed and code optimized.
- * Updated to include new genres and improved chat history management.
  */
 
 // Firebase SDK Check
-if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in chat.html");
+if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
 
 // Firebase Config
 const firebaseConfig = {
@@ -79,7 +78,7 @@ let bgColor = 'white';
 const ctx = elements.editCanvas?.getContext('2d');
 const image = new Image();
 
-// Genres Data (Updated with new entries)
+   // Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
@@ -182,6 +181,7 @@ const genres = [
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
 
+
 // Auth State Listener
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -190,7 +190,8 @@ auth.onAuthStateChanged(user => {
         if (currentChatId) loadChatMessages(currentChatId);
         else startNewChat();
     } else {
-        auth.signInAnonymously().catch(error => showErrorMessage('Authentication error: ' + error.message));
+        currentUserUid = null;
+        window.location.href = 'login.html';
     }
 });
 
@@ -205,23 +206,13 @@ function displayMessage(message, sender) {
     if (!elements.messagesDiv) return;
     const messageDiv = document.createElement('div');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
-    if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
-        const img = document.createElement('img');
-        img.src = message;
-        img.classList.add('chat-image');
-        img.alt = 'Uploaded Image';
-        img.addEventListener('click', () => openImageModal(message));
-        messageDiv.appendChild(img);
-    } else {
-        messageDiv.innerHTML = sanitizeMessage(message);
-    }
+    messageDiv.innerHTML = sanitizeMessage(message);
     elements.messagesDiv.appendChild(messageDiv);
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
 
 function showErrorMessage(message) {
     displayMessage(sanitizeMessage(message), 'bot');
-    saveChatHistory(sanitizeMessage(message), 'bot');
 }
 
 function hideWelcomeMessage() {
@@ -247,14 +238,25 @@ function showTypingIndicator() {
 async function startNewChat() {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।');
     try {
-        const chatRef = await db.collection('users').doc(currentUserUid).collection('chats').add({
-            title: 'নতুন চ্যাট',
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        const chatRef = await db.collection('chats').add({
+            uid: currentUserUid,
+            name: 'নতুন চ্যাট',
+            last_message: 'চ্যাট শুরু হয়েছে',
+            created_at: firebase.firestore.FieldValue.serverTimestamp(),
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
         });
         currentChatId = chatRef.id;
         localStorage.setItem('currentChatId', currentChatId);
-        elements.messagesDiv.innerHTML = '';
-        elements.welcomeMessage.style.display = 'block';
+
+        await db.collection('chats').doc(currentChatId).collection('messages').add({
+            message: 'Chat session started',
+            sender: 'system',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            uid: currentUserUid
+        });
+
+        if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
+        if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
         await loadChatHistory();
     } catch (error) {
         showErrorMessage('নতুন চ্যাট শুরু করতে সমস্যা: ' + error.message);
@@ -262,13 +264,37 @@ async function startNewChat() {
 }
 
 async function saveChatHistory(message, sender) {
-    if (!currentUserUid || !currentChatId) return showErrorMessage('ইউজার বা চ্যাট আইডি পাওয়া যায়নি।');
+    if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।');
+    if (!message || typeof message !== 'string') return showErrorMessage('অবৈধ মেসেজ।');
+
+    if (!currentChatId) await startNewChat();
+    if (!currentChatId) return showErrorMessage('চ্যাট তৈরি ব্যর্থ।');
+
     try {
-        await db.collection('users').doc(currentUserUid).collection('chats').doc(currentChatId).collection('messages').add({
-            message: sanitizeMessage(message),
+        const chatDoc = await db.collection('chats').doc(currentChatId).get();
+        if (!chatDoc.exists) return showErrorMessage('চ্যাট ডকুমেন্ট পাওয়া যায়নি।');
+
+        const messageRef = await db.collection('chats').doc(currentChatId).collection('messages').add({
+            uid: currentUserUid,
+            message,
             sender,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        const chatData = chatDoc.data();
+        let chatName = chatData.name || 'নতুন চ্যাট';
+        if (!chatData.name && sender === 'user') {
+            chatName = message.length > 30 ? message.substring(0, 30) + '...' : message;
+        }
+        const lastMessage = message.length > 50 ? message.substring(0, 50) + '...' : message;
+
+        await db.collection('chats').doc(currentChatId).update({
+            name: chatName,
+            last_message: lastMessage,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        await loadChatHistory();
     } catch (error) {
         showErrorMessage('মেসেজ সেভ করতে সমস্যা: ' + error.message);
     }
@@ -277,25 +303,30 @@ async function saveChatHistory(message, sender) {
 async function loadChatHistory(searchQuery = '') {
     if (!currentUserUid || !elements.historyList) return showErrorMessage('ইউজার লগইন করেননি।');
     elements.historyList.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
+
     try {
-        let query = db.collection('users').doc(currentUserUid).collection('chats').orderBy('timestamp', 'desc');
-        if (searchQuery) {
-            query = query.where('title', '>=', searchQuery).where('title', '<=', searchQuery + '\uf8ff');
-        }
-        const snapshot = await query.get();
+        const snapshot = await db.collection('chats')
+            .where('uid', '==', currentUserUid)
+            .orderBy('updated_at', 'desc')
+            .get();
+
         elements.historyList.innerHTML = '';
         if (snapshot.empty) {
             elements.historyList.innerHTML = '<div>কোনো চ্যাট হিস্ট্রি নেই।</div>';
             return;
         }
+
         snapshot.forEach(doc => {
             const chat = doc.data();
+            const searchLower = searchQuery.toLowerCase();
+            if (searchQuery && !chat.name?.toLowerCase().includes(searchLower) && !chat.last_message?.toLowerCase().includes(searchLower)) return;
+
             const historyItem = document.createElement('div');
             historyItem.classList.add('history-item');
             historyItem.setAttribute('data-chat-id', doc.id);
             historyItem.innerHTML = `
                 <div class="history-content">
-                    <span class="history-title">${sanitizeMessage(chat.title || 'নতুন চ্যাট')}</span>
+                    <span class="history-title">${sanitizeMessage(chat.name || 'নতুন চ্যাট')}</span>
                     <span class="history-preview">${sanitizeMessage(chat.last_message || 'কোনো মেসেজ নেই')}</span>
                 </div>
                 <div class="history-actions">
@@ -303,6 +334,7 @@ async function loadChatHistory(searchQuery = '') {
                     <i class="fas fa-trash delete-chat" title="মুছুন"></i>
                 </div>
             `;
+
             historyItem.addEventListener('click', async e => {
                 if (e.target.classList.contains('rename-chat') || e.target.classList.contains('delete-chat')) return;
                 currentChatId = doc.id;
@@ -310,15 +342,18 @@ async function loadChatHistory(searchQuery = '') {
                 await loadChatMessages(currentChatId);
                 elements.sidebar?.classList.remove('open');
             });
+
             historyItem.querySelector('.rename-chat')?.addEventListener('click', () => {
                 elements.renameModal?.setAttribute('data-chat-id', doc.id);
-                elements.renameInput.value = chat.title || 'নতুন চ্যাট';
+                elements.renameInput.value = chat.name || 'নতুন চ্যাট';
                 elements.renameModal.style.display = 'block';
             });
+
             historyItem.querySelector('.delete-chat')?.addEventListener('click', () => {
                 elements.deleteModal?.setAttribute('data-chat-id', doc.id);
                 elements.deleteModal.style.display = 'block';
             });
+
             elements.historyList.appendChild(historyItem);
         });
     } catch (error) {
@@ -330,17 +365,20 @@ async function loadChatMessages(chatId) {
     if (!chatId || !elements.messagesDiv) return showErrorMessage('চ্যাট আইডি বা মেসেজ এলাকা পাওয়া যায়নি।');
     elements.messagesDiv.innerHTML = '';
     elements.welcomeMessage.style.display = 'none';
+
     try {
-        const snapshot = await db.collection('users').doc(currentUserUid).collection('chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').get();
+        const snapshot = await db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').get();
         snapshot.forEach(doc => {
             const msg = doc.data();
             if (msg.sender === 'user' || msg.sender === 'bot') displayMessage(sanitizeMessage(msg.message), msg.sender);
         });
+
         const submissions = await db.collection('submissions').where('chat_id', '==', chatId).get();
         submissions.forEach(doc => {
             const sub = doc.data();
             if (sub.review_data) displayReview(sub.review_data);
         });
+
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
     } catch (error) {
         showErrorMessage('মেসেজ লোড করতে সমস্যা: ' + error.message);
@@ -350,14 +388,16 @@ async function loadChatMessages(chatId) {
 async function deleteChat() {
     const chatId = elements.deleteModal?.getAttribute('data-chat-id');
     if (!chatId) return showErrorMessage('চ্যাট আইডি পাওয়া যায়নি।');
+
     try {
-        await db.collection('users').doc(currentUserUid).collection('chats').doc(chatId).delete();
-        const messagesSnapshot = await db.collection('users').doc(currentUserUid).collection('chats').doc(chatId).collection('messages').get();
+        await db.collection('chats').doc(chatId).delete();
+        const messagesSnapshot = await db.collection('chats').doc(chatId).collection('messages').get();
         if (!messagesSnapshot.empty) {
             const batch = db.batch();
             messagesSnapshot.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
         }
+
         elements.deleteModal.style.display = 'none';
         if (chatId === currentChatId) {
             currentChatId = null;
@@ -376,10 +416,11 @@ async function renameChat() {
     const chatId = elements.renameModal?.getAttribute('data-chat-id');
     const newName = elements.renameInput?.value.trim();
     if (!chatId || !newName) return showErrorMessage('চ্যাট আইডি বা নাম অবৈধ।');
+
     try {
-        await db.collection('users').doc(currentUserUid).collection('chats').doc(chatId).update({
-            title: newName,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        await db.collection('chats').doc(chatId).update({
+            name: newName,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
         });
         elements.renameModal.style.display = 'none';
         await loadChatHistory();
@@ -402,19 +443,17 @@ function closeSidebarHandler() {
 
 function sendMessage() {
     const message = elements.userInput?.value.trim();
-    if (!message && !selectedFile) return;
-    if (!currentChatId) startNewChat();
     if (message) {
         displayMessage(message, 'user');
         saveChatHistory(message, 'user');
         callRasaAPI(message);
         elements.userInput.value = '';
-    }
-    if (selectedFile) {
+        hideWelcomeMessage();
+    } else if (selectedFile) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('user-message', 'slide-in');
         const img = document.createElement('img');
-        img.src = editedImage || elements.previewImage?.src || '';
+        img.src = elements.previewImage?.src || '';
         img.classList.add('image-preview');
         img.addEventListener('click', () => openImageModal(img.src));
         messageDiv.appendChild(img);
@@ -423,26 +462,23 @@ function sendMessage() {
 
         const formData = new FormData();
         formData.append('image', selectedFile);
-        fetch('http://localhost:5000/upload', {
-            method: 'POST',
-            body: formData
-        })
+        fetch('http://localhost:5000/upload-image', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
-                if (data.url) {
-                    callRasaAPI(data.url);
-                    saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');
+                if (data.image_url) {
+                    callRasaAPI(data.image_url);
+                    saveChatHistory(`[Image: ${selectedFile.name}]`, 'user');
                 } else {
-                    showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + (data.error || 'Unknown error'));
+                    showErrorMessage('ইমেজ আপলোডে সমস্যা।');
                 }
             })
-            .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message));
+            .catch(() => showErrorMessage('ইমেজ আপলোডে সমস্যা।'));
         clearPreview();
+        hideWelcomeMessage();
     }
-    hideWelcomeMessage();
 }
 
-// Updated displayReview Function
+// আপডেটেড displayReview ফাংশন
 function displayReview(reviewData) {
     const reviewCard = document.createElement('div');
     reviewCard.classList.add('review-card', 'slide-in');
@@ -455,13 +491,14 @@ function displayReview(reviewData) {
     reviewContent.classList.add('review-content');
 
     for (const [key, value] of Object.entries(reviewData)) {
-        if (key === 'form_type') continue;
         const reviewItem = document.createElement('div');
         reviewItem.classList.add('review-item');
         reviewItem.setAttribute('data-key', key);
+
         const label = document.createElement('label');
         label.textContent = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ') + ':';
         reviewItem.appendChild(label);
+
         if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
             const img = document.createElement('img');
             img.src = value;
@@ -476,41 +513,49 @@ function displayReview(reviewData) {
 
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('review-buttons');
+
     const editBtn = document.createElement('button');
     editBtn.classList.add('edit-btn', 'ripple-btn');
     editBtn.textContent = 'Edit';
+
     const confirmBtn = document.createElement('button');
     confirmBtn.classList.add('confirm-btn', 'ripple-btn');
     confirmBtn.textContent = 'Confirm';
     let isProcessing = false;
 
     editBtn.addEventListener('click', () => toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData));
+
     confirmBtn.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
         confirmBtn.disabled = true;
+
         try {
-            if (!currentChatId || !currentUserUid) throw new Error('চ্যাট আইডি বা ইউজার পাওয়া যায়নি।');
+            if (!currentChatId) throw new Error('চ্যাট আইডি পাওয়া যায়নি।');
+            if (!currentUserUid) throw new Error('ইউজার লগইন করেননি।');
+
             const updatedData = {};
             reviewContent.querySelectorAll('.review-item').forEach(item => {
                 const key = item.getAttribute('data-key');
                 const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
                 if (value) updatedData[key] = value;
             });
+
             await db.collection('submissions').add({
                 review_data: updatedData,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 chat_id: currentChatId,
-                uid: currentUserUid
+                uid: currentUserUid // UID যোগ করা
             });
+
             displayMessage('তথ্য সফলভাবে সংরক্ষিত!', 'bot');
-            saveChatHistory('তথ্য সফলভাবে সংরক্ষিত!', 'bot');
             generatePDF(reviewData, reviewCard);
             reviewCard.setAttribute('data-confirmed', 'true');
             reviewCard.setAttribute('data-editable', 'false');
             editBtn.disabled = true;
             editBtn.style.display = 'none';
             confirmBtn.style.display = 'none';
+
             buttonContainer.innerHTML = '';
             const downloadBtn = document.createElement('button');
             downloadBtn.classList.add('download-btn', 'ripple-btn');
@@ -545,34 +590,40 @@ function displayReview(reviewData) {
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
 
-// Updated toggleEdit Function
+// আপডেটেড toggleEdit ফাংশন
 function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData) {
     if (reviewCard.getAttribute('data-confirmed') === 'true') {
         showErrorMessage('ডেটা কনফার্ম হয়ে গেছে। এডিট করা যাবে না।');
         return;
     }
+
     const isEditable = reviewCard.getAttribute('data-editable') === 'true';
     if (!isEditable) {
         reviewCard.setAttribute('data-editable', 'true');
         editBtn.textContent = 'Save';
         confirmBtn.style.display = 'none';
+
         reviewContent.querySelectorAll('.review-item').forEach(item => {
             const key = item.getAttribute('data-key');
             const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
             item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label>`;
+
             if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
                 const img = document.createElement('img');
                 img.src = value;
                 item.appendChild(img);
+
                 const replaceInput = document.createElement('input');
                 replaceInput.type = 'file';
                 replaceInput.classList.add('replace-image-input');
                 replaceInput.accept = 'image/png, image/jpeg';
                 replaceInput.style.display = 'none';
                 item.appendChild(replaceInput);
+
                 const replaceIcon = document.createElement('i');
                 replaceIcon.classList.add('fas', 'fa-camera', 'replace-image-icon');
                 item.appendChild(replaceIcon);
+
                 replaceIcon.addEventListener('click', () => replaceInput.click());
                 replaceInput.addEventListener('change', () => {
                     const file = replaceInput.files[0];
@@ -609,11 +660,10 @@ function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData) 
         reviewCard.setAttribute('data-editable', 'false');
         editBtn.textContent = 'Edit';
         confirmBtn.style.display = 'inline-block';
-        Object.assign(reviewData, updatedData);
     }
 }
 
-// Updated generatePDF Function
+// আপডেটেড generatePDF ফাংশন
 function generatePDF(reviewData, reviewCard) {
     const formType = reviewData.form_type || 'generic';
     const payload = {
@@ -625,6 +675,7 @@ function generatePDF(reviewData, reviewCard) {
         ),
         formType
     };
+
     fetch('http://localhost:5000/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -649,12 +700,14 @@ function generatePDF(reviewData, reviewCard) {
 function callRasaAPI(message, metadata = {}) {
     const typingDiv = showTypingIndicator();
     const payload = { sender: currentChatId || 'default', message, ...metadata };
+
     setTimeout(() => {
         if (typeof $ === 'undefined') {
             typingDiv.remove();
             showErrorMessage('jQuery লোড হয়নি।');
             return;
         }
+
         $.ajax({
             url: 'http://localhost:5005/webhooks/rest/webhook',
             method: 'POST',
@@ -768,6 +821,7 @@ function closeGenresModal() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Chat History Handlers
     elements.historyIcon?.addEventListener('click', toggleSidebar);
     elements.closeSidebar?.addEventListener('click', closeSidebarHandler);
     elements.newChatIcon?.addEventListener('click', startNewChat);
@@ -776,10 +830,14 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.confirmDelete?.addEventListener('click', deleteChat);
     elements.cancelRename?.addEventListener('click', () => elements.renameModal.style.display = 'none');
     elements.saveRename?.addEventListener('click', renameChat);
+
+    // Message Sending
     elements.sendBtn?.addEventListener('click', sendMessage);
     elements.userInput?.addEventListener('keypress', e => {
         if (e.key === 'Enter' && !e.repeat) sendMessage();
     });
+
+    // Image Upload
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
     elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
@@ -795,10 +853,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInput.value = '';
     });
+
+    // Image Review
     elements.previewImage?.addEventListener('click', () => {
         elements.reviewImage.src = elements.previewImage.src;
         elements.imageReviewModal.style.display = 'block';
     });
+
+    // Image Editing
     elements.previewImage?.addEventListener('dblclick', () => {
         image.src = elements.previewImage.src || '';
         image.onload = () => {
@@ -812,6 +874,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     });
+
+    // Canvas Controls
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
     elements.cropY?.addEventListener('input', e => { cropRect.y = parseInt(e.target.value); drawImage(); });
     elements.cropWidth?.addEventListener('input', e => { cropRect.width = parseInt(e.target.value); drawImage(); });
@@ -819,6 +883,8 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
+
+    // Apply Edit
     elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
@@ -835,18 +901,26 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.editModal.style.display = 'none';
         }
     });
+
     elements.editCancelBtn?.addEventListener('click', () => elements.editModal.style.display = 'none');
+
+    // Image Modal
     elements.imageReviewModal?.addEventListener('click', e => {
         if (e.target === elements.imageReviewModal || e.target === elements.deleteImageBtn) {
             elements.imageReviewModal.style.display = 'none';
         }
     });
+
     elements.deleteImageBtn?.addEventListener('click', () => {
         clearPreview();
         elements.imageReviewModal.style.display = 'none';
     });
+
+    // Genres Modal
     elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
+
+    // Welcome Buttons
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
         button.classList.add('ripple-btn');
         button.addEventListener('click', () => {
