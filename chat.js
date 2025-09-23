@@ -38,13 +38,20 @@ const elements = {
     saveRename: document.getElementById('saveRename'),
     renameInput: document.getElementById('renameInput'),
     messagesDiv: document.getElementById('messages'),
+    messagesRight: document.getElementById('messages-right'),
     welcomeMessage: document.getElementById('welcomeMessage'),
     userInput: document.getElementById('userInput'),
+    userInputRight: document.getElementById('userInput-right'),
     sendBtn: document.getElementById('sendBtn'),
+    sendBtnRight: document.getElementById('sendBtn-right'),
     uploadBtn: document.getElementById('uploadBtn'),
+    uploadBtnRight: document.getElementById('uploadBtn-right'),
     fileInput: document.getElementById('fileInput'),
+    fileInputRight: document.getElementById('fileInput-right'),
     previewContainer: document.getElementById('previewContainer'),
+    previewContainerRight: document.getElementById('previewContainer-right'),
     previewImage: document.getElementById('previewImage'),
+    previewImageRight: document.getElementById('previewImage-right'),
     editModal: document.getElementById('editModal'),
     editCanvas: document.getElementById('editCanvas'),
     cropX: document.getElementById('cropX'),
@@ -354,6 +361,7 @@ async function loadChatHistory(searchQuery = '') {
 async function loadChatMessages(chatId) {
     if (!chatId || !elements.messagesDiv) return showErrorMessage('চ্যাট আইডি বা মেসেজ এলাকা পাওয়া যায়নি।');
     elements.messagesDiv.innerHTML = '';
+    elements.messagesRight.innerHTML = '';
     elements.welcomeMessage.style.display = 'none';
     try {
         const snapshot = await db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').get();
@@ -367,6 +375,7 @@ async function loadChatMessages(chatId) {
             if (sub.review_data) displayReview(sub.review_data);
         });
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
+        elements.messagesRight.scrollTop = elements.messagesRight.scrollHeight;
     } catch (error) {
         showErrorMessage('মেসেজ লোড করতে সমস্যা: ' + error.message);
     }
@@ -387,6 +396,7 @@ async function deleteChat() {
             currentChatId = null;
             localStorage.removeItem('currentChatId');
             if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
+            if (elements.messagesRight) elements.messagesRight.innerHTML = '';
             if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
             await startNewChat();
         }
@@ -792,7 +802,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     initializeApp();
-
     // Chat History Handlers
     elements.historyIcon?.addEventListener('click', toggleSidebar);
     elements.closeSidebar?.addEventListener('click', closeSidebarHandler);
@@ -802,12 +811,17 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.confirmDelete?.addEventListener('click', deleteChat);
     elements.cancelRename?.addEventListener('click', () => elements.renameModal.style.display = 'none');
     elements.saveRename?.addEventListener('click', renameChat);
-    // Message Sending
-    elements.sendBtn?.addEventListener('click', sendMessage);
+    // Message Sending for left column
+    elements.sendBtn?.addEventListener('click', () => sendMessage('left'));
     elements.userInput?.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !e.repeat) sendMessage();
+        if (e.key === 'Enter' && !e.repeat) sendMessage('left');
     });
-    // Image Upload
+    // Message Sending for right column
+    elements.sendBtnRight?.addEventListener('click', () => sendMessage('right'));
+    elements.userInputRight?.addEventListener('keypress', e => {
+        if (e.key === 'Enter' && !e.repeat) sendMessage('right');
+    });
+    // Image Upload for left column
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
     elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
@@ -823,12 +837,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInput.value = '';
     });
-    // Image Review
+    // Image Upload for right column
+    elements.uploadBtnRight?.addEventListener('click', () => elements.fileInputRight?.click());
+    elements.fileInputRight?.addEventListener('change', () => {
+        const file = elements.fileInputRight.files[0];
+        if (file) {
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = e => {
+                if (elements.previewImageRight) elements.previewImageRight.src = e.target.result;
+                if (elements.previewContainerRight) elements.previewContainerRight.style.display = 'block';
+            };
+            reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।');
+            reader.readAsDataURL(file);
+        }
+        elements.fileInputRight.value = '';
+    });
+    // Image Review for left
     elements.previewImage?.addEventListener('click', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
-    // Image Editing
+    // Image Review for right
+    elements.previewImageRight?.addEventListener('click', () => {
+        if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
+        if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
+    });
+    // Image Editing for left
     elements.previewImage?.addEventListener('dblclick', () => {
         if (elements.previewImage) {
             image.src = elements.previewImage.src || '';
@@ -844,7 +879,23 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
-    // Canvas Controls
+    // Image Editing for right
+    elements.previewImageRight?.addEventListener('dblclick', () => {
+        if (elements.previewImageRight) {
+            image.src = elements.previewImageRight.src || '';
+            image.onload = () => {
+                if (elements.editCanvas) {
+                    elements.editCanvas.width = image.width;
+                    elements.editCanvas.height = image.height;
+                    cropRect.width = Math.min(200, image.width);
+                    cropRect.height = Math.min(200, image.height);
+                    drawImage();
+                    if (elements.editModal) elements.editModal.style.display = 'block';
+                }
+            };
+        }
+    });
+    // Canvas Controls (shared)
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
     elements.cropY?.addEventListener('input', e => { cropRect.y = parseInt(e.target.value); drawImage(); });
     elements.cropWidth?.addEventListener('input', e => { cropRect.width = parseInt(e.target.value); drawImage(); });
@@ -852,13 +903,13 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-    // Apply Edit
+    // Apply Edit (updates the current previewImage)
     elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
         tempCanvas.height = cropRect.height;
         const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx && elements.previewImage) {
+        if (tempCtx && editedImage) {
             tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
             tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
