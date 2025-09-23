@@ -204,26 +204,25 @@ function sanitizeMessage(message) {
     div.textContent = message;
     return div.innerHTML;
 }
-function displayMessage(message, sender, side = 'left') {
-    const messageDiv = document.getElementById(side === 'left' ? 'messages' : 'messages-right');
-    if (!messageDiv) {
-        console.error(`${side} messagesDiv not found`);
+function displayMessage(message, sender) {
+    if (!elements.messagesDiv) {
+        console.error('messagesDiv not found');
         return;
     }
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in', 'message-box');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
     if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
         const img = document.createElement('img');
         img.src = message;
         img.classList.add('chat-image');
         img.alt = 'Uploaded Image';
         img.addEventListener('click', () => openImageModal(message));
-        msgDiv.appendChild(img);
+        messageDiv.appendChild(img);
     } else {
-        msgDiv.innerHTML = sanitizeMessage(message);
+        messageDiv.innerHTML = sanitizeMessage(message);
     }
-    messageDiv.appendChild(msgDiv);
-    messageDiv.scrollTop = messageDiv.scrollHeight;
+    elements.messagesDiv.appendChild(messageDiv);
+    elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
 function showErrorMessage(message) {
     console.error(message);
@@ -271,7 +270,6 @@ async function startNewChat() {
             uid: currentUserUid
         });
         elements.messagesDiv.innerHTML = '';
-        elements.messagesRight.innerHTML = '';
         if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
         await loadChatHistory();
     } catch (error) {
@@ -369,9 +367,7 @@ async function loadChatMessages(chatId) {
         const snapshot = await db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').get();
         snapshot.forEach(doc => {
             const msg = doc.data();
-            if (msg.sender === 'user' || msg.sender === 'bot') {
-                displayMessage(sanitizeMessage(msg.message), msg.sender, msg.sender === 'user' ? 'left' : 'right');
-            }
+            if (msg.sender === 'user' || msg.sender === 'bot') displayMessage(sanitizeMessage(msg.message), msg.sender);
         });
         const submissions = await db.collection('submissions').where('chat_id', '==', chatId).get();
         submissions.forEach(doc => {
@@ -434,37 +430,29 @@ function toggleSidebar() {
 function closeSidebarHandler() {
     if (elements.sidebar) elements.sidebar.classList.remove('open');
 }
-function sendMessage(side = 'left') {
-    const userInput = side === 'left' ? elements.userInput : elements.userInputRight;
-    const sendBtn = side === 'left' ? elements.sendBtn : elements.sendBtnRight;
-    const messageDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-    const uploadBtn = side === 'left' ? elements.uploadBtn : elements.uploadBtnRight;
-    const fileInput = side === 'left' ? elements.fileInput : elements.fileInputRight;
-    const previewContainer = side === 'left' ? elements.previewContainer : elements.previewContainerRight;
-    const previewImage = side === 'left' ? elements.previewImage : elements.previewImageRight;
-
-    if (!userInput || !sendBtn || !messageDiv) {
-        console.error(`Required elements for ${side} (userInput, sendBtn, or messagesDiv) not found`);
+function sendMessage() {
+    if (!elements.userInput || !elements.sendBtn || !elements.messagesDiv) {
+        console.error('Required elements (userInput, sendBtn, or messagesDiv) not found');
         return;
     }
-    sendBtn.disabled = true;
-    const message = userInput.value.trim();
+    elements.sendBtn.disabled = true;
+    const message = elements.userInput.value.trim();
     if (message) {
-        displayMessage(message, 'user', side);
+        displayMessage(message, 'user');
         saveChatHistory(message, 'user');
         callRasaAPI(message);
-        userInput.value = '';
+        elements.userInput.value = '';
         hideWelcomeMessage();
     } else if (selectedFile) {
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('user-message', 'slide-in', 'message-box');
+        messageDiv.classList.add('user-message', 'slide-in');
         const img = document.createElement('img');
-        img.src = previewImage?.src || '';
-        img.classList.add('chat-image');
+        img.src = elements.previewImage?.src || '';
+        img.classList.add('image-preview');
         img.addEventListener('click', () => openImageModal(img.src));
         messageDiv.appendChild(img);
-        messageDiv.appendChild(messageDiv);
-        messageDiv.scrollTop = messageDiv.scrollHeight;
+        elements.messagesDiv.appendChild(messageDiv);
+        elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
         const formData = new FormData();
         formData.append('image', selectedFile);
         fetch('http://localhost:5000/upload', {
@@ -484,11 +472,11 @@ function sendMessage(side = 'left') {
                 }
             })
             .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message))
-            .finally(() => sendBtn.disabled = false);
+            .finally(() => elements.sendBtn.disabled = false);
         clearPreview();
         hideWelcomeMessage();
     } else {
-        sendBtn.disabled = false;
+        elements.sendBtn.disabled = false;
     }
 }
 // আপডেটেড displayReview ফাংশন
