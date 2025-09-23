@@ -270,6 +270,7 @@ async function startNewChat() {
             uid: currentUserUid
         });
         elements.messagesDiv.innerHTML = '';
+        elements.messagesRight.innerHTML = '';
         if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
         await loadChatHistory();
     } catch (error) {
@@ -375,7 +376,6 @@ async function loadChatMessages(chatId) {
             if (sub.review_data) displayReview(sub.review_data);
         });
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
-        elements.messagesRight.scrollTop = elements.messagesRight.scrollHeight;
     } catch (error) {
         showErrorMessage('মেসেজ লোড করতে সমস্যা: ' + error.message);
     }
@@ -396,7 +396,6 @@ async function deleteChat() {
             currentChatId = null;
             localStorage.removeItem('currentChatId');
             if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
-            if (elements.messagesRight) elements.messagesRight.innerHTML = '';
             if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
             await startNewChat();
         }
@@ -430,29 +429,39 @@ function toggleSidebar() {
 function closeSidebarHandler() {
     if (elements.sidebar) elements.sidebar.classList.remove('open');
 }
-function sendMessage() {
-    if (!elements.userInput || !elements.sendBtn || !elements.messagesDiv) {
-        console.error('Required elements (userInput, sendBtn, or messagesDiv) not found');
+function sendMessage(side = 'left') {
+    const userInput = side === 'left' ? elements.userInput : elements.userInputRight;
+    const sendBtn = side === 'left' ? elements.sendBtn : elements.sendBtnRight;
+    const messageDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
+    const uploadBtn = side === 'left' ? elements.uploadBtn : elements.uploadBtnRight;
+    const fileInput = side === 'left' ? elements.fileInput : elements.fileInputRight;
+    const previewContainer = side === 'left' ? elements.previewContainer : elements.previewContainerRight;
+    const previewImage = side === 'left' ? elements.previewImage : elements.previewImageRight;
+
+    if (!userInput || !sendBtn || !messageDiv) {
+        console.error(`Required elements for ${side} (userInput, sendBtn, or messagesDiv) not found`);
         return;
     }
-    elements.sendBtn.disabled = true;
-    const message = elements.userInput.value.trim();
+    sendBtn.disabled = true;
+    const message = userInput.value.trim();
     if (message) {
-        displayMessage(message, 'user');
-        saveChatHistory(message, 'user');
-        callRasaAPI(message);
-        elements.userInput.value = '';
+        displayMessage(message, 'user', side);
+        if (side === 'left') {
+            saveChatHistory(message, 'user');
+            callRasaAPI(message);
+        }
+        userInput.value = '';
         hideWelcomeMessage();
     } else if (selectedFile) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('user-message', 'slide-in');
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('user-message', 'slide-in', 'message-box');
         const img = document.createElement('img');
-        img.src = elements.previewImage?.src || '';
-        img.classList.add('image-preview');
+        img.src = previewImage?.src || '';
+        img.classList.add('chat-image');
         img.addEventListener('click', () => openImageModal(img.src));
-        messageDiv.appendChild(img);
-        elements.messagesDiv.appendChild(messageDiv);
-        elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
+        msgDiv.appendChild(img);
+        messageDiv.appendChild(msgDiv);
+        messageDiv.scrollTop = messageDiv.scrollHeight;
         const formData = new FormData();
         formData.append('image', selectedFile);
         fetch('http://localhost:5000/upload', {
@@ -465,18 +474,20 @@ function sendMessage() {
             })
             .then(data => {
                 if (data.url) {
-                    callRasaAPI(data.url);
-                    saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');
+                    if (side === 'left') {
+                        callRasaAPI(data.url);
+                        saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');
+                    }
                 } else {
                     showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message))
-            .finally(() => elements.sendBtn.disabled = false);
+            .finally(() => sendBtn.disabled = false);
         clearPreview();
         hideWelcomeMessage();
     } else {
-        elements.sendBtn.disabled = false;
+        sendBtn.disabled = false;
     }
 }
 // আপডেটেড displayReview ফাংশন
@@ -811,17 +822,12 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.confirmDelete?.addEventListener('click', deleteChat);
     elements.cancelRename?.addEventListener('click', () => elements.renameModal.style.display = 'none');
     elements.saveRename?.addEventListener('click', renameChat);
-    // Message Sending for left column
-    elements.sendBtn?.addEventListener('click', () => sendMessage('left'));
+    // Message Sending
+    elements.sendBtn?.addEventListener('click', sendMessage);
     elements.userInput?.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !e.repeat) sendMessage('left');
+        if (e.key === 'Enter' && !e.repeat) sendMessage();
     });
-    // Message Sending for right column
-    elements.sendBtnRight?.addEventListener('click', () => sendMessage('right'));
-    elements.userInputRight?.addEventListener('keypress', e => {
-        if (e.key === 'Enter' && !e.repeat) sendMessage('right');
-    });
-    // Image Upload for left column
+    // Image Upload
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
     elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
@@ -837,33 +843,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInput.value = '';
     });
-    // Image Upload for right column
-    elements.uploadBtnRight?.addEventListener('click', () => elements.fileInputRight?.click());
-    elements.fileInputRight?.addEventListener('change', () => {
-        const file = elements.fileInputRight.files[0];
-        if (file) {
-            selectedFile = file;
-            const reader = new FileReader();
-            reader.onload = e => {
-                if (elements.previewImageRight) elements.previewImageRight.src = e.target.result;
-                if (elements.previewContainerRight) elements.previewContainerRight.style.display = 'block';
-            };
-            reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।');
-            reader.readAsDataURL(file);
-        }
-        elements.fileInputRight.value = '';
-    });
-    // Image Review for left
+    // Image Review
     elements.previewImage?.addEventListener('click', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
-    // Image Review for right
-    elements.previewImageRight?.addEventListener('click', () => {
-        if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
-        if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
-    });
-    // Image Editing for left
+    // Image Editing
     elements.previewImage?.addEventListener('dblclick', () => {
         if (elements.previewImage) {
             image.src = elements.previewImage.src || '';
@@ -879,23 +864,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
-    // Image Editing for right
-    elements.previewImageRight?.addEventListener('dblclick', () => {
-        if (elements.previewImageRight) {
-            image.src = elements.previewImageRight.src || '';
-            image.onload = () => {
-                if (elements.editCanvas) {
-                    elements.editCanvas.width = image.width;
-                    elements.editCanvas.height = image.height;
-                    cropRect.width = Math.min(200, image.width);
-                    cropRect.height = Math.min(200, image.height);
-                    drawImage();
-                    if (elements.editModal) elements.editModal.style.display = 'block';
-                }
-            };
-        }
-    });
-    // Canvas Controls (shared)
+    // Canvas Controls
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
     elements.cropY?.addEventListener('input', e => { cropRect.y = parseInt(e.target.value); drawImage(); });
     elements.cropWidth?.addEventListener('input', e => { cropRect.width = parseInt(e.target.value); drawImage(); });
@@ -903,13 +872,13 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-    // Apply Edit (updates the current previewImage)
+    // Apply Edit
     elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
         tempCanvas.height = cropRect.height;
         const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx && editedImage) {
+        if (tempCtx && elements.previewImage) {
             tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
             tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
