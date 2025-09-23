@@ -71,7 +71,7 @@ let contrastValue = 0;
 let bgColor = 'white';
 const ctx = elements.editCanvas?.getContext('2d');
 const image = new Image();
-   // Genres Data
+// Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
@@ -174,17 +174,23 @@ const genres = [
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
 // Auth State Listener
-auth.onAuthStateChanged(user => {
-    if (user) {
-        currentUserUid = user.uid;
-        loadChatHistory();
-        if (currentChatId) loadChatMessages(currentChatId);
-        else startNewChat();
-    } else {
-        currentUserUid = null;
-        window.location.href = 'login.html';
-    }
-});
+function initializeApp() {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUserUid = user.uid;
+            if (elements.messagesDiv && elements.historyList) {
+                loadChatHistory();
+                if (currentChatId) loadChatMessages(currentChatId);
+                else startNewChat();
+            } else {
+                showErrorMessage('DOM elements (messagesDiv or historyList) not found. Please check your HTML.');
+            }
+        } else {
+            currentUserUid = null;
+            window.location.href = 'login.html';
+        }
+    });
+}
 // Utility Functions
 function sanitizeMessage(message) {
     const div = document.createElement('div');
@@ -192,14 +198,16 @@ function sanitizeMessage(message) {
     return div.innerHTML;
 }
 function displayMessage(message, sender) {
-    if (!elements.messagesDiv) return console.error('messagesDiv not found');
+    if (!elements.messagesDiv) {
+        console.error('messagesDiv not found');
+        return;
+    }
     const messageDiv = document.createElement('div');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
-    // নতুন ফাংশনালিটি: যদি message ইমেজ URL হয়, তাহলে <img> রেন্ডার করুন (ইনলাইন ইমেজ)
     if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
         const img = document.createElement('img');
         img.src = message;
-        img.classList.add('chat-image'); // CSS-এ যোগ করুন: .chat-image { max-width: 300px; border-radius: 8px; }
+        img.classList.add('chat-image');
         img.alt = 'Uploaded Image';
         img.addEventListener('click', () => openImageModal(message));
         messageDiv.appendChild(img);
@@ -237,6 +245,7 @@ function showTypingIndicator() {
 // Chat History Functions
 async function startNewChat() {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।');
+    if (!elements.messagesDiv) return showErrorMessage('messagesDiv not found');
     try {
         const chatRef = await db.collection('chats').add({
             uid: currentUserUid,
@@ -253,7 +262,7 @@ async function startNewChat() {
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             uid: currentUserUid
         });
-        if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
+        elements.messagesDiv.innerHTML = '';
         if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
         await loadChatHistory();
     } catch (error) {
@@ -377,8 +386,8 @@ async function deleteChat() {
         if (chatId === currentChatId) {
             currentChatId = null;
             localStorage.removeItem('currentChatId');
-            elements.messagesDiv.innerHTML = '';
-            elements.welcomeMessage.style.display = 'block';
+            if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
+            if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
             await startNewChat();
         }
         await loadChatHistory();
@@ -405,18 +414,18 @@ async function renameChat() {
 function toggleSidebar() {
     if (elements.sidebar) {
         elements.sidebar.classList.toggle('open');
-        if (elements.sidebar.classList.contains('open')) loadChatHistory();
+        if (elements.sidebar.classList.contains('open') && elements.historyList) loadChatHistory();
     }
 }
 function closeSidebarHandler() {
-    elements.sidebar?.classList.remove('open');
+    if (elements.sidebar) elements.sidebar.classList.remove('open');
 }
 function sendMessage() {
-    if (!elements.userInput || !elements.sendBtn) {
-        console.error('userInput or sendBtn not found');
+    if (!elements.userInput || !elements.sendBtn || !elements.messagesDiv) {
+        console.error('Required elements (userInput, sendBtn, or messagesDiv) not found');
         return;
     }
-    elements.sendBtn.disabled = true; // Prevent multiple clicks
+    elements.sendBtn.disabled = true;
     const message = elements.userInput.value.trim();
     if (message) {
         displayMessage(message, 'user');
@@ -432,7 +441,7 @@ function sendMessage() {
         img.classList.add('image-preview');
         img.addEventListener('click', () => openImageModal(img.src));
         messageDiv.appendChild(img);
-        elements.messagesDiv?.appendChild(messageDiv);
+        elements.messagesDiv.appendChild(messageDiv);
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
         const formData = new FormData();
         formData.append('image', selectedFile);
@@ -441,9 +450,7 @@ function sendMessage() {
             body: formData
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('API response not OK: ' + response.status);
-                }
+                if (!response.ok) throw new Error('API response not OK: ' + response.status);
                 return response.json();
             })
             .then(data => {
@@ -455,19 +462,19 @@ function sendMessage() {
                 }
             })
             .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message))
-            .finally(() => {
-                elements.sendBtn.disabled = false;
-            });
+            .finally(() => elements.sendBtn.disabled = false);
         clearPreview();
         hideWelcomeMessage();
     } else {
         elements.sendBtn.disabled = false;
     }
-    elements.sendBtn.disabled = false; // Re-enable after processing
 }
 // আপডেটেড displayReview ফাংশন
 function displayReview(reviewData) {
-    if (!elements.messagesDiv) return console.error('messagesDiv not found');
+    if (!elements.messagesDiv) {
+        console.error('messagesDiv not found');
+        return;
+    }
     const reviewCard = document.createElement('div');
     reviewCard.classList.add('review-card', 'slide-in');
     reviewCard.setAttribute('data-editable', 'true');
@@ -521,7 +528,7 @@ function displayReview(reviewData) {
                 review_data: updatedData,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 chat_id: currentChatId,
-                uid: currentUserUid // UID যোগ করা
+                uid: currentUserUid
             });
             displayMessage('তথ্য সফলভাবে সংরক্ষিত!', 'bot');
             generatePDF(reviewData, reviewCard);
@@ -662,7 +669,7 @@ function generatePDF(reviewData, reviewCard) {
 }
 function callRasaAPI(message, metadata = {}) {
     const typingDiv = showTypingIndicator();
-    if (!typingDiv) return; // If messagesDiv null, abort
+    if (!typingDiv) return;
     const payload = { sender: currentChatId || 'default', message, ...metadata };
     setTimeout(() => {
         if (typeof $ === 'undefined') {
@@ -763,19 +770,29 @@ function renderGenres() {
 }
 function openGenresModal() {
     renderGenres();
-    elements.genresModal?.classList.add('slide-in');
-    elements.genresModal.style.display = 'block';
-    setTimeout(() => elements.genresModal?.classList.remove('slide-in'), 300);
+    if (elements.genresModal) {
+        elements.genresModal.classList.add('slide-in');
+        elements.genresModal.style.display = 'block';
+        setTimeout(() => elements.genresModal.classList.remove('slide-in'), 300);
+    }
 }
 function closeGenresModal() {
-    elements.genresModal?.classList.add('slide-out');
-    setTimeout(() => {
-        elements.genresModal.style.display = 'none';
-        elements.genresModal.classList.remove('slide-out');
-    }, 300);
+    if (elements.genresModal) {
+        elements.genresModal.classList.add('slide-out');
+        setTimeout(() => {
+            elements.genresModal.style.display = 'none';
+            elements.genresModal.classList.remove('slide-out');
+        }, 300);
+    }
 }
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    if (!elements.messagesDiv || !elements.historyList) {
+        console.error('Critical DOM elements (messagesDiv or historyList) not found. Please check your HTML.');
+        return;
+    }
+    initializeApp();
+
     // Chat History Handlers
     elements.historyIcon?.addEventListener('click', toggleSidebar);
     elements.closeSidebar?.addEventListener('click', closeSidebarHandler);
@@ -798,8 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedFile = file;
             const reader = new FileReader();
             reader.onload = e => {
-                elements.previewImage.src = e.target.result;
-                elements.previewContainer.style.display = 'block';
+                if (elements.previewImage) elements.previewImage.src = e.target.result;
+                if (elements.previewContainer) elements.previewContainer.style.display = 'block';
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।');
             reader.readAsDataURL(file);
@@ -808,22 +825,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // Image Review
     elements.previewImage?.addEventListener('click', () => {
-        elements.reviewImage.src = elements.previewImage.src;
-        elements.imageReviewModal.style.display = 'block';
+        if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
+        if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
     // Image Editing
     elements.previewImage?.addEventListener('dblclick', () => {
-        image.src = elements.previewImage.src || '';
-        image.onload = () => {
-            if (elements.editCanvas) {
-                elements.editCanvas.width = image.width;
-                elements.editCanvas.height = image.height;
-                cropRect.width = Math.min(200, image.width);
-                cropRect.height = Math.min(200, image.height);
-                drawImage();
-                elements.editModal.style.display = 'block';
-            }
-        };
+        if (elements.previewImage) {
+            image.src = elements.previewImage.src || '';
+            image.onload = () => {
+                if (elements.editCanvas) {
+                    elements.editCanvas.width = image.width;
+                    elements.editCanvas.height = image.height;
+                    cropRect.width = Math.min(200, image.width);
+                    cropRect.height = Math.min(200, image.height);
+                    drawImage();
+                    if (elements.editModal) elements.editModal.style.display = 'block';
+                }
+            };
+        }
     });
     // Canvas Controls
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
@@ -839,7 +858,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tempCanvas.width = cropRect.width;
         tempCanvas.height = cropRect.height;
         const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx) {
+        if (tempCtx && elements.previewImage) {
             tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
             tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
@@ -847,19 +866,21 @@ document.addEventListener('DOMContentLoaded', () => {
             editedImage = tempCanvas.toDataURL('image/jpeg');
             elements.previewImage.src = editedImage;
             callRasaAPI("show_review");
-            elements.editModal.style.display = 'none';
+            if (elements.editModal) elements.editModal.style.display = 'none';
         }
     });
-    elements.editCancelBtn?.addEventListener('click', () => elements.editModal.style.display = 'none');
+    elements.editCancelBtn?.addEventListener('click', () => {
+        if (elements.editModal) elements.editModal.style.display = 'none';
+    });
     // Image Modal
     elements.imageReviewModal?.addEventListener('click', e => {
         if (e.target === elements.imageReviewModal || e.target === elements.deleteImageBtn) {
-            elements.imageReviewModal.style.display = 'none';
+            if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
         }
     });
     elements.deleteImageBtn?.addEventListener('click', () => {
         clearPreview();
-        elements.imageReviewModal.style.display = 'none';
+        if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
     });
     // Genres Modal
     elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
