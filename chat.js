@@ -2,10 +2,8 @@
  * Combined chat functionality for handling Firebase, chat history, and UI interactions.
  * Merged from script.js and chatHistory.js, with duplicates removed and code optimized.
  */
-
 // Firebase SDK Check
 if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
-
 // Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyCoIdMx9Zd7kQt9MSZmowbphaQVRl8D16E",
@@ -15,18 +13,15 @@ const firebaseConfig = {
     messagingSenderId: "398052082157",
     appId: "1:398052082157:web:0bc02d66cbdf55dd2567e4"
 };
-
 // Initialize Firebase
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-
 // Global Variables
 let currentChatId = localStorage.getItem('currentChatId') || null;
 let currentUserUid = null;
 let selectedFile = null;
 let editedImage = null;
-
 // DOM Elements
 const elements = {
     sidebar: document.getElementById('sidebar'),
@@ -69,7 +64,6 @@ const elements = {
     reviewImage: document.getElementById('reviewImage'),
     deleteImageBtn: document.getElementById('deleteImageBtn')
 };
-
 // Image Editing State
 const cropRect = { x: 0, y: 0, width: 200, height: 200 };
 let brightnessValue = 0;
@@ -77,7 +71,6 @@ let contrastValue = 0;
 let bgColor = 'white';
 const ctx = elements.editCanvas?.getContext('2d');
 const image = new Image();
-
    // Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
@@ -180,8 +173,6 @@ const genres = [
     { name: 'এন্টারটেইনমেন্ট চাকরি', icon: 'fas fa-film', message: 'আমি এন্টারটেইনমেন্ট চাকরির জন্য আবেদন করতে চাই' },
     { name: 'অর্গানিক ফার্মিং চাকরি', icon: 'fas fa-leaf', message: 'আমি অর্গানিক ফার্মিং চাকরির জন্য আবেদন করতে চাই' }
 ];
-
-
 // Auth State Listener
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -194,39 +185,34 @@ auth.onAuthStateChanged(user => {
         window.location.href = 'login.html';
     }
 });
-
 // Utility Functions
 function sanitizeMessage(message) {
     const div = document.createElement('div');
     div.textContent = message;
     return div.innerHTML;
 }
-
 function displayMessage(message, sender) {
-    if (!elements.messagesDiv) return;
+    if (!elements.messagesDiv) return console.error('messagesDiv not found');
     const messageDiv = document.createElement('div');
     messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
-
     // নতুন ফাংশনালিটি: যদি message ইমেজ URL হয়, তাহলে <img> রেন্ডার করুন (ইনলাইন ইমেজ)
     if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
         const img = document.createElement('img');
         img.src = message;
-        img.classList.add('chat-image');  // CSS-এ যোগ করুন: .chat-image { max-width: 300px; border-radius: 8px; }
+        img.classList.add('chat-image'); // CSS-এ যোগ করুন: .chat-image { max-width: 300px; border-radius: 8px; }
         img.alt = 'Uploaded Image';
         img.addEventListener('click', () => openImageModal(message));
         messageDiv.appendChild(img);
     } else {
         messageDiv.innerHTML = sanitizeMessage(message);
     }
-
     elements.messagesDiv.appendChild(messageDiv);
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
-
 function showErrorMessage(message) {
+    console.error(message);
     displayMessage(sanitizeMessage(message), 'bot');
 }
-
 function hideWelcomeMessage() {
     if (elements.welcomeMessage && elements.welcomeMessage.style.display !== 'none') {
         elements.welcomeMessage.classList.add('fade-out');
@@ -236,16 +222,18 @@ function hideWelcomeMessage() {
         }, 300);
     }
 }
-
 function showTypingIndicator() {
+    if (!elements.messagesDiv) {
+        console.error('messagesDiv not found');
+        return null;
+    }
     const typingDiv = document.createElement('div');
     typingDiv.classList.add('typing-indicator');
     typingDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-    elements.messagesDiv?.appendChild(typingDiv);
+    elements.messagesDiv.appendChild(typingDiv);
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
     return typingDiv;
 }
-
 // Chat History Functions
 async function startNewChat() {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।');
@@ -259,14 +247,12 @@ async function startNewChat() {
         });
         currentChatId = chatRef.id;
         localStorage.setItem('currentChatId', currentChatId);
-
         await db.collection('chats').doc(currentChatId).collection('messages').add({
             message: 'Chat session started',
             sender: 'system',
             timestamp: firebase.firestore.FieldValue.serverTimestamp(),
             uid: currentUserUid
         });
-
         if (elements.messagesDiv) elements.messagesDiv.innerHTML = '';
         if (elements.welcomeMessage) elements.welcomeMessage.style.display = 'block';
         await loadChatHistory();
@@ -274,65 +260,53 @@ async function startNewChat() {
         showErrorMessage('নতুন চ্যাট শুরু করতে সমস্যা: ' + error.message);
     }
 }
-
 async function saveChatHistory(message, sender) {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।');
     if (!message || typeof message !== 'string') return showErrorMessage('অবৈধ মেসেজ।');
-
     if (!currentChatId) await startNewChat();
     if (!currentChatId) return showErrorMessage('চ্যাট তৈরি ব্যর্থ।');
-
     try {
         const chatDoc = await db.collection('chats').doc(currentChatId).get();
         if (!chatDoc.exists) return showErrorMessage('চ্যাট ডকুমেন্ট পাওয়া যায়নি।');
-
         const messageRef = await db.collection('chats').doc(currentChatId).collection('messages').add({
             uid: currentUserUid,
             message,
             sender,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-
         const chatData = chatDoc.data();
         let chatName = chatData.name || 'নতুন চ্যাট';
         if (!chatData.name && sender === 'user') {
             chatName = message.length > 30 ? message.substring(0, 30) + '...' : message;
         }
         const lastMessage = message.length > 50 ? message.substring(0, 50) + '...' : message;
-
         await db.collection('chats').doc(currentChatId).update({
             name: chatName,
             last_message: lastMessage,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         });
-
         await loadChatHistory();
     } catch (error) {
         showErrorMessage('মেসেজ সেভ করতে সমস্যা: ' + error.message);
     }
 }
-
 async function loadChatHistory(searchQuery = '') {
-    if (!currentUserUid || !elements.historyList) return showErrorMessage('ইউজার লগইন করেননি।');
+    if (!currentUserUid || !elements.historyList) return showErrorMessage('ইউজার লগইন করেননি বা historyList পাওয়া যায়নি।');
     elements.historyList.innerHTML = '<div class="loading">লোড হচ্ছে...</div>';
-
     try {
         const snapshot = await db.collection('chats')
             .where('uid', '==', currentUserUid)
             .orderBy('updated_at', 'desc')
             .get();
-
         elements.historyList.innerHTML = '';
         if (snapshot.empty) {
             elements.historyList.innerHTML = '<div>কোনো চ্যাট হিস্ট্রি নেই।</div>';
             return;
         }
-
         snapshot.forEach(doc => {
             const chat = doc.data();
             const searchLower = searchQuery.toLowerCase();
             if (searchQuery && !chat.name?.toLowerCase().includes(searchLower) && !chat.last_message?.toLowerCase().includes(searchLower)) return;
-
             const historyItem = document.createElement('div');
             historyItem.classList.add('history-item');
             historyItem.setAttribute('data-chat-id', doc.id);
@@ -346,7 +320,6 @@ async function loadChatHistory(searchQuery = '') {
                     <i class="fas fa-trash delete-chat" title="মুছুন"></i>
                 </div>
             `;
-
             historyItem.addEventListener('click', async e => {
                 if (e.target.classList.contains('rename-chat') || e.target.classList.contains('delete-chat')) return;
                 currentChatId = doc.id;
@@ -354,53 +327,44 @@ async function loadChatHistory(searchQuery = '') {
                 await loadChatMessages(currentChatId);
                 elements.sidebar?.classList.remove('open');
             });
-
             historyItem.querySelector('.rename-chat')?.addEventListener('click', () => {
                 elements.renameModal?.setAttribute('data-chat-id', doc.id);
                 elements.renameInput.value = chat.name || 'নতুন চ্যাট';
                 elements.renameModal.style.display = 'block';
             });
-
             historyItem.querySelector('.delete-chat')?.addEventListener('click', () => {
                 elements.deleteModal?.setAttribute('data-chat-id', doc.id);
                 elements.deleteModal.style.display = 'block';
             });
-
             elements.historyList.appendChild(historyItem);
         });
     } catch (error) {
         showErrorMessage('চ্যাট হিস্ট্রি লোড করতে সমস্যা: ' + error.message);
     }
 }
-
 async function loadChatMessages(chatId) {
     if (!chatId || !elements.messagesDiv) return showErrorMessage('চ্যাট আইডি বা মেসেজ এলাকা পাওয়া যায়নি।');
     elements.messagesDiv.innerHTML = '';
     elements.welcomeMessage.style.display = 'none';
-
     try {
         const snapshot = await db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp', 'asc').get();
         snapshot.forEach(doc => {
             const msg = doc.data();
             if (msg.sender === 'user' || msg.sender === 'bot') displayMessage(sanitizeMessage(msg.message), msg.sender);
         });
-
         const submissions = await db.collection('submissions').where('chat_id', '==', chatId).get();
         submissions.forEach(doc => {
             const sub = doc.data();
             if (sub.review_data) displayReview(sub.review_data);
         });
-
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
     } catch (error) {
         showErrorMessage('মেসেজ লোড করতে সমস্যা: ' + error.message);
     }
 }
-
 async function deleteChat() {
     const chatId = elements.deleteModal?.getAttribute('data-chat-id');
     if (!chatId) return showErrorMessage('চ্যাট আইডি পাওয়া যায়নি।');
-
     try {
         await db.collection('chats').doc(chatId).delete();
         const messagesSnapshot = await db.collection('chats').doc(chatId).collection('messages').get();
@@ -409,7 +373,6 @@ async function deleteChat() {
             messagesSnapshot.forEach(doc => batch.delete(doc.ref));
             await batch.commit();
         }
-
         elements.deleteModal.style.display = 'none';
         if (chatId === currentChatId) {
             currentChatId = null;
@@ -423,12 +386,10 @@ async function deleteChat() {
         showErrorMessage('চ্যাট ডিলিট করতে সমস্যা: ' + error.message);
     }
 }
-
 async function renameChat() {
     const chatId = elements.renameModal?.getAttribute('data-chat-id');
     const newName = elements.renameInput?.value.trim();
     if (!chatId || !newName) return showErrorMessage('চ্যাট আইডি বা নাম অবৈধ।');
-
     try {
         await db.collection('chats').doc(chatId).update({
             name: newName,
@@ -440,7 +401,6 @@ async function renameChat() {
         showErrorMessage('নাম পরিবর্তন করতে সমস্যা: ' + error.message);
     }
 }
-
 // UI Interaction Functions
 function toggleSidebar() {
     if (elements.sidebar) {
@@ -448,13 +408,16 @@ function toggleSidebar() {
         if (elements.sidebar.classList.contains('open')) loadChatHistory();
     }
 }
-
 function closeSidebarHandler() {
     elements.sidebar?.classList.remove('open');
 }
-
 function sendMessage() {
-    const message = elements.userInput?.value.trim();
+    if (!elements.userInput || !elements.sendBtn) {
+        console.error('userInput or sendBtn not found');
+        return;
+    }
+    elements.sendBtn.disabled = true; // Prevent multiple clicks
+    const message = elements.userInput.value.trim();
     if (message) {
         displayMessage(message, 'user');
         saveChatHistory(message, 'user');
@@ -471,10 +434,9 @@ function sendMessage() {
         messageDiv.appendChild(img);
         elements.messagesDiv?.appendChild(messageDiv);
         elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
-
         const formData = new FormData();
         formData.append('image', selectedFile);
-        fetch('http://localhost:5000/upload', { 
+        fetch('http://localhost:5000/upload', {
             method: 'POST',
             body: formData
         })
@@ -485,40 +447,42 @@ function sendMessage() {
                 return response.json();
             })
             .then(data => {
-                if (data.url) {  
-                    callRasaAPI(data.url);  
-                    saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');  
+                if (data.url) {
+                    callRasaAPI(data.url);
+                    saveChatHistory(`[Image: ${selectedFile.name} - URL: ${data.url}]`, 'user');
                 } else {
                     showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + (data.error || 'Unknown error'));
                 }
             })
-            .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message));
+            .catch(error => showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message))
+            .finally(() => {
+                elements.sendBtn.disabled = false;
+            });
         clearPreview();
         hideWelcomeMessage();
+    } else {
+        elements.sendBtn.disabled = false;
     }
+    elements.sendBtn.disabled = false; // Re-enable after processing
 }
-
 // আপডেটেড displayReview ফাংশন
 function displayReview(reviewData) {
+    if (!elements.messagesDiv) return console.error('messagesDiv not found');
     const reviewCard = document.createElement('div');
     reviewCard.classList.add('review-card', 'slide-in');
     reviewCard.setAttribute('data-editable', 'true');
     reviewCard.setAttribute('data-id', Date.now());
     reviewCard.setAttribute('data-confirmed', 'false');
     reviewCard.innerHTML = '<h3>আপনার তথ্য রিভিউ</h3>';
-
     const reviewContent = document.createElement('div');
     reviewContent.classList.add('review-content');
-
     for (const [key, value] of Object.entries(reviewData)) {
         const reviewItem = document.createElement('div');
         reviewItem.classList.add('review-item');
         reviewItem.setAttribute('data-key', key);
-
         const label = document.createElement('label');
         label.textContent = key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' ') + ':';
         reviewItem.appendChild(label);
-
         if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
             const img = document.createElement('img');
             img.src = value;
@@ -530,44 +494,35 @@ function displayReview(reviewData) {
         }
         reviewContent.appendChild(reviewItem);
     }
-
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('review-buttons');
-
     const editBtn = document.createElement('button');
     editBtn.classList.add('edit-btn', 'ripple-btn');
     editBtn.textContent = 'Edit';
-
     const confirmBtn = document.createElement('button');
     confirmBtn.classList.add('confirm-btn', 'ripple-btn');
     confirmBtn.textContent = 'Confirm';
     let isProcessing = false;
-
     editBtn.addEventListener('click', () => toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData));
-
     confirmBtn.addEventListener('click', async () => {
         if (isProcessing) return;
         isProcessing = true;
         confirmBtn.disabled = true;
-
         try {
             if (!currentChatId) throw new Error('চ্যাট আইডি পাওয়া যায়নি।');
             if (!currentUserUid) throw new Error('ইউজার লগইন করেননি।');
-
             const updatedData = {};
             reviewContent.querySelectorAll('.review-item').forEach(item => {
                 const key = item.getAttribute('data-key');
                 const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
                 if (value) updatedData[key] = value;
             });
-
             await db.collection('submissions').add({
                 review_data: updatedData,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 chat_id: currentChatId,
                 uid: currentUserUid // UID যোগ করা
             });
-
             displayMessage('তথ্য সফলভাবে সংরক্ষিত!', 'bot');
             generatePDF(reviewData, reviewCard);
             reviewCard.setAttribute('data-confirmed', 'true');
@@ -575,7 +530,6 @@ function displayReview(reviewData) {
             editBtn.disabled = true;
             editBtn.style.display = 'none';
             confirmBtn.style.display = 'none';
-
             buttonContainer.innerHTML = '';
             const downloadBtn = document.createElement('button');
             downloadBtn.classList.add('download-btn', 'ripple-btn');
@@ -601,49 +555,41 @@ function displayReview(reviewData) {
             isProcessing = false;
         }
     });
-
     buttonContainer.appendChild(editBtn);
     buttonContainer.appendChild(confirmBtn);
     reviewCard.appendChild(reviewContent);
     reviewCard.appendChild(buttonContainer);
-    elements.messagesDiv?.appendChild(reviewCard);
+    elements.messagesDiv.appendChild(reviewCard);
     elements.messagesDiv.scrollTop = elements.messagesDiv.scrollHeight;
 }
-
 // আপডেটেড toggleEdit ফাংশন
 function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData) {
     if (reviewCard.getAttribute('data-confirmed') === 'true') {
         showErrorMessage('ডেটা কনফার্ম হয়ে গেছে। এডিট করা যাবে না।');
         return;
     }
-
     const isEditable = reviewCard.getAttribute('data-editable') === 'true';
     if (!isEditable) {
         reviewCard.setAttribute('data-editable', 'true');
         editBtn.textContent = 'Save';
         confirmBtn.style.display = 'none';
-
         reviewContent.querySelectorAll('.review-item').forEach(item => {
             const key = item.getAttribute('data-key');
             const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
             item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label>`;
-
             if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
                 const img = document.createElement('img');
                 img.src = value;
                 item.appendChild(img);
-
                 const replaceInput = document.createElement('input');
                 replaceInput.type = 'file';
                 replaceInput.classList.add('replace-image-input');
                 replaceInput.accept = 'image/png, image/jpeg';
                 replaceInput.style.display = 'none';
                 item.appendChild(replaceInput);
-
                 const replaceIcon = document.createElement('i');
                 replaceIcon.classList.add('fas', 'fa-camera', 'replace-image-icon');
                 item.appendChild(replaceIcon);
-
                 replaceIcon.addEventListener('click', () => replaceInput.click());
                 replaceInput.addEventListener('change', () => {
                     const file = replaceInput.files[0];
@@ -682,7 +628,6 @@ function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData) 
         confirmBtn.style.display = 'inline-block';
     }
 }
-
 // আপডেটেড generatePDF ফাংশন
 function generatePDF(reviewData, reviewCard) {
     const formType = reviewData.form_type || 'generic';
@@ -695,7 +640,6 @@ function generatePDF(reviewData, reviewCard) {
         ),
         formType
     };
-
     fetch('http://localhost:5000/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -716,18 +660,16 @@ function generatePDF(reviewData, reviewCard) {
             saveChatHistory('PDF error: ' + error.message, 'bot');
         });
 }
-
 function callRasaAPI(message, metadata = {}) {
     const typingDiv = showTypingIndicator();
+    if (!typingDiv) return; // If messagesDiv null, abort
     const payload = { sender: currentChatId || 'default', message, ...metadata };
-
     setTimeout(() => {
         if (typeof $ === 'undefined') {
             typingDiv.remove();
             showErrorMessage('jQuery লোড হয়নি।');
             return;
         }
-
         $.ajax({
             url: 'http://localhost:5005/webhooks/rest/webhook',
             method: 'POST',
@@ -770,7 +712,6 @@ function callRasaAPI(message, metadata = {}) {
         });
     }, 500);
 }
-
 // Image Handling Functions
 function clearPreview() {
     selectedFile = null;
@@ -778,12 +719,10 @@ function clearPreview() {
     if (elements.previewImage) elements.previewImage.src = '';
     if (elements.previewContainer) elements.previewContainer.style.display = 'none';
 }
-
 function openImageModal(src) {
     if (elements.reviewImage) elements.reviewImage.src = src;
     if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
 }
-
 function drawImage() {
     if (!ctx) return;
     ctx.clearRect(0, 0, elements.editCanvas.width, elements.editCanvas.height);
@@ -796,7 +735,6 @@ function drawImage() {
     ctx.strokeRect(cropRect.x, cropRect.y, cropRect.width, cropRect.height);
     ctx.filter = 'none';
 }
-
 // Genres Modal Functions
 function renderGenres() {
     if (!elements.genresList) return;
@@ -823,14 +761,12 @@ function renderGenres() {
         elements.genresList.appendChild(item);
     });
 }
-
 function openGenresModal() {
     renderGenres();
     elements.genresModal?.classList.add('slide-in');
     elements.genresModal.style.display = 'block';
     setTimeout(() => elements.genresModal?.classList.remove('slide-in'), 300);
 }
-
 function closeGenresModal() {
     elements.genresModal?.classList.add('slide-out');
     setTimeout(() => {
@@ -838,7 +774,6 @@ function closeGenresModal() {
         elements.genresModal.classList.remove('slide-out');
     }, 300);
 }
-
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     // Chat History Handlers
@@ -850,13 +785,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.confirmDelete?.addEventListener('click', deleteChat);
     elements.cancelRename?.addEventListener('click', () => elements.renameModal.style.display = 'none');
     elements.saveRename?.addEventListener('click', renameChat);
-
     // Message Sending
     elements.sendBtn?.addEventListener('click', sendMessage);
     elements.userInput?.addEventListener('keypress', e => {
         if (e.key === 'Enter' && !e.repeat) sendMessage();
     });
-
     // Image Upload
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
     elements.fileInput?.addEventListener('change', () => {
@@ -873,13 +806,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInput.value = '';
     });
-
     // Image Review
     elements.previewImage?.addEventListener('click', () => {
         elements.reviewImage.src = elements.previewImage.src;
         elements.imageReviewModal.style.display = 'block';
     });
-
     // Image Editing
     elements.previewImage?.addEventListener('dblclick', () => {
         image.src = elements.previewImage.src || '';
@@ -894,7 +825,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
     });
-
     // Canvas Controls
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
     elements.cropY?.addEventListener('input', e => { cropRect.y = parseInt(e.target.value); drawImage(); });
@@ -903,7 +833,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-
     // Apply Edit
     elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
@@ -921,25 +850,20 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.editModal.style.display = 'none';
         }
     });
-
     elements.editCancelBtn?.addEventListener('click', () => elements.editModal.style.display = 'none');
-
     // Image Modal
     elements.imageReviewModal?.addEventListener('click', e => {
         if (e.target === elements.imageReviewModal || e.target === elements.deleteImageBtn) {
             elements.imageReviewModal.style.display = 'none';
         }
     });
-
     elements.deleteImageBtn?.addEventListener('click', () => {
         clearPreview();
         elements.imageReviewModal.style.display = 'none';
     });
-
     // Genres Modal
     elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
-
     // Welcome Buttons
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
         button.classList.add('ripple-btn');
