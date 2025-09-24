@@ -3,7 +3,7 @@
  * Merged from script.js and chatHistory.js, with duplicates removed and code optimized.
  * Updated to handle two separate chat boxes: left (আবেদন) and right (প্রশ্ন জিজ্ঞাসা).
  * Messages are isolated: left messages only in left, right in right.
- * Welcome message hides after first message in each chat, specific to the box where the message is sent.
+ * Right chat's welcome message hides immediately after the user sends a message in the right chat box.
  * Right chat displays messages in a clean, beautiful way under "প্রশ্ন জিজ্ঞাসা".
  * Each chat has its own chatId and history.
  */
