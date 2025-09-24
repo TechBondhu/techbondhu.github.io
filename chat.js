@@ -3,7 +3,7 @@
  * Merged from script.js and chatHistory.js, with duplicates removed and code optimized.
  * Updated to handle two separate chat boxes: left (আবেদন) and right (প্রশ্ন জিজ্ঞাসা).
  * Messages are isolated: left messages only in left, right in right.
- * Welcome message hides after first message in each chat.
+ * Welcome message hides after first message in each chat, including right chat.
  * Right chat displays messages in a clean, beautiful way under "প্রশ্ন জিজ্ঞাসা".
  * Each chat has its own chatId and history.
  */
@@ -50,8 +50,8 @@ const elements = {
     renameInput: document.getElementById('renameInput'),
     messagesDiv: document.getElementById('messages'), // Left chat messages
     messagesRight: document.getElementById('messages-right'), // Right chat messages
-    welcomeMessage: document.getElementById('welcomeMessage'), // Assuming left welcome
-    welcomeMessageRight: document.getElementById('welcomeMessage-right'), // Add this if needed in HTML, or handle dynamically
+    welcomeMessage: document.getElementById('welcomeMessage'), // Left welcome
+    welcomeMessageRight: document.getElementById('welcomeMessage-right'), // Right welcome
     userInput: document.getElementById('userInput'), // Left input
     userInputRight: document.getElementById('userInput-right'), // Right input
     sendBtn: document.getElementById('sendBtn'), // Left send
@@ -84,7 +84,6 @@ const elements = {
     deleteImageBtn: document.getElementById('deleteImageBtn')
 };
 
-
 // Image Editing State
 const cropRect = { x: 0, y: 0, width: 200, height: 200 };
 let brightnessValue = 0;
@@ -93,7 +92,7 @@ let bgColor = 'white';
 const ctx = elements.editCanvas?.getContext('2d');
 const image = new Image();
 
-// Genres Data (Restored)
+// Genres Data
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
@@ -106,7 +105,7 @@ function initializeApp() {
         if (user) {
             currentUserUid = user.uid;
             if (elements.messagesDiv && elements.historyList && elements.messagesRight) {
-                loadChatHistory(); // Loads combined history, but messages loaded per chatId
+                loadChatHistory();
                 if (leftChatId) loadChatMessages(leftChatId, 'left');
                 else startNewChat('left');
                 if (rightChatId) loadChatMessages(rightChatId, 'right');
@@ -146,7 +145,6 @@ function displayMessage(message, sender, side) {
     } else {
         messageDiv.innerHTML = sanitizeMessage(message);
     }
-    // For right side, add extra styling for beautiful display under "প্রশ্ন জিজ্ঞাসা"
     if (side === 'right') {
         messageDiv.style.margin = '10px 0';
         messageDiv.style.padding = '10px';
@@ -155,6 +153,10 @@ function displayMessage(message, sender, side) {
     }
     messagesContainer.appendChild(messageDiv);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    // Ensure welcome message hides after first user message
+    if (sender === 'user') {
+        hideWelcomeMessage(side);
+    }
 }
 
 function showErrorMessage(message, side) {
@@ -199,7 +201,7 @@ async function startNewChat(side) {
             last_message: 'চ্যাট শুরু হয়েছে',
             created_at: firebase.firestore.FieldValue.serverTimestamp(),
             updated_at: firebase.firestore.FieldValue.serverTimestamp(),
-            side: side // Add side to distinguish in DB
+            side: side
         });
         const chatId = chatRef.id;
         if (side === 'left') {
@@ -271,14 +273,14 @@ async function loadChatHistory(searchTerm = '') {
         document.querySelectorAll('.delete-icon').forEach(icon => {
             icon.addEventListener('click', e => {
                 e.stopPropagation();
-                currentChatId = e.target.getAttribute('data-id'); // Temporary for delete
+                currentChatId = e.target.getAttribute('data-id');
                 elements.deleteModal.style.display = 'block';
             });
         });
         document.querySelectorAll('.rename-icon').forEach(icon => {
             icon.addEventListener('click', e => {
                 e.stopPropagation();
-                currentChatId = e.target.getAttribute('data-id'); // Temporary for rename
+                currentChatId = e.target.getAttribute('data-id');
                 elements.renameInput.value = '';
                 elements.renameModal.style.display = 'block';
             });
@@ -298,13 +300,20 @@ async function loadChatMessages(chatId, side) {
     try {
         const snapshot = await db.collection('chats').doc(chatId).collection('messages')
             .orderBy('timestamp', 'asc').get();
+        let hasUserMessage = false;
         snapshot.forEach(doc => {
             const data = doc.data();
             if (data.sender !== 'system') {
                 displayMessage(data.message, data.sender, side);
+                if (data.sender === 'user') hasUserMessage = true;
             }
         });
-        hideWelcomeMessage(side); // Hide welcome if messages exist
+        // Hide welcome message if there are user messages
+        if (hasUserMessage) hideWelcomeMessage(side);
+        else {
+            const welcome = side === 'left' ? elements.welcomeMessage : elements.welcomeMessageRight;
+            if (welcome) welcome.style.display = 'block';
+        }
     } catch (error) {
         showErrorMessage('মেসেজ লোডে সমস্যা: ' + error.message, side);
     }
@@ -352,7 +361,7 @@ function closeSidebarHandler() {
     if (elements.sidebar) elements.sidebar.classList.remove('active');
 }
 
-// Send Message Function (updated for side)
+// Send Message Function
 function sendMessage(side) {
     const input = side === 'left' ? elements.userInput : elements.userInputRight;
     if (!input) return;
@@ -362,10 +371,9 @@ function sendMessage(side) {
     saveChatHistory(message, 'user', side);
     callRasaAPI(message, {}, side);
     input.value = '';
-    hideWelcomeMessage(side);
 }
 
-// Rasa API Call (updated for side)
+// Rasa API Call
 function callRasaAPI(message, metadata = {}, side) {
     const typingDiv = showTypingIndicator(side);
     if (!typingDiv) return;
@@ -421,7 +429,7 @@ function callRasaAPI(message, metadata = {}, side) {
     }, 500);
 }
 
-// Display Review (updated for side)
+// Display Review
 function displayReview(reviewData, side) {
     const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
     if (!messagesContainer) return;
@@ -510,7 +518,7 @@ function displayReview(reviewData, side) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Toggle Edit (updated for side)
+// Toggle Edit
 function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, side) {
     if (reviewCard.getAttribute('data-confirmed') === 'true') {
         showErrorMessage('ডেটা কনফার্ম হয়ে গেছে। এডিট করা যাবে না।', side);
@@ -577,7 +585,7 @@ function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, 
     }
 }
 
-// Generate PDF (updated for side)
+// Generate PDF
 function generatePDF(reviewData, reviewCard, side) {
     const formType = reviewData.form_type || 'generic';
     const payload = {
@@ -610,7 +618,7 @@ function generatePDF(reviewData, reviewCard, side) {
         });
 }
 
-// Image Handling Functions (unchanged, but ensure side-specific previews)
+// Image Handling Functions
 function clearPreview(side) {
     selectedFile = null;
     editedImage = null;
@@ -638,7 +646,7 @@ function drawImage() {
     ctx.filter = 'none';
 }
 
-// Genres Modal Functions (unchanged, but send to left chat by default)
+// Genres Modal Functions
 function renderGenres() {
     if (!elements.genresList) return;
     elements.genresList.innerHTML = '';
@@ -653,7 +661,7 @@ function renderGenres() {
                 elements.genresModal.classList.remove('slide-out');
             }, 300);
             if (genre.message) {
-                displayMessage(sanitizeMessage(genre.message), 'user', 'left'); // Default to left
+                displayMessage(sanitizeMessage(genre.message), 'user', 'left');
                 saveChatHistory(sanitizeMessage(genre.message), 'user', 'left');
                 callRasaAPI(genre.message, {}, 'left');
                 hideWelcomeMessage('left');
@@ -691,11 +699,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     initializeApp();
-    // Chat History Handlers
     elements.historyIcon?.addEventListener('click', toggleSidebar);
     elements.closeSidebar?.addEventListener('click', closeSidebarHandler);
     elements.newChatIcon?.addEventListener('click', () => {
-        startNewChat('left'); // Or prompt for side, but default to left
+        startNewChat('left');
         startNewChat('right');
     });
     elements.searchInput?.addEventListener('input', () => loadChatHistory(elements.searchInput.value.trim()));
@@ -703,17 +710,14 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.confirmDelete?.addEventListener('click', deleteChat);
     elements.cancelRename?.addEventListener('click', () => elements.renameModal.style.display = 'none');
     elements.saveRename?.addEventListener('click', renameChat);
-    // Message Sending for left
     elements.sendBtn?.addEventListener('click', () => sendMessage('left'));
     elements.userInput?.addEventListener('keypress', e => {
         if (e.key === 'Enter' && !e.repeat) sendMessage('left');
     });
-    // Message Sending for right
     elements.sendBtnRight?.addEventListener('click', () => sendMessage('right'));
     elements.userInputRight?.addEventListener('keypress', e => {
         if (e.key === 'Enter' && !e.repeat) sendMessage('right');
     });
-    // Image Upload for left
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
     elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
@@ -729,7 +733,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInput.value = '';
     });
-    // Image Upload for right
     elements.uploadBtnRight?.addEventListener('click', () => elements.fileInputRight?.click());
     elements.fileInputRight?.addEventListener('change', () => {
         const file = elements.fileInputRight.files[0];
@@ -745,17 +748,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         elements.fileInputRight.value = '';
     });
-    // Image Review for left
     elements.previewImage?.addEventListener('click', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
-    // Image Review for right
     elements.previewImageRight?.addEventListener('click', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
-    // Image Editing for left
     elements.previewImage?.addEventListener('dblclick', () => {
         if (elements.previewImage) {
             image.src = elements.previewImage.src || '';
@@ -771,7 +771,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
-    // Image Editing for right
     elements.previewImageRight?.addEventListener('dblclick', () => {
         if (elements.previewImageRight) {
             image.src = elements.previewImageRight.src || '';
@@ -787,7 +786,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     });
-    // Canvas Controls (shared)
     elements.cropX?.addEventListener('input', e => { cropRect.x = parseInt(e.target.value); drawImage(); });
     elements.cropY?.addEventListener('input', e => { cropRect.y = parseInt(e.target.value); drawImage(); });
     elements.cropWidth?.addEventListener('input', e => { cropRect.width = parseInt(e.target.value); drawImage(); });
@@ -795,7 +793,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-    // Apply Edit (updates the current previewImage based on which was dblclicked)
     elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
@@ -807,31 +804,27 @@ document.addEventListener('DOMContentLoaded', () => {
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
             tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
             editedImage = tempCanvas.toDataURL('image/jpeg');
-            // Update the correct preview based on which side was editing (assume last preview used, or add side param if needed)
             if (elements.previewImage.src) elements.previewImage.src = editedImage;
             if (elements.previewImageRight.src) elements.previewImageRight.src = editedImage;
-            callRasaAPI("show_review"); // Assuming this is global, adjust if needed
+            callRasaAPI("show_review");
             if (elements.editModal) elements.editModal.style.display = 'none';
         }
     });
     elements.editCancelBtn?.addEventListener('click', () => {
         if (elements.editModal) elements.editModal.style.display = 'none';
     });
-    // Image Modal
     elements.imageReviewModal?.addEventListener('click', e => {
         if (e.target === elements.imageReviewModal || e.target === elements.deleteImageBtn) {
             if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
         }
     });
     elements.deleteImageBtn?.addEventListener('click', () => {
-        clearPreview('left'); // Or handle side
+        clearPreview('left');
         clearPreview('right');
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
     });
-    // Genres Modal
     elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
-    // Welcome Buttons (assume for left, add for right if needed)
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
         button.classList.add('ripple-btn');
         button.addEventListener('click', () => {
