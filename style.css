@@ -1785,7 +1785,7 @@ body {
     color: #333;
 }
 
-#genres2List .genre-item {
+#genres2List .category-item {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -1796,13 +1796,31 @@ body {
     transition: background-color 0.3s;
 }
 
-#genres2List .genre-item:hover {
+#genres2List .category-item:hover {
     background-color: #e0f7fa;
 }
 
-#genres2List .genre-item i {
+#genres2List .category-item i {
     margin-right: 10px;
     font-size: 18px;
+}
+
+#genres2List .sub-questions {
+    margin-left: 20px;
+    display: none; /* Toggle starts hidden */
+}
+
+#genres2List .sub-question-item {
+    padding: 5px 10px;
+    margin: 5px 0;
+    background-color: #e0f7fa;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#genres2List .sub-question-item:hover {
+    background-color: #d1e8eb;
 }
 
 #genres2Modal h2 {
