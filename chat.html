@@ -6,7 +6,7 @@
     <title>ফর্মবন্ধু চ্যাটবট</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="sty.css">
     <link rel="stylesheet" href="drag-drop.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -30,7 +30,7 @@
             <div class="header-right-icons">
                 <i class="fas fa-cog settings-icon" id="settingsIcon" title="সেটিংস" onclick="window.location.href='settings.html'"></i>
                 <i class="fas fa-user-cog account-icon" title="অ্যাকাউন্ট সেটিংস" onclick="window.location.href='account.html'"></i>
-           </div>
+            </div>
         </div>
         <div class="sub-header">
             <div class="sub-header-left">আবেদন</div>
@@ -131,14 +131,16 @@
                 </div>
             </div>
         </div>
-    <div id="genres2Modal" class="modal">
-     <div class="modal-content slide-in">
-              <span id="closeGenres2Modal" class="close">&times;</span>
-                  <h2>জনরা 2</h2>
+        <div id="genres2Modal" class="modal">
+            <div class="modal-content slide-in">
+                <span id="closeGenres2Modal" class="close">&times;</span>
+                <h2><i class="fas fa-list-check"></i> জনরা 2</h2>
                 <div id="genres2List"></div>
+                <div class="genres-modal-buttons">
+                    <button class="cancel" id="closeGenres2ModalBtn">বন্ধ করুন</button>
+                </div>
             </div>
-          </div>
-         </div>
+        </div>
         <div class="image-review-modal" id="imageReviewModal">
             <div class="image-review-content">
                 <img class="review-image" id="reviewImage" src="" alt="Review Image">
