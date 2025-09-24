@@ -1951,3 +1951,58 @@ body {
 #genres2Modal.slide-out {
     animation: slideOutModal 0.3s ease-in;
 }
+/* Video Modal Styles */
+.video-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+.video-modal-content {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-in-out;
+}
+@keyframes slideIn {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.video-modal-content video {
+    width: 100%;
+    border-radius: 8px;
+}
+.video-modal-content .close-video {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    transition: color 0.3s;
+}
+.video-modal-content .close-video:hover {
+    color: #ff0000;
+}
+
+/* Add this to ensure the video icon aligns with other header icons */
+.video-icon {
+    cursor: pointer;
+    font-size: 20px;
+    margin: 0 10px;
+    color: #333;
+    transition: color 0.3s;
+}
+.video-icon:hover {
+    color: #007bff;
+}
