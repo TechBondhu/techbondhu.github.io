@@ -1753,142 +1753,79 @@ body {
     .typing-dot, .dot, .welcome-message, .chat-box, .modal-content {
         animation: none;
     }
-/* Genres2 Modal Styles (Updated for larger size, center positioning, animation, contrast, and organization) */
-#genres2Modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Darker overlay for better focus and contrast */
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
+/* New styles for genres2 sub-questions (adapted to match genre-item) */
+.sub-questions {
+    display: none; /* Initially hidden */
+    padding-left: 20px; /* Indent for hierarchy */
+    gap: 10px;
+    margin-top: 10px;
 }
 
-#genres2Modal .modal-content {
-    background-color: #f0f4f8; /* Light gray-blue background for soft, readable base */
-    padding: 20px;
-    border-radius: 12px;
-    width: 80%; /* Larger width for bigger size */
-    max-width: 600px; /* Max size for larger modal without overwhelming screen */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Deeper shadow for professional depth */
-    position: fixed; /* Fixed for centering */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Perfect centering */
-    text-align: center; /* Center text for organization */
-}
-
-#genres2Modal .modal-content h2 {
-    font-size: 22px; /* Slightly larger for prominence */
-    margin-bottom: 15px;
-    color: #333; /* Dark text for high contrast */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-#genres2Modal .modal-content h2 i {
-    font-size: 20px;
-    color: #0288d1; /* Vibrant blue icon for visual interest */
-}
-
-#genres2Modal .close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 28px;
-    cursor: pointer;
-    color: #0288d1;
-    transition: color 0.3s, transform 0.3s;
-}
-
-#genres2Modal .close:hover {
-    color: #01579b;
-    transform: rotate(90deg); /* Fun hover animation */
-}
-
-#genres2List {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive grid for organized categories */
-    gap: 12px; /* More spacing for clarity */
-    max-height: 400px; /* Taller for larger modal */
-    padding: 10px;
-    overflow-y: auto;
-}
-
-#genres2List .genre-item {
-    display: flex;
+.sub-question-item {
+    display: flex; /* Match genre-item */
     align-items: center;
     padding: 12px;
-    font-size: 14px;
+    font-size: 14px; /* Slightly smaller for sub-level */
     gap: 10px;
-    justify-content: center; /* Centered for toggle-like feel */
-    background-color: #ffffff; /* White background for items with high contrast */
-    color: #333; /* Dark text */
+    background: rgba(255, 255, 255, 0.05); /* Lighter to show sub-level */
+    color: #fff;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for button-like toggle effect */
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
-#genres2List .genre-item:hover {
-    background-color: #e3f2fd; /* Light blue on hover for selection feedback */
-    transform: scale(1.05); /* Slight zoom for toggle interaction */
+.sub-question-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.02); /* Subtle scale to match */
 }
 
-#genres2List .genre-item i {
-    font-size: 18px;
-    color: #0288d1; /* Blue icons for consistency */
+/* Remove all previous genres2Modal specific styles (now reusing genresModal styles) */
+/* #genres2Modal { ... } and its children are removed or commented out */
+
+/* Animations (shared) */
+@keyframes floatIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-#genres2Modal .genres-modal-buttons {
-    margin-top: 15px;
-    display: flex;
-    justify-content: center; /* Centered for professional look */
+.slide-in {
+    animation: slideIn 0.3s ease-in-out;
 }
 
-#genres2Modal .genres-modal-buttons button {
-    padding: 8px 20px;
-    font-size: 14px;
-    background-color: #0288d1; /* Blue button */
-    color: #ffffff; /* White text */
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+.slide-out {
+    animation: slideOut 0.3s ease-in-out;
 }
 
-#genres2Modal .genres-modal-buttons button:hover {
-    background-color: #01579b;
-    transform: translateY(-2px); /* Lift on hover */
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-/* Updated Animations for smooth center appearance */
-#genres2Modal .slide-in {
-    animation: slideInCenter 0.3s ease-in-out;
+@keyframes slideOut {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(20px); opacity: 0; }
 }
 
-#genres2Modal .slide-out {
-    animation: slideOutCenter 0.3s ease-in-out;
+/* Media Queries (updated to cover both modals similarly) */
+@media (max-width: 768px) {
+    .genres-modal-content {
+        width: 90%;
+        padding: 15px;
+    }
+    .genres-list {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    .genre-item, .sub-question-item {
+        padding: 10px;
+        font-size: 14px;
+    }
 }
 
-@keyframes slideInCenter {
-    from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
-    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
+/* ... (rest of media queries and other styles unchanged) */
 
-@keyframes slideOutCenter {
-    from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    to { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
-}
-
-/* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
-    #genres2Modal .modal-content {
+    .genres-modal-content, .slide-in, .slide-out {
         animation: none;
     }
 }
