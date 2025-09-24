@@ -452,37 +452,30 @@ body {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px rgba(30, 58, 138, 0.6); }
 }
-/* দ্বিতীয় চ্যাটবটের মেসেজ ডিজাইন */
-.user-message-2, .bot-message-2 {
-    padding: 15px 20px;
-    border-radius: 12px;
-    max-width: 60%;
-    word-wrap: break-word;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.user-message, .bot-message { 
+    padding: 15px 20px; 
+    border-radius: 12px; 
+    max-width: 60%; 
+    word-wrap: break-word; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
     font-size: 18px;
-    margin: 10px;
-    font-family: 'Tiro Bangla', serif;
-    font-weight: 700;
-    transition: all 0.3s ease;
-}
-
-.user-message-2 {
+    margin: 10px; 
+    font-family: 'Tiro Bangla', serif; 
+    font-weight: 700; transition: all 0.3s ease; } 
+.user-message { 
     background: #f7f7f7;
-    color: #000000;
-    text-align: right;
-    margin-left: auto;  /* ডান পাশে বসানোর জন্য */
-}
-
-.bot-message-2 {
-    background: #fff;
-    color: #111827;
-    text-align: left;
-    margin-right: auto; /* বাম পাশে বসানোর জন্য */
+    color: #000000; 
+    text-align: right; 
+    margin-left: auto; } 
+.bot-message { 
+    background: #fff; 
+    color: #111827; 
+    text-align: left; 
+    margin-right: auto;
     animation: fadeIn 0.3s ease-out;
-    text-shadow: none;
+    text-shadow: none; 
     box-shadow: none;
-    border: none;
-}
+    border: none; }
 
 @keyframes slideIn {
     from { transform: translateX(20px); opacity: 0; }
