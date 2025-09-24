@@ -475,7 +475,7 @@ body {
 }
 
 .bot-message {
-    background: #fff;
+    background: #ffffff;
     color: #111827;
     text-align: left;
     margin-right: auto;
@@ -489,7 +489,7 @@ body {
 /* Ensure messages in right chat (#messages-right) follow the same styling */
 #messages-right .user-message,
 #messages-right .bot-message {
-    padding: 15px 20px;
+    padding: 150px 20px;
     border-radius: 12px;
     max-width: 60%;
     word-wrap: break-word;
