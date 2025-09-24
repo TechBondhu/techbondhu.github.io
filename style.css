@@ -466,42 +466,24 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Chat Container */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px; /* user এবং bot মেসেজের মধ্যে ফাঁকা জায়গা */
-  padding: 15px;
-}
-
-/* Bot message (left side) */
-.bot-message {
-  max-width: 60%;
-  align-self: flex-start; /* সবসময় বাম পাশে */
-  background-color: #f1f1f1; /* হালকা ধূসর */
-  color: #333;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border-top-left-radius: 0;
-  margin: 5px 0;
-  word-wrap: break-word;
-  font-size: 15px;
-  line-height: 1.4;
-}
-
-/* User message (right side) */
 .user-message {
-  max-width: 60%;
-  align-self: flex-end; /* সবসময় ডান পাশে */
-  background-color: #007bff; /* নীল */
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border-top-right-radius: 0;
-  margin: 5px 0;
-  word-wrap: break-word;
-  font-size: 15px;
-  line-height: 1.4;
+    background: #f7f7f7;
+    color: #000000;
+    text-align: right;
+    margin-left: auto;
+    margin-right: 50px; /* Added to push user message to the far right */
+}
+
+.bot-message {
+    background: #ffffff;
+    color: #111827;
+    text-align: left;
+    margin-right: auto;
+    margin-left: 15px; /* Added to push bot message to the far left */
+    animation: fadeIn 0.3s ease-out;
+    text-shadow: none;
+    box-shadow: none;
+    border: none;
 }
 
 /* Ensure messages in right chat (#messages-right) follow the same styling */
@@ -527,11 +509,11 @@ body {
 }
 
 #messages-right .bot-message {
-    background: #ffffff;
+    background: #fff;
     color: #111827;
     text-align: left;
     margin-right: auto;
-    margin-left: 50px; /* Push to far left */
+    margin-left: 15px; /* Push to far left */
     animation: fadeIn 0.3s ease-out;
     text-shadow: none;
     box-shadow: none;
@@ -1969,4 +1951,3 @@ body {
 #genres2Modal.slide-out {
     animation: slideOutModal 0.3s ease-in;
 }
-
