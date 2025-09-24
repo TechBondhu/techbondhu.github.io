@@ -22,6 +22,7 @@
                 <i class="fas fa-home home-icon" title="Home" onclick="window.location.href='index.html'"></i>
                 <i class="fas fa-bars history-icon" id="historyIcon" title="Chat History"></i>
                 <i class="fas fa-pen-to-square new-chat-icon" id="newChatIcon" title="New Chat"></i>
+                <i class="fas fa-video video-icon" id="videoIcon" title="টিউটোরিয়াল ভিডিও"></i>
             </div>
             <div class="header-brand">
                 <span class="brand-logo">ফর্মবন্ধু</span>
@@ -190,6 +191,15 @@
                         <button class="apply" id="editApplyBtn">পরিবর্তন প্রয়োগ করুন</button>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="video-modal" id="videoModal">
+            <div class="video-modal-content">
+                <i class="fas fa-times close-video" id="closeVideoModal"></i>
+                <video controls>
+                    <source src="https://example.com/tutorial-video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
             </div>
         </div>
     </div>
