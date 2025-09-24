@@ -452,7 +452,8 @@ body {
     0%, 100% { opacity: 0.3; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 8px rgba(30, 58, 138, 0.6); }
 }
-.user-message, .bot-message {
+/* দ্বিতীয় চ্যাটবটের মেসেজ ডিজাইন */
+.user-message-2, .bot-message-2 {
     padding: 15px 20px;
     border-radius: 12px;
     max-width: 60%;
@@ -464,22 +465,25 @@ body {
     font-weight: 700;
     transition: all 0.3s ease;
 }
-.user-message {
+
+.user-message-2 {
     background: #f7f7f7;
     color: #000000;
     text-align: right;
-    margin-left: auto;
+    margin-left: auto;  /* ডান পাশে বসানোর জন্য */
 }
-.bot-message {
+
+.bot-message-2 {
     background: #fff;
     color: #111827;
     text-align: left;
-    margin-right: auto;
+    margin-right: auto; /* বাম পাশে বসানোর জন্য */
     animation: fadeIn 0.3s ease-out;
     text-shadow: none;
     box-shadow: none;
     border: none;
 }
+
 @keyframes slideIn {
     from { transform: translateX(20px); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
