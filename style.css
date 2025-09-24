@@ -1767,19 +1767,13 @@ body {
 }
 
 #genres2Modal .modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
     width: 90%;
-    max-width: 300px;
-    padding: 15px;
-}
-
-#genres2Modal .modal-content h2 {
-    font-size: 18px;
-    margin-bottom: 12px;
-    gap: 5px;
-}
-
-#genres2Modal .modal-content h2 i {
-    font-size: 16px;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 #genres2Modal .close {
@@ -1791,20 +1785,10 @@ body {
     color: #333;
 }
 
-#genres2List {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    max-height: 250px;
-    padding: 5px;
-}
-
-#genres2List .category-item {
-    padding: 8px;
-    font-size: 12px;
-    gap: 6px;
-    justify-content: flex-start;
+#genres2List .genre-item {
     display: flex;
     align-items: center;
+    padding: 10px;
     margin: 5px 0;
     background-color: #f1f8e9;
     border-radius: 5px;
@@ -1812,39 +1796,19 @@ body {
     transition: background-color 0.3s;
 }
 
-#genres2List .category-item:hover {
+#genres2List .genre-item:hover {
     background-color: #e0f7fa;
 }
 
-#genres2List .category-item i {
-    font-size: 14px;
+#genres2List .genre-item i {
     margin-right: 10px;
+    font-size: 18px;
 }
 
-#genres2List .sub-questions {
-    margin-left: 20px;
-    display: none; /* Toggle starts hidden */
-}
-
-#genres2List .sub-question-item {
-    padding: 8px;
-    font-size: 12px;
-    gap: 6px;
-    justify-content: flex-start;
-    background-color: #f1f8e9;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    margin: 5px 0;
-}
-
-#genres2List .sub-question-item:hover {
-    background-color: #e0f7fa;
-}
-
-.genres-modal-buttons button {
-    padding: 6px 15px;
-    font-size: 10px;
+#genres2Modal h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #333;
 }
 
 .slide-in {
@@ -1863,10 +1827,4 @@ body {
 @keyframes slideOut {
     from { transform: translateY(0); opacity: 1; }
     to { transform: translateY(-50px); opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .typing-dot, .dot, .welcome-message, .chat-box, .modal-content {
-        animation: none;
-    }
 }
