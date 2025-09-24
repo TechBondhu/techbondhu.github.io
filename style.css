@@ -1753,21 +1753,20 @@ body {
     .typing-dot, .dot, .welcome-message, .chat-box, .modal-content {
         animation: none;
     }
-/* New styles for genres2 sub-questions (adapted to match genre-item) */
 .sub-questions {
-    display: none; /* Initially hidden */
+    display: none; /* Initially hidden for toggle */
     padding-left: 20px; /* Indent for hierarchy */
     gap: 10px;
     margin-top: 10px;
 }
 
 .sub-question-item {
-    display: flex; /* Match genre-item */
+    display: flex;
     align-items: center;
     padding: 12px;
-    font-size: 14px; /* Slightly smaller for sub-level */
+    font-size: 14px; /* Slightly smaller to match genre-item hierarchy */
     gap: 10px;
-    background: rgba(255, 255, 255, 0.05); /* Lighter to show sub-level */
+    background: rgba(255, 255, 255, 0.05); /* Lighter to indicate sub-level */
     color: #fff;
     border-radius: 8px;
     cursor: pointer;
@@ -1776,53 +1775,76 @@ body {
 
 .sub-question-item:hover {
     background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.02); /* Subtle scale to match */
+    transform: scale(1.02); /* Subtle scale to match genre-item */
 }
 
-/* Remove all previous genres2Modal specific styles (now reusing genresModal styles) */
-/* #genres2Modal { ... } and its children are removed or commented out */
+.genres-modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
 
-/* Animations (shared) */
+.genres-modal-buttons button {
+    padding: 10px 25px;
+    font-size: 16px;
+    background: #fff;
+    color: #1E3A8A;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.genres-modal-buttons button:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
 @keyframes floatIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.slide-in {
-    animation: slideIn 0.3s ease-in-out;
-}
-
-.slide-out {
-    animation: slideOut 0.3s ease-in-out;
-}
-
-@keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideOut {
-    from { transform: translateY(0); opacity: 1; }
-    to { transform: translateY(20px); opacity: 0; }
-}
-
-/* Media Queries (updated to cover both modals similarly) */
-@media (max-width: 768px) {
+/* Media Queries (matching your provided snippet for 480px) */
+@media (max-width: 480px) {
     .genres-modal-content {
         width: 90%;
+        max-width: 300px;
         padding: 15px;
     }
-    .genres-list {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 10px;
+    .genres-modal-content h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        gap: 5px;
     }
-    .genre-item, .sub-question-item {
-        padding: 10px;
+    .genres-modal-content h3 i {
+        font-size: 16px;
+    }
+    .genres-list {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        max-height: 250px;
+        padding: 5px;
+    }
+    .genre-item {
+        padding: 8px;
+        font-size: 12px;
+        gap: 6px;
+        justify-content: flex-start;
+    }
+    .genre-item i {
         font-size: 14px;
     }
+    .sub-question-item {
+        padding: 8px;
+        font-size: 12px;
+        gap: 6px;
+    }
+    .genres-modal-buttons button {
+        padding: 6px 15px;
+        font-size: 10px;
+    }
 }
-
-/* ... (rest of media queries and other styles unchanged) */
 
 @media (prefers-reduced-motion: reduce) {
     .genres-modal-content, .slide-in, .slide-out {
