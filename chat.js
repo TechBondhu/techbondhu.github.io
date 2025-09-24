@@ -12,6 +12,15 @@
  * Sub-questions send message on click.
  */
 
+document.getElementById('videoIcon').addEventListener('click', function() {
+    document.getElementById('videoModal').style.display = 'flex';
+});
+document.getElementById('closeVideoModal').addEventListener('click', function() {
+    document.getElementById('videoModal').style.display = 'none';
+    const video = document.querySelector('#videoModal video');
+    video.pause();
+    video.currentTime = 0;
+});
 // Firebase SDK Check
 if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
 
