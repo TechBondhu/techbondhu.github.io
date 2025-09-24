@@ -7,6 +7,9 @@
  * Messages are isolated: left messages only in left, right in right.
  * Right chat displays messages in a clean, beautiful way under "প্রশ্ন জিজ্ঞাসা".
  * Each chat has its own chatId and history.
+ * Updated genres2 to have categories like NID, Passport, Company Registration with toggle sub-questions.
+ * No message sent on category click; toggle shows/hides sub-questions.
+ * Sub-questions send message on click.
  */
 
 // Firebase SDK Check
@@ -104,11 +107,38 @@ const genres = [
     { name: 'কোম্পানি রেজিস্ট্রেশন', icon: 'fas fa-building', message: 'আমি কোম্পানি রেজিস্ট্রেশন করতে চাই' },
 ];
 
-// Genres2 Data (for right chat)
+// Genres2 Data (for right chat, with sub-questions)
 const genres2 = [
-    { name: 'সাধারণ প্রশ্ন', icon: 'fas fa-question-circle', message: 'আমার একটি সাধারণ প্রশ্ন আছে' },
-    { name: 'সেবা সম্পর্কিত', icon: 'fas fa-info-circle', message: 'সেবা সম্পর্কে জানতে চাই' },
-    { name: 'অভিযোগ', icon: 'fas fa-exclamation-triangle', message: 'আমার একটি অভিযোগ আছে' },
+    {
+        name: 'এনআইডি আবেদন',
+        icon: 'fas fa-id-card',
+        subQuestions: [
+            { question: 'এনআইডি আবেদন করতে কত বয়স হওয়া উচিত?', message: 'এনআইডি আবেদন করতে কত বয়স হওয়া উচিত?' },
+            { question: 'এনআইডি করতে কি কি তথ্য থাকা দরকার?', message: 'এনআইডি করতে কি কি তথ্য থাকা দরকার?' },
+            { question: 'এনআইডির জন্য কিভাবে আবেদন করতে হয়?', message: 'এনআইডির জন্য কিভাবে আবেদন করতে হয়?' },
+            { question: 'এনআইডি আবেদন করতে কি বাবা মার অনুমতি নিতে হয়?', message: 'এনআইডি আবেদন করতে কি বাবা মার অনুমতি নিতে হয়?' }
+        ]
+    },
+    {
+        name: 'পাসপোর্ট আবেদন',
+        icon: 'fas fa-passport',
+        subQuestions: [
+            { question: 'পাসপোর্ট আবেদন করতে কত বয়স হওয়া উচিত?', message: 'পাসপোর্ট আবেদন করতে কত বয়স হওয়া উচিত?' },
+            { question: 'পাসপোর্ট করতে কি কি তথ্য থাকা দরকার?', message: 'পাসপোর্ট করতে কি কি তথ্য থাকা দরকার?' },
+            { question: 'পাসপোর্টের জন্য কিভাবে আবেদন করতে হয়?', message: 'পাসপোর্টের জন্য কিভাবে আবেদন করতে হয়?' },
+            { question: 'পাসপোর্ট আবেদন করতে কি বাবা মার অনুমতি নিতে হয়?', message: 'পাসপোর্ট আবেদন করতে কি বাবা মার অনুমতি নিতে হয়?' }
+        ]
+    },
+    {
+        name: 'কোম্পানি রেজিস্ট্রেশন',
+        icon: 'fas fa-building',
+        subQuestions: [
+            { question: 'কোম্পানি রেজিস্ট্রেশন করতে কি কি তথ্য থাকা দরকার?', message: 'কোম্পানি রেজিস্ট্রেশন করতে কি কি তথ্য থাকা দরকার?' },
+            { question: 'কোম্পানি রেজিস্ট্রেশনের জন্য কিভাবে আবেদন করতে হয়?', message: 'কোম্পানি রেজিস্ট্রেশনের জন্য কিভাবে আবেদন করতে হয়?' },
+            { question: 'কোম্পানি রেজিস্ট্রেশন করতে কত সময় লাগে?', message: 'কোম্পানি রেজিস্ট্রেশন করতে কত সময় লাগে?' },
+            { question: 'কোম্পানি রেজিস্ট্রেশনের খরচ কত?', message: 'কোম্পানি রেজিস্ট্রেশনের খরচ কত?' }
+        ]
+    }
 ];
 
 // Auth State Listener
@@ -705,30 +735,51 @@ function closeGenresModal() {
     }
 }
 
-// Genres2 Modal Functions (for right chat)
+// Genres2 Modal Functions (for right chat with toggle sub-questions)
 function renderGenres2() {
     if (!elements.genres2List) return;
     elements.genres2List.innerHTML = '';
-    genres2.forEach(genre => {
-        const item = document.createElement('div');
-        item.className = 'genre-item ripple-btn';
-        item.innerHTML = `<i class="${genre.icon}"></i><span>${sanitizeMessage(genre.name)}</span>`;
-        item.addEventListener('click', () => {
-            elements.genres2Modal?.classList.add('slide-out');
-            setTimeout(() => {
-                elements.genres2Modal.style.display = 'none';
-                elements.genres2Modal.classList.remove('slide-out');
-            }, 300);
-            if (genre.message) {
-                displayMessage(sanitizeMessage(genre.message), 'user', 'right');
-                saveChatHistory(sanitizeMessage(genre.message), 'user', 'right');
-                callRasaAPI(genre.message, {}, 'right');
-                hideWelcomeMessage('right');
+    genres2.forEach(category => {
+        const categoryItem = document.createElement('div');
+        categoryItem.className = 'category-item ripple-btn';
+        categoryItem.innerHTML = `<i class="${category.icon}"></i><span>${sanitizeMessage(category.name)}</span>`;
+        categoryItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const subQuestionsDiv = categoryItem.nextSibling;
+            if (subQuestionsDiv.style.display === 'block') {
+                subQuestionsDiv.style.display = 'none';
             } else {
-                showErrorMessage('এই সেবা উপলব্ধ নয়।', 'right');
+                subQuestionsDiv.style.display = 'block';
             }
         });
-        elements.genres2List.appendChild(item);
+
+        const subQuestionsDiv = document.createElement('div');
+        subQuestionsDiv.className = 'sub-questions';
+        subQuestionsDiv.style.display = 'none'; // Initially hidden
+        category.subQuestions.forEach(subQ => {
+            const subItem = document.createElement('div');
+            subItem.className = 'sub-question-item ripple-btn';
+            subItem.innerHTML = `<span>${sanitizeMessage(subQ.question)}</span>`;
+            subItem.addEventListener('click', () => {
+                elements.genres2Modal?.classList.add('slide-out');
+                setTimeout(() => {
+                    elements.genres2Modal.style.display = 'none';
+                    elements.genres2Modal.classList.remove('slide-out');
+                }, 300);
+                if (subQ.message) {
+                    displayMessage(sanitizeMessage(subQ.message), 'user', 'right');
+                    saveChatHistory(sanitizeMessage(subQ.message), 'user', 'right');
+                    callRasaAPI(subQ.message, {}, 'right');
+                    hideWelcomeMessage('right');
+                } else {
+                    showErrorMessage('এই প্রশ্ন উপলব্ধ নয়।', 'right');
+                }
+            });
+            subQuestionsDiv.appendChild(subItem);
+        });
+
+        elements.genres2List.appendChild(categoryItem);
+        elements.genres2List.appendChild(subQuestionsDiv);
     });
 }
 
