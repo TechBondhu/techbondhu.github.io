@@ -1,10 +1,10 @@
 /**
  * Combined chat functionality for handling Firebase, chat history, and UI interactions.
- * Merged from script.js and chatHistory.js, with duplicates removed and code optimized.
  * Updated to handle two separate chat boxes: left (আবেদন) and right (প্রশ্ন জিজ্ঞাসা).
+ * Right chat's welcome message hides immediately after the user sends a message.
+ * Added new "জনরা 2" modal triggered by the "আরও" button (moreOptionsBtn-right) in the right chat box.
+ * Left chat's "আরও" button (moreOptionsBtn) opens the existing genresModal.
  * Messages are isolated: left messages only in left, right in right.
- * Right chat's welcome message hides immediately after the user sends a message in the right chat box.
- * Added new "জনরা 2" modal triggered by the "আরও" button in the right chat box, displaying new genre options.
  * Right chat displays messages in a clean, beautiful way under "প্রশ্ন জিজ্ঞাসা".
  * Each chat has its own chatId and history.
  */
@@ -76,7 +76,8 @@ const elements = {
     backgroundColor: document.getElementById('bgColor'),
     editCancelBtn: document.getElementById('cancelEdit'),
     editApplyBtn: document.getElementById('editApplyBtn'),
-    moreOptionsBtn: document.getElementById('moreOptionsBtn'),
+    moreOptionsBtn: document.getElementById('moreOptionsBtn'), // Left "আরও" button
+    moreOptionsBtnRight: document.getElementById('moreOptionsBtn-right'), // Right "আরও" button
     genresModal: document.getElementById('genresModal'),
     closeGenresModal: document.getElementById('closeGenresModal'),
     genresList: document.getElementById('genresList'),
@@ -96,14 +97,14 @@ let bgColor = 'white';
 const ctx = elements.editCanvas?.getContext('2d');
 const image = new Image();
 
-// Genres Data
+// Genres Data (for left chat)
 const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
     { name: 'কোম্পানি রেজিস্ট্রেশন', icon: 'fas fa-building', message: 'আমি কোম্পানি রেজিস্ট্রেশন করতে চাই' },
 ];
 
-// Genres2 Data (New for "জনরা 2")
+// Genres2 Data (for right chat)
 const genres2 = [
     { name: 'সাধারণ প্রশ্ন', icon: 'fas fa-question-circle', message: 'আমার একটি সাধারণ প্রশ্ন আছে' },
     { name: 'সেবা সম্পর্কিত', icon: 'fas fa-info-circle', message: 'সেবা সম্পর্কে জানতে চাই' },
@@ -658,7 +659,7 @@ function drawImage() {
     ctx.filter = 'none';
 }
 
-// Genres Modal Functions
+// Genres Modal Functions (for left chat)
 function renderGenres() {
     if (!elements.genresList) return;
     elements.genresList.innerHTML = '';
@@ -704,7 +705,7 @@ function closeGenresModal() {
     }
 }
 
-// Genres2 Modal Functions (New for "জনরা 2")
+// Genres2 Modal Functions (for right chat)
 function renderGenres2() {
     if (!elements.genres2List) return;
     elements.genres2List.innerHTML = '';
@@ -881,7 +882,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearPreview('right');
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
     });
-    elements.moreOptionsBtn?.addEventListener('click', openGenres2Modal); // Updated to open genres2Modal
+    elements.moreOptionsBtn?.addEventListener('click', openGenresModal); // Left "আরও" opens genresModal
+    elements.moreOptionsBtnRight?.addEventListener('click', openGenres2Modal); // Right "আরও" opens genres2Modal
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
     elements.closeGenres2Modal?.addEventListener('click', closeGenres2Modal);
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
@@ -890,12 +892,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const genreName = button.getAttribute('data-genre');
             const genre = genres.find(g => g.name === genreName);
             if (genre?.message) {
-                displayMessage(sanitizeMessage(genre.message), 'user', 'left');
-                saveChatHistory(genre.message, 'user', 'left');
-                callRasaAPI(genre.message, {}, 'left');
-                hideWelcomeMessage('left');
+                // Determine the side based on the parent welcome-message
+                const side = button.closest('#welcomeMessage') ? 'left' : 'right';
+                displayMessage(sanitizeMessage(genre.message), 'user', side);
+                saveChatHistory(genre.message, 'user', side);
+                callRasaAPI(genre.message, {}, side);
+                hideWelcomeMessage(side);
             } else {
-                showErrorMessage('এই সেবা উপলব্ধ নয়।', 'left');
+                showErrorMessage('এই সেবা উপলব্ধ নয়।', button.closest('#welcomeMessage') ? 'left' : 'right');
             }
         });
     });
