@@ -4,6 +4,7 @@
  * Updated to handle two separate chat boxes: left (আবেদন) and right (প্রশ্ন জিজ্ঞাসা).
  * Messages are isolated: left messages only in left, right in right.
  * Right chat's welcome message hides immediately after the user sends a message in the right chat box.
+ * Added new "জনরা 2" modal triggered by the "আরও" button in the right chat box, displaying new genre options.
  * Right chat displays messages in a clean, beautiful way under "প্রশ্ন জিজ্ঞাসা".
  * Each chat has its own chatId and history.
  */
@@ -79,6 +80,9 @@ const elements = {
     genresModal: document.getElementById('genresModal'),
     closeGenresModal: document.getElementById('closeGenresModal'),
     genresList: document.getElementById('genresList'),
+    genres2Modal: document.getElementById('genres2Modal'),
+    closeGenres2Modal: document.getElementById('closeGenres2Modal'),
+    genres2List: document.getElementById('genres2List'),
     imageReviewModal: document.getElementById('imageReviewModal'),
     reviewImage: document.getElementById('reviewImage'),
     deleteImageBtn: document.getElementById('deleteImageBtn')
@@ -97,6 +101,13 @@ const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
     { name: 'কোম্পানি রেজিস্ট্রেশন', icon: 'fas fa-building', message: 'আমি কোম্পানি রেজিস্ট্রেশন করতে চাই' },
+];
+
+// Genres2 Data (New for "জনরা 2")
+const genres2 = [
+    { name: 'সাধারণ প্রশ্ন', icon: 'fas fa-question-circle', message: 'আমার একটি সাধারণ প্রশ্ন আছে' },
+    { name: 'সেবা সম্পর্কিত', icon: 'fas fa-info-circle', message: 'সেবা সম্পর্কে জানতে চাই' },
+    { name: 'অভিযোগ', icon: 'fas fa-exclamation-triangle', message: 'আমার একটি অভিযোগ আছে' },
 ];
 
 // Auth State Listener
@@ -363,15 +374,14 @@ function closeSidebarHandler() {
 }
 
 // Send Message Function
-function sendMessage(side) {
+function sendMessage(side, message) {
     const input = side === 'left' ? elements.userInput : elements.userInputRight;
-    if (!input) return;
-    const message = input.value.trim();
-    if (!message) return;
-    displayMessage(message, 'user', side);
-    saveChatHistory(message, 'user', side);
-    callRasaAPI(message, {}, side);
-    input.value = '';
+    if (!message && (!input || !input.value.trim())) return;
+    const msg = message || input.value.trim();
+    displayMessage(msg, 'user', side);
+    saveChatHistory(msg, 'user', side);
+    callRasaAPI(msg, {}, side);
+    if (!message && input) input.value = '';
     hideWelcomeMessage(side); // Hide welcome message for the specific box
 }
 
@@ -414,7 +424,7 @@ function callRasaAPI(message, metadata = {}, side) {
                             const button = document.createElement('button');
                             button.textContent = sanitizeMessage(btn.title);
                             button.classList.add('ripple-btn');
-                            button.addEventListener('click', () => sendMessage(btn.payload, side));
+                            button.addEventListener('click', () => sendMessage(side, btn.payload));
                             buttonDiv.appendChild(button);
                         });
                         const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
@@ -694,6 +704,52 @@ function closeGenresModal() {
     }
 }
 
+// Genres2 Modal Functions (New for "জনরা 2")
+function renderGenres2() {
+    if (!elements.genres2List) return;
+    elements.genres2List.innerHTML = '';
+    genres2.forEach(genre => {
+        const item = document.createElement('div');
+        item.className = 'genre-item ripple-btn';
+        item.innerHTML = `<i class="${genre.icon}"></i><span>${sanitizeMessage(genre.name)}</span>`;
+        item.addEventListener('click', () => {
+            elements.genres2Modal?.classList.add('slide-out');
+            setTimeout(() => {
+                elements.genres2Modal.style.display = 'none';
+                elements.genres2Modal.classList.remove('slide-out');
+            }, 300);
+            if (genre.message) {
+                displayMessage(sanitizeMessage(genre.message), 'user', 'right');
+                saveChatHistory(sanitizeMessage(genre.message), 'user', 'right');
+                callRasaAPI(genre.message, {}, 'right');
+                hideWelcomeMessage('right');
+            } else {
+                showErrorMessage('এই সেবা উপলব্ধ নয়।', 'right');
+            }
+        });
+        elements.genres2List.appendChild(item);
+    });
+}
+
+function openGenres2Modal() {
+    renderGenres2();
+    if (elements.genres2Modal) {
+        elements.genres2Modal.classList.add('slide-in');
+        elements.genres2Modal.style.display = 'block';
+        setTimeout(() => elements.genres2Modal.classList.remove('slide-in'), 300);
+    }
+}
+
+function closeGenres2Modal() {
+    if (elements.genres2Modal) {
+        elements.genres2Modal.classList.add('slide-out');
+        setTimeout(() => {
+            elements.genres2Modal.style.display = 'none';
+            elements.genres2Modal.classList.remove('slide-out');
+        }, 300);
+    }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     if (!elements.messagesDiv || !elements.historyList || !elements.messagesRight) {
@@ -825,8 +881,9 @@ document.addEventListener('DOMContentLoaded', () => {
         clearPreview('right');
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
     });
-    elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
+    elements.moreOptionsBtn?.addEventListener('click', openGenres2Modal); // Updated to open genres2Modal
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
+    elements.closeGenres2Modal?.addEventListener('click', closeGenres2Modal);
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
         button.classList.add('ripple-btn');
         button.addEventListener('click', () => {
