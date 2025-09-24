@@ -456,11 +456,11 @@ body {
 .user-message, .bot-message {
     padding: 15px 20px;
     border-radius: 12px;
-    max-width: 60%;
+    max-width: 60%; /* Keeping max-width to prevent overflow */
     word-wrap: break-word;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     font-size: 18px;
-    margin: 10px;
+    margin: 15px 10px; /* Increased margin for better spacing */
     font-family: 'Tiro Bangla', serif;
     font-weight: 700;
     transition: all 0.3s ease;
@@ -471,6 +471,7 @@ body {
     color: #000000;
     text-align: right;
     margin-left: auto;
+    margin-right: 15px; /* Added to push user message to the far right */
 }
 
 .bot-message {
@@ -478,6 +479,7 @@ body {
     color: #111827;
     text-align: left;
     margin-right: auto;
+    margin-left: 15px; /* Added to push bot message to the far left */
     animation: fadeIn 0.3s ease-out;
     text-shadow: none;
     box-shadow: none;
@@ -492,7 +494,7 @@ body {
     max-width: 60%;
     word-wrap: break-word;
     font-size: 18px;
-    margin: 10px;
+    margin: 15px 10px; /* Increased margin for better spacing */
     font-family: 'Tiro Bangla', serif;
     font-weight: 700;
     transition: all 0.3s ease;
@@ -503,6 +505,7 @@ body {
     color: #000000;
     text-align: right;
     margin-left: auto;
+    margin-right: 15px; /* Push to far right */
 }
 
 #messages-right .bot-message {
@@ -510,6 +513,7 @@ body {
     color: #111827;
     text-align: left;
     margin-right: auto;
+    margin-left: 15px; /* Push to far left */
     animation: fadeIn 0.3s ease-out;
     text-shadow: none;
     box-shadow: none;
