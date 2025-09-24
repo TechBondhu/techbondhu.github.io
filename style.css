@@ -1753,7 +1753,6 @@ body {
     .typing-dot, .dot, .welcome-message, .chat-box, .modal-content {
         animation: none;
     }
-}
 #genres2Modal {
     display: none;
     position: fixed;
@@ -1761,20 +1760,21 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 123, 255, 0.5); /* হালকা নীল ব্যাকড্রপ */
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
 
 #genres2Modal .modal-content {
-    background-color: #fff;
-    padding: 20px;
+    background-color: #FFFFFF; /* সাদা ব্যাকগ্রাউন্ড */
+    padding: 15px;
     border-radius: 8px;
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* নীল ছায়া */
     position: relative;
+    border: 1px solid #007BFF; /* নীল বর্ডার */
 }
 
 #genres2Modal .close {
@@ -1783,27 +1783,32 @@ body {
     right: 15px;
     font-size: 24px;
     cursor: pointer;
-    color: #333;
+    color: #007BFF; /* নীল বন্ধ বোতাম */
 }
 
 #genres2List .category-item {
     display: flex;
     align-items: center;
-    padding: 10px;
+    padding: 8px;
     margin: 5px 0;
-    background-color: #f1f8e9;
+    background-color: #E9F1FF; /* হালকা নীল ব্যাকগ্রাউন্ড */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 12px;
+    gap: 6px;
+    justify-content: flex-start;
+    color: #333;
+    border: 1px solid #007BFF; /* নীল বর্ডার */
 }
 
 #genres2List .category-item:hover {
-    background-color: #e0f7fa;
+    background-color: #CCE5FF; /* আরও হালকা নীল হোভার */
 }
 
 #genres2List .category-item i {
-    margin-right: 10px;
-    font-size: 18px;
+    font-size: 14px;
+    color: #007BFF; /* নীল আইকন */
 }
 
 #genres2List .sub-questions {
@@ -1812,22 +1817,34 @@ body {
 }
 
 #genres2List .sub-question-item {
-    padding: 5px 10px;
+    padding: 5px 8px;
     margin: 5px 0;
-    background-color: #e0f7fa;
+    background-color: #F8F9FF; /* সাদা-নীল মিশ্রণ */
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    font-size: 12px;
+    color: #333;
+    border: 1px solid #007BFF; /* নীল বর্ডার */
 }
 
 #genres2List .sub-question-item:hover {
-    background-color: #d1e8eb;
+    background-color: #DDEAFF; /* হালকা নীল হোভার */
 }
 
 #genres2Modal h2 {
     margin-top: 0;
-    font-size: 20px;
-    color: #333;
+    font-size: 18px;
+    color: #007BFF; /* নীল হেডিং */
+    margin-bottom: 12px;
+    gap: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#genres2Modal h2 i {
+    font-size: 16px;
+    color: #007BFF; /* নীল আইকন */
 }
 
 .slide-in {
@@ -1846,4 +1863,10 @@ body {
 @keyframes slideOut {
     from { transform: translateY(0); opacity: 1; }
     to { transform: translateY(-50px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .typing-dot, .dot, .welcome-message, .chat-box, .modal-content {
+        animation: none;
+    }
 }
