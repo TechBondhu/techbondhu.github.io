@@ -10,6 +10,7 @@
  * Updated genres2 to have categories like NID, Passport, Company Registration with toggle sub-questions.
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
+ * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
  */
  
 document.getElementById('videoIcon').addEventListener('click', function() {
@@ -47,6 +48,9 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+
+// xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
+const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
 
 // Global Variables
 let leftChatId = localStorage.getItem('leftChatId') || null;
@@ -252,6 +256,70 @@ function showTypingIndicator(side) {
     return typingDiv;
 }
 
+// New Function for Right Side: Call xAI Grok API
+async function callGrokAPI(message, side) {
+    if (side !== 'right') return; // শুধু right side-এর জন্য
+
+    const typingDiv = showTypingIndicator(side);
+    try {
+        const response = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${GROK_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                model: 'grok-4', // বা 'grok-3' যেটা চান
+                messages: [{ role: 'user', content: message }]
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Grok API error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        const botResponse = data.choices[0].message.content;
+        displayMessage(botResponse, 'bot', side);
+        saveChatHistory(botResponse, 'bot', side);
+    } catch (error) {
+        showErrorMessage('Grok API কল করতে সমস্যা: ' + error.message, side);
+    } finally {
+        typingDiv?.remove();
+    }
+}
+
+// Existing Rasa API Function (only for left side)
+async function callRasaAPI(message, reviewData = {}, side) {
+    if (side !== 'left') return; // শুধু left side-এর জন্য
+
+    const typingDiv = showTypingIndicator(side);
+    try {
+        const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sender: 'user', message })
+        });
+
+        if (!response.ok) {
+            throw new Error('Rasa API error: ' + response.statusText);
+        }
+
+        const data = await response.json();
+        if (data.length > 0) {
+            const botResponse = data[0].text;
+            displayMessage(botResponse, 'bot', side);
+            saveChatHistory(botResponse, 'bot', side);
+        } else {
+            showErrorMessage('Rasa থেকে কোনো রেসপন্স পাওয়া যায়নি।', side);
+        }
+    } catch (error) {
+        showErrorMessage('Rasa API কল করতে সমস্যা: ' + error.message, side);
+    } finally {
+        typingDiv?.remove();
+    }
+}
+
 // Chat History Functions
 async function startNewChat(side) {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।', side);
@@ -376,7 +444,7 @@ async function loadChatHistory(searchTerm = '') {
             });
         });
     } catch (error) {
-        console.error('হিস্ট্রি লোডে সমস্যা: ', error);
+        console.error('চ্যাট হিস্ট্রি লোডে সমস্যা: ' + error.message);
     }
 }
 
@@ -384,8 +452,8 @@ async function deleteChat() {
     if (!currentChatId) return;
     try {
         await db.collection('chats').doc(currentChatId).delete();
-        elements.deleteModal.style.display = 'none';
         await loadChatHistory();
+        elements.deleteModal.style.display = 'none';
         if (currentChatId === leftChatId) {
             leftChatId = null;
             localStorage.removeItem('leftChatId');
@@ -401,282 +469,32 @@ async function deleteChat() {
 }
 
 async function renameChat() {
-    if (!currentChatId || !elements.renameInput.value.trim()) return;
+    if (!currentChatId) return;
+    const newName = elements.renameInput.value.trim();
+    if (!newName) return showErrorMessage('নতুন নাম দিন।');
     try {
-        await db.collection('chats').doc(currentChatId).update({
-            name: elements.renameInput.value.trim()
-        });
-        elements.renameModal.style.display = 'none';
+        await db.collection('chats').doc(currentChatId).update({ name: newName });
         await loadChatHistory();
+        elements.renameModal.style.display = 'none';
     } catch (error) {
         showErrorMessage('চ্যাট রিনেমে সমস্যা: ' + error.message);
     }
 }
 
-// Sidebar Handlers
-function toggleSidebar() {
-    if (elements.sidebar) elements.sidebar.classList.toggle('active');
-}
-
-function closeSidebarHandler() {
-    if (elements.sidebar) elements.sidebar.classList.remove('active');
-}
-
 // Send Message Function
-function sendMessage(side, message) {
-    const input = side === 'left' ? elements.userInput : elements.userInputRight;
-    if (!message && (!input || !input.value.trim())) return;
-    const msg = message || input.value.trim();
-    displayMessage(msg, 'user', side);
-    saveChatHistory(msg, 'user', side);
-    callRasaAPI(msg, {}, side);
-    if (!message && input) input.value = '';
-    hideWelcomeMessage(side); // Hide welcome message for the specific box
-}
-
-// Rasa API Call
-function callRasaAPI(message, metadata = {}, side) {
-    const typingDiv = showTypingIndicator(side);
-    if (!typingDiv) return;
-    const chatId = side === 'left' ? leftChatId : rightChatId;
-    const payload = { sender: chatId || 'default', message, ...metadata };
-    setTimeout(() => {
-        if (typeof $ === 'undefined') {
-            typingDiv.remove();
-            showErrorMessage('jQuery লোড হয়নি।', side);
-            return;
-        }
-        $.ajax({
-            url: 'http://localhost:5005/webhooks/rest/webhook',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            success: data => {
-                typingDiv.remove();
-                if (!data || !data.length) {
-                    showErrorMessage('কোনো সাড়া পাওয়া যায়নি।', side);
-                    saveChatHistory('কোনো সাড়া পাওয়া যায়নি।', 'bot', side);
-                    return;
-                }
-                data.forEach(response => {
-                    if (response.text && !response.text.toLowerCase().includes('hi')) {
-                        displayMessage(sanitizeMessage(response.text), 'bot', side);
-                        saveChatHistory(sanitizeMessage(response.text), 'bot', side);
-                    }
-                    if (response.custom?.review_data) {
-                        displayReview(response.custom.review_data, side);
-                    }
-                    if (response.buttons) {
-                        const buttonDiv = document.createElement('div');
-                        buttonDiv.classList.add('welcome-buttons');
-                        response.buttons.forEach(btn => {
-                            const button = document.createElement('button');
-                            button.textContent = sanitizeMessage(btn.title);
-                            button.classList.add('ripple-btn');
-                            button.addEventListener('click', () => sendMessage(side, btn.payload));
-                            buttonDiv.appendChild(button);
-                        });
-                        const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-                        messagesContainer?.appendChild(buttonDiv);
-                    }
-                });
-            },
-            error: () => {
-                typingDiv.remove();
-                showErrorMessage('বট সংযোগে সমস্যা।', side);
-                saveChatHistory('বট সংযোগে সমস্যা।', 'bot', side);
-            }
-        });
-    }, 500);
-}
-
-// Display Review
-function displayReview(reviewData, side) {
-    const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-    if (!messagesContainer) return;
-    const reviewCard = document.createElement('div');
-    reviewCard.classList.add('review-card');
-    reviewCard.setAttribute('data-editable', 'false');
-    reviewCard.setAttribute('data-confirmed', 'false');
-    const reviewContent = document.createElement('div');
-    reviewContent.classList.add('review-content');
-    Object.entries(reviewData).forEach(([key, value]) => {
-        const item = document.createElement('div');
-        item.classList.add('review-item');
-        item.setAttribute('data-key', key);
-        if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
-            item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label><img src="${value}" />`;
-        } else {
-            item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label><p>${sanitizeMessage(value)}</p>`;
-        }
-        reviewContent.appendChild(item);
-    });
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('review-buttons');
-    const editBtn = document.createElement('button');
-    editBtn.classList.add('edit-btn', 'ripple-btn');
-    editBtn.textContent = 'Edit';
-    editBtn.addEventListener('click', () => toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, side));
-    const confirmBtn = document.createElement('button');
-    confirmBtn.classList.add('confirm-btn', 'ripple-btn');
-    confirmBtn.textContent = 'Confirm';
-    let isProcessing = false;
-    confirmBtn.addEventListener('click', async () => {
-        if (isProcessing || reviewCard.getAttribute('data-confirmed') === 'true') return;
-        isProcessing = true;
-        confirmBtn.disabled = true;
-        try {
-            if (!currentUserUid) throw new Error('ইউজার লগইন করেননি।');
-            const updatedData = {};
-            reviewContent.querySelectorAll('.review-item').forEach(item => {
-                const key = item.getAttribute('data-key');
-                const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
-                if (value) updatedData[key] = value;
-            });
-            await db.collection('submissions').add({
-                review_data: updatedData,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                chat_id: side === 'left' ? leftChatId : rightChatId,
-                uid: currentUserUid
-            });
-            displayMessage('তথ্য সফলভাবে সংরক্ষিত!', 'bot', side);
-            generatePDF(updatedData, reviewCard, side);
-            reviewCard.setAttribute('data-confirmed', 'true');
-            reviewCard.setAttribute('data-editable', 'false');
-            editBtn.disabled = true;
-            editBtn.style.display = 'none';
-            confirmBtn.style.display = 'none';
-            buttonContainer.innerHTML = '';
-            const downloadBtn = document.createElement('button');
-            downloadBtn.classList.add('download-btn', 'ripple-btn');
-            downloadBtn.textContent = 'Download PDF';
-            downloadBtn.addEventListener('click', () => {
-                const pdfUrl = reviewCard.getAttribute('data-pdf-url');
-                if (pdfUrl) {
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = decodeURIComponent(pdfUrl.split('/').pop());
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
-                    showErrorMessage('পিডিএফ ডাউনলোডের জন্য URL পাওয়া যায়নি।', side);
-                }
-            });
-            buttonContainer.appendChild(downloadBtn);
-        } catch (error) {
-            showErrorMessage('তথ্য সংরক্ষণে সমস্যা: ' + error.message, side);
-            confirmBtn.disabled = false;
-        } finally {
-            isProcessing = false;
-        }
-    });
-    buttonContainer.appendChild(editBtn);
-    buttonContainer.appendChild(confirmBtn);
-    reviewCard.appendChild(reviewContent);
-    reviewCard.appendChild(buttonContainer);
-    messagesContainer.appendChild(reviewCard);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Toggle Edit
-function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, side) {
-    if (reviewCard.getAttribute('data-confirmed') === 'true') {
-        showErrorMessage('ডেটা কনফার্ম হয়ে গেছে। এডিট করা যাবে না।', side);
-        return;
-    }
-    const isEditable = reviewCard.getAttribute('data-editable') === 'true';
-    if (!isEditable) {
-        reviewCard.setAttribute('data-editable', 'true');
-        editBtn.textContent = 'Save';
-        confirmBtn.style.display = 'none';
-        reviewContent.querySelectorAll('.review-item').forEach(item => {
-            const key = item.getAttribute('data-key');
-            const value = item.querySelector('p')?.textContent || item.querySelector('img')?.src;
-            item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label>`;
-            if (typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image'))) {
-                const img = document.createElement('img');
-                img.src = value;
-                item.appendChild(img);
-                const replaceInput = document.createElement('input');
-                replaceInput.type = 'file';
-                replaceInput.classList.add('replace-image-input');
-                replaceInput.accept = 'image/png, image/jpeg';
-                replaceInput.style.display = 'none';
-                item.appendChild(replaceInput);
-                const replaceIcon = document.createElement('i');
-                replaceIcon.classList.add('fas', 'fa-camera', 'replace-image-icon');
-                item.appendChild(replaceIcon);
-                replaceIcon.addEventListener('click', () => replaceInput.click());
-                replaceInput.addEventListener('change', () => {
-                    const file = replaceInput.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = e => img.src = e.target.result;
-                        reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', side);
-                        reader.readAsDataURL(file);
-                    }
-                });
-            } else {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = value || '';
-                input.classList.add('edit-input');
-                item.appendChild(input);
-            }
-        });
+async function sendMessage(side) {
+    const userInput = side === 'left' ? elements.userInput : elements.userInputRight;
+    const message = userInput.value.trim();
+    if (!message) return;
+    displayMessage(message, 'user', side);
+    saveChatHistory(message, 'user', side);
+    userInput.value = '';
+    hideWelcomeMessage(side);
+    if (side === 'left') {
+        callRasaAPI(message, {}, side);
     } else {
-        const updatedData = { ...reviewData };
-        reviewContent.querySelectorAll('.review-item').forEach(item => {
-            const key = item.getAttribute('data-key');
-            const input = item.querySelector('input.edit-input');
-            const img = item.querySelector('img');
-            if (input) {
-                const newValue = input.value.trim();
-                updatedData[key] = newValue;
-                item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label><p>${sanitizeMessage(newValue)}</p>`;
-            } else if (img) {
-                updatedData[key] = img.src;
-                item.innerHTML = `<label>${sanitizeMessage(key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '))}:</label><img src="${img.src}" />`;
-            }
-        });
-        reviewCard.setAttribute('data-editable', 'false');
-        editBtn.textContent = 'Edit';
-        confirmBtn.style.display = 'inline-block';
+        callGrokAPI(message, side); // Right side-এর জন্য Grok API কল
     }
-}
-
-// Generate PDF
-function generatePDF(reviewData, reviewCard, side) {
-    const formType = reviewData.form_type || 'generic';
-    const payload = {
-        reviewData: Object.fromEntries(
-            Object.entries(reviewData).map(([key, value]) => [
-                key,
-                typeof value === 'string' && (value.startsWith('http') || value.startsWith('data:image')) ? '[Image]' : value
-            ])
-        ),
-        formType
-    };
-    fetch('http://localhost:5000/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.pdf_url) {
-                reviewCard.setAttribute('data-pdf-url', data.pdf_url);
-                displayMessage('PDF তৈরি ও আপলোড সফল!', 'bot', side);
-                saveChatHistory('PDF তৈরি সফল।', 'bot', side);
-            } else {
-                throw new Error(data.error || 'PDF generation failed');
-            }
-        })
-        .catch(error => {
-            showErrorMessage('PDF তৈরিতে সমস্যা: ' + error.message, side);
-            saveChatHistory('PDF error: ' + error.message, 'bot', side);
-        });
 }
 
 // Image Handling Functions
@@ -787,7 +605,7 @@ function renderGenres2() {
                 if (subQ.message) {
                     displayMessage(sanitizeMessage(subQ.message), 'user', 'right');
                     saveChatHistory(sanitizeMessage(subQ.message), 'user', 'right');
-                    callRasaAPI(subQ.message, {}, 'right');
+                    callGrokAPI(subQ.message, 'right');
                     hideWelcomeMessage('right');
                 } else {
                     showErrorMessage('এই প্রশ্ন উপলব্ধ নয়।', 'right');
@@ -818,6 +636,17 @@ function closeGenres2Modal() {
             elements.genres2Modal.classList.remove('slide-out');
         }, 300);
     }
+}
+
+// Toggle Sidebar
+function toggleSidebar() {
+    elements.sidebar.classList.toggle('open');
+    document.querySelector('.chat-container').classList.toggle('sidebar-open');
+}
+
+function closeSidebarHandler() {
+    elements.sidebar.classList.remove('open');
+    document.querySelector('.chat-container').classList.remove('sidebar-open');
 }
 
 // Event Listeners
@@ -969,6 +798,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 hideWelcomeMessage(side);
             } else {
                 showErrorMessage('এই সেবা উপলব্ধ নয়।', button.closest('#welcomeMessage') ? 'left' : 'right');
+            }
+        });
+    });
+    document.querySelectorAll('.welcome-buttons button[data-category]').forEach(button => {
+        button.classList.add('ripple-btn');
+        button.addEventListener('click', () => {
+            const categoryName = button.getAttribute('data-category');
+            const category = genres2.find(g => g.name === categoryName);
+            if (category) {
+                openGenres2Modal();
+            } else {
+                showErrorMessage('এই সেবা উপলব্ধ নয়।', 'right');
             }
         });
     });
