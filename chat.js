@@ -49,7 +49,6 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage();
 
 // xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
 const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
