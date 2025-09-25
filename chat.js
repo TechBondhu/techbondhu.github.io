@@ -11,16 +11,25 @@
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
  */
-
+ 
 document.getElementById('videoIcon').addEventListener('click', function() {
-    document.getElementById('videoModal').style.display = 'flex';
-});
-document.getElementById('closeVideoModal').addEventListener('click', function() {
-    document.getElementById('videoModal').style.display = 'none';
-    const video = document.querySelector('#videoModal video');
-    video.pause();
-    video.currentTime = 0;
-});
+       document.getElementById('videoModal').style.display = 'flex';
+       // Reset video to start when modal opens
+       const video = document.getElementById('tutorialVideo');
+       if (video) {
+           video.currentTime = 0;
+           video.load();
+       }
+   });
+
+   document.getElementById('closeVideoModal').addEventListener('click', function() {
+       document.getElementById('videoModal').style.display = 'none';
+       // Pause video when modal closes
+       const video = document.getElementById('tutorialVideo');
+       if (video) {
+           video.pause();
+       }
+   });
 // Firebase SDK Check
 if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
 
