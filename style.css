@@ -771,18 +771,32 @@ body {
     transition: background 0.3s ease, transform 0.2s ease;
 }
 
-#sendBtn, #sendBtn-right {
+#sendBtn {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: #1E3A8A; /* নীল ব্যাকগ্রাউন্ড নিশ্চিত করা */
+    background: #1E3A8A;
     color: #fff;
     font-size: 16px;
 }
 
-#sendBtn:hover, #sendBtn-right:hover {
-    background: #3B82F6; /* হোভারে লেফটের মতোই কালার এবং স্কেল */
+#sendBtn-right {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #1E3A8A !important; /* নীল ব্যাকগ্রাউন্ড নিশ্চিত করা */
+    color: #fff !important;
+    font-size: 16px;
+}
+
+#sendBtn:hover {
+    background: #3B82F6;
     transform: scale(1.1);
+}
+
+#sendBtn-right:hover {
+    background: #3B82F6 !important; /* হোভারে নীল কালার এবং স্কেল */
+    transform: scale(1.1) !important;
 }
 
 #uploadBtn, #uploadBtn-right {
@@ -852,11 +866,50 @@ body {
     #uploadBtn i, #uploadBtn-right i {
         font-size: 14px;
     }
+    #sendBtn-right {
+        background: #1E3A8A !important; /* মোবাইলেও নীল কালার নিশ্চিত */
+    }
+    #sendBtn-right:hover {
+        background: #3B82F6 !important;
+        transform: scale(1.1) !important;
+    }
     .preview-container, #previewContainer, #previewContainer-right {
         max-width: 50px;
     }
 }
 
+@media (max-width: 480px) {
+    .input-area {
+        padding: 8px;
+    }
+    .input-wrapper {
+        width: 95%;
+        padding: 6px 10px;
+    }
+    #userInput, #userInput-right {
+        font-size: 12px;
+        min-height: 40px;
+        max-height: 80px;
+    }
+    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+    #uploadBtn i, #uploadBtn-right i {
+        font-size: 12px;
+    }
+    #sendBtn-right {
+        background: #1E3A8A !important; /* মোবাইলেও নীল কালার নিশ্চিত */
+    }
+    #sendBtn-right:hover {
+        background: #3B82F6 !important;
+        transform: scale(1.1) !important;
+    }
+    .preview-container, #previewContainer, #previewContainer-right {
+        max-width: 40px;
+    }
+}
 @media (max-width: 480px) {
     .input-area {
         padding: 8px;
