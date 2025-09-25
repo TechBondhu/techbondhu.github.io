@@ -11,27 +11,28 @@
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
  * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
- * Fixed image upload for left side (আবেদন): Now uploads to Firebase Storage and displays URL seamlessly.
+ * Fixed image upload for left side (আবেদন): Now uploads to Firebase Storage with proper initialization, file size/format validation, and seamless URL display.
  */
  
 document.getElementById('videoIcon').addEventListener('click', function() {
-       document.getElementById('videoModal').style.display = 'flex';
-       // Reset video to start when modal opens
-       const video = document.getElementById('tutorialVideo');
-       if (video) {
-           video.currentTime = 0;
-           video.load();
-       }
-   });
+    document.getElementById('videoModal').style.display = 'flex';
+    // Reset video to start when modal opens
+    const video = document.getElementById('tutorialVideo');
+    if (video) {
+        video.currentTime = 0;
+        video.load();
+    }
+});
 
-   document.getElementById('closeVideoModal').addEventListener('click', function() {
-       document.getElementById('videoModal').style.display = 'none';
-       // Pause video when modal closes
-       const video = document.getElementById('tutorialVideo');
-       if (video) {
-           video.pause();
-       }
-   });
+document.getElementById('closeVideoModal').addEventListener('click', function() {
+    document.getElementById('videoModal').style.display = 'none';
+    // Pause video when modal closes
+    const video = document.getElementById('tutorialVideo');
+    if (video) {
+        video.pause();
+    }
+});
+
 // Firebase SDK Check
 if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
 
@@ -49,6 +50,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage(); // Initialize Firebase Storage
 
 // xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
 const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
@@ -500,19 +502,40 @@ async function sendMessage(side) {
 
 // Image Handling Functions (Updated for seamless upload in left side)
 async function uploadImageToFirebase(file, side) {
-    if (side !== 'left') return; // শুধু left side-এর জন্য আপলোড
+    if (side !== 'left') return null; // শুধু left side-এর জন্য আপলোড
+    if (!currentUserUid) {
+        showErrorMessage('ইউজার লগইন করেননি। ইমেজ আপলোড করতে লগইন করুন।', side);
+        return null;
+    }
 
-    const storageRef = storage.ref();
-    const fileRef = storageRef.child(`images/${currentUserUid}/${file.name}`);
+    // Validate file format and size
+    const validFormats = ['image/jpeg', 'image/png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (!validFormats.includes(file.type)) {
+        showErrorMessage('শুধুমাত্র JPEG বা PNG ফরম্যাটের ইমেজ আপলোড করা যাবে।', side);
+        return null;
+    }
+    if (file.size > maxSize) {
+        showErrorMessage('ইমেজের সাইজ ৫ এমবি-এর বেশি হতে পারবে না।', side);
+        return null;
+    }
+
+    const typingDiv = showTypingIndicator(side);
     try {
+        const storageRef = storage.ref();
+        const fileName = `${Date.now()}_${file.name}`; // Unique file name
+        const fileRef = storageRef.child(`images/${currentUserUid}/${fileName}`);
         const snapshot = await fileRef.put(file);
         const downloadURL = await snapshot.ref.getDownloadURL();
         displayMessage(downloadURL, 'user', side); // ইমেজ URL ডিসপ্লে করুন
         saveChatHistory(downloadURL, 'user', side);
-        callRasaAPI('Image uploaded: ' + downloadURL, {}, side); // Rasa-কে URL পাঠান
+        callRasaAPI(`Image uploaded: ${downloadURL}`, {}, side); // Rasa-কে URL পাঠান
         return downloadURL;
     } catch (error) {
         showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message, side);
+        return null;
+    } finally {
+        typingDiv?.remove();
     }
 }
 
@@ -707,8 +730,8 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsDataURL(file);
             // Seamless upload to Firebase
             await uploadImageToFirebase(file, 'left');
+            elements.fileInput.value = ''; // Clear file input after upload
         }
-        elements.fileInput.value = '';
     });
     elements.uploadBtnRight?.addEventListener('click', () => elements.fileInputRight?.click());
     elements.fileInputRight?.addEventListener('change', () => {
@@ -722,15 +745,15 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'right');
             reader.readAsDataURL(file);
+            elements.fileInputRight.value = '';
         }
-        elements.fileInputRight.value = '';
     });
     elements.previewImage?.addEventListener('click', () => {
-        if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
+        if (elements.reviewImage && elements.previewImage.src) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
     elements.previewImageRight?.addEventListener('click', () => {
-        if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
+        if (elements.reviewImage && elements.previewImageRight.src) elements.reviewImage.src = elements.previewImageRight.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
     elements.previewImage?.addEventListener('dblclick', () => {
@@ -770,21 +793,26 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-    elements.editApplyBtn?.addEventListener('click', () => {
+    elements.editApplyBtn?.addEventListener('click', async () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
         tempCanvas.height = cropRect.height;
         const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx && editedImage) {
+        if (tempCtx && selectedFile) {
             tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
             tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
             tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
-            editedImage = tempCanvas.toDataURL('image/jpeg');
-            if (elements.previewImage.src) elements.previewImage.src = editedImage;
-            if (elements.previewImageRight.src) elements.previewImageRight.src = editedImage;
-            callRasaAPI("show_review");
-            if (elements.editModal) elements.editModal.style.display = 'none';
+            // Convert canvas to Blob for Firebase upload
+            tempCanvas.toBlob(async (blob) => {
+                const editedFile = new File([blob], `edited_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                const downloadURL = await uploadImageToFirebase(editedFile, 'left');
+                if (downloadURL) {
+                    if (elements.previewImage.src) elements.previewImage.src = downloadURL;
+                    if (elements.previewImageRight.src) elements.previewImageRight.src = downloadURL;
+                }
+                if (elements.editModal) elements.editModal.style.display = 'none';
+            }, 'image/jpeg');
         }
     });
     elements.editCancelBtn?.addEventListener('click', () => {
@@ -810,7 +838,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const genreName = button.getAttribute('data-genre');
             const genre = genres.find(g => g.name === genreName);
             if (genre?.message) {
-                // Determine the side based on the parent welcome-message
                 const side = button.closest('#welcomeMessage') ? 'left' : 'right';
                 displayMessage(sanitizeMessage(genre.message), 'user', side);
                 saveChatHistory(genre.message, 'user', side);
