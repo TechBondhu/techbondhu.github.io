@@ -11,6 +11,7 @@
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
  * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
+ * Fixed image upload for left side (আবেদন): Now uploads to Firebase Storage and displays URL seamlessly.
  */
  
 document.getElementById('videoIcon').addEventListener('click', function() {
@@ -48,6 +49,7 @@ const firebaseConfig = {
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+const storage = firebase.storage();
 
 // xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
 const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
@@ -497,7 +499,24 @@ async function sendMessage(side) {
     }
 }
 
-// Image Handling Functions
+// Image Handling Functions (Updated for seamless upload in left side)
+async function uploadImageToFirebase(file, side) {
+    if (side !== 'left') return; // শুধু left side-এর জন্য আপলোড
+
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(`images/${currentUserUid}/${file.name}`);
+    try {
+        const snapshot = await fileRef.put(file);
+        const downloadURL = await snapshot.ref.getDownloadURL();
+        displayMessage(downloadURL, 'user', side); // ইমেজ URL ডিসপ্লে করুন
+        saveChatHistory(downloadURL, 'user', side);
+        callRasaAPI('Image uploaded: ' + downloadURL, {}, side); // Rasa-কে URL পাঠান
+        return downloadURL;
+    } catch (error) {
+        showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message, side);
+    }
+}
+
 function clearPreview(side) {
     selectedFile = null;
     editedImage = null;
@@ -676,7 +695,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter' && !e.repeat) sendMessage('right');
     });
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
-    elements.fileInput?.addEventListener('change', () => {
+    elements.fileInput?.addEventListener('change', async () => {
         const file = elements.fileInput.files[0];
         if (file) {
             selectedFile = file;
@@ -687,6 +706,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'left');
             reader.readAsDataURL(file);
+            // Seamless upload to Firebase
+            await uploadImageToFirebase(file, 'left');
         }
         elements.fileInput.value = '';
     });
