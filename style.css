@@ -775,13 +775,13 @@ body {
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: #1E3A8A;
+    background: #1E3A8A; /* নীল ব্যাকগ্রাউন্ড নিশ্চিত করা */
     color: #fff;
     font-size: 16px;
 }
 
 #sendBtn:hover, #sendBtn-right:hover {
-    background: #3B82F6;
+    background: #3B82F6; /* হোভারে লেফটের মতোই কালার এবং স্কেল */
     transform: scale(1.1);
 }
 
@@ -854,6 +854,32 @@ body {
     }
     .preview-container, #previewContainer, #previewContainer-right {
         max-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-area {
+        padding: 8px;
+    }
+    .input-wrapper {
+        width: 95%;
+        padding: 6px 10px;
+    }
+    #userInput, #userInput-right {
+        font-size: 12px;
+        min-height: 40px;
+        max-height: 80px;
+    }
+    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+    #uploadBtn i, #uploadBtn-right i {
+        font-size: 12px;
+    }
+    .preview-container, #previewContainer, #previewContainer-right {
+        max-width: 40px;
     }
 }
 
