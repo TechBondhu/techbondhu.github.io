@@ -706,6 +706,7 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
 }
+/* ইনপুট এরিয়া (মেসেজ বক্স) স্টাইল */
 .input-area {
     display: flex;
     flex-direction: column;
@@ -718,6 +719,7 @@ body {
     margin-top: auto;
     gap: 10px;
 }
+
 .input-wrapper {
     position: relative;
     display: flex;
@@ -726,14 +728,15 @@ body {
     width: 80%;
     max-width: 800px;
     background: #fff;
-    border: 1px solid #d1d5db;
+    border: 2px solid #1E3A8A; /* স্পষ্ট বর্ডার যাতে মেসেজ বক্স সংজ্ঞায়িত হয় */
     border-radius: 25px;
     padding: 10px 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     gap: 10px;
     transition: height 0.3s ease;
 }
-#userInput, #userInputApplication, #userInputQuestion {
+
+#userInput, #userInput-right {
     flex-grow: 1;
     padding: 10px 12px;
     font-size: 16px;
@@ -752,12 +755,14 @@ body {
     line-height: 1.6;
     transition: height 0.3s ease;
 }
-#userInput:focus, #userInputApplication:focus, #userInputQuestion:focus {
+
+#userInput:focus, #userInput-right:focus {
     border: none;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
     outline: none;
 }
-#sendBtn, #uploadBtn, #sendBtnApplication, #uploadBtnApplication, #sendBtnQuestion, #uploadBtnQuestion {
+
+#sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
     border: none;
     cursor: pointer;
     display: flex;
@@ -765,7 +770,8 @@ body {
     align-items: center;
     transition: background 0.3s ease, transform 0.2s ease;
 }
-#sendBtn, #sendBtnApplication, #sendBtnQuestion {
+
+#sendBtn, #sendBtn-right {
     width: 35px;
     height: 35px;
     border-radius: 50%;
@@ -773,11 +779,13 @@ body {
     color: #fff;
     font-size: 16px;
 }
-#sendBtn:hover, #sendBtnApplication:hover, #sendBtnQuestion:hover {
+
+#sendBtn:hover, #sendBtn-right:hover {
     background: #3B82F6;
     transform: scale(1.1);
 }
-#uploadBtn, #uploadBtnApplication, #uploadBtnQuestion {
+
+#uploadBtn, #uploadBtn-right {
     width: 35px;
     height: 35px;
     border-radius: 50%;
@@ -787,27 +795,92 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     margin-left: 10px;
 }
-#uploadBtn i, #uploadBtnApplication i, #uploadBtnQuestion i {
+
+#uploadBtn i, #uploadBtn-right i {
     font-size: 16px;
 }
-#uploadBtn:hover, #uploadBtnApplication:hover, #uploadBtnQuestion:hover {
+
+#uploadBtn:hover, #uploadBtn-right:hover {
     background: #3B82F6;
     transform: scale(1.1);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
+
 .button-container {
     display: flex;
     gap: 5px;
     justify-content: flex-end;
 }
+
 .preview-container {
-    position: absolute;
-    left: 15px;
-    top: 10px;
-    transform: none;
     display: none;
-    align-items: center;
-    gap: 5px;
+    max-width: 60px;
+    margin-right: 10px;
+}
+
+#previewContainer, #previewContainer-right {
+    display: none;
+    max-width: 60px;
+    margin-right: 10px;
+}
+
+.preview-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* রেসপনসিভ ডিজাইন */
+@media (max-width: 768px) {
+    .input-area {
+        padding: 10px;
+    }
+    .input-wrapper {
+        width: 90%;
+        padding: 8px 12px;
+    }
+    #userInput, #userInput-right {
+        font-size: 14px;
+        min-height: 50px;
+        max-height: 100px;
+    }
+    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    #uploadBtn i, #uploadBtn-right i {
+        font-size: 14px;
+    }
+    .preview-container, #previewContainer, #previewContainer-right {
+        max-width: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-area {
+        padding: 8px;
+    }
+    .input-wrapper {
+        width: 95%;
+        padding: 6px 10px;
+    }
+    #userInput, #userInput-right {
+        font-size: 12px;
+        min-height: 40px;
+        max-height: 80px;
+    }
+    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
+        width: 25px;
+        height: 25px;
+        font-size: 12px;
+    }
+    #uploadBtn i, #uploadBtn-right i {
+        font-size: 12px;
+    }
+    .preview-container, #previewContainer, #previewContainer-right {
+        max-width: 40px;
+    }
 }
 .preview-image {
     width: 40px;
