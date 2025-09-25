@@ -11,30 +11,28 @@
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
  * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
- * Fixed image upload for left side (আবেদন): Properly initialized Firebase Storage, added file validation, and ensured seamless upload.
  */
  
-document.getElementById('videoIcon')?.addEventListener('click', function() {
-    document.getElementById('videoModal').style.display = 'flex';
-    const video = document.getElementById('tutorialVideo');
-    if (video) {
-        video.currentTime = 0;
-        video.load();
-    }
-});
+document.getElementById('videoIcon').addEventListener('click', function() {
+       document.getElementById('videoModal').style.display = 'flex';
+       // Reset video to start when modal opens
+       const video = document.getElementById('tutorialVideo');
+       if (video) {
+           video.currentTime = 0;
+           video.load();
+       }
+   });
 
-document.getElementById('closeVideoModal')?.addEventListener('click', function() {
-    document.getElementById('videoModal').style.display = 'none';
-    const video = document.getElementById('tutorialVideo');
-    if (video) {
-        video.pause();
-    }
-});
-
+   document.getElementById('closeVideoModal').addEventListener('click', function() {
+       document.getElementById('videoModal').style.display = 'none';
+       // Pause video when modal closes
+       const video = document.getElementById('tutorialVideo');
+       if (video) {
+           video.pause();
+       }
+   });
 // Firebase SDK Check
-if (typeof firebase === 'undefined') {
-    throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
-}
+if (typeof firebase === 'undefined') throw new Error("Firebase SDK not loaded. Add Firebase CDN in index.html");
 
 // Firebase Config
 const firebaseConfig = {
@@ -47,17 +45,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage ? firebase.storage() : null; // Safely initialize storage
-
-// Check if storage is available
-if (!storage) {
-    console.error("Firebase Storage SDK is not loaded. Please include firebase-storage.js in index.html");
-}
 
 // xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
 const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
@@ -503,53 +493,11 @@ async function sendMessage(side) {
     if (side === 'left') {
         callRasaAPI(message, {}, side);
     } else {
-        callGrokAPI(message, side);
+        callGrokAPI(message, side); // Right side-এর জন্য Grok API কল
     }
 }
 
-// Image Handling Functions (Updated for seamless upload in left side)
-async function uploadImageToFirebase(file, side) {
-    if (side !== 'left') return null; // শুধু left side-এর জন্য আপলোড
-    if (!currentUserUid) {
-        showErrorMessage('ইউজার লগইন করেননি। ইমেজ আপলোড করতে লগইন করুন।', side);
-        return null;
-    }
-    if (!storage) {
-        showErrorMessage('Firebase Storage SDK লোড হয়নি। index.html এ firebase-storage.js যোগ করুন।', side);
-        return null;
-    }
-
-    // Validate file format and size
-    const validFormats = ['image/jpeg', 'image/png'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (!validFormats.includes(file.type)) {
-        showErrorMessage('শুধুমাত্র JPEG বা PNG ফরম্যাটের ইমেজ আপলোড করা যাবে।', side);
-        return null;
-    }
-    if (file.size > maxSize) {
-        showErrorMessage('ইমেজের সাইজ ৫ এমবি-এর বেশি হতে পারবে না।', side);
-        return null;
-    }
-
-    const typingDiv = showTypingIndicator(side);
-    try {
-        const storageRef = storage.ref();
-        const fileName = `${Date.now()}_${file.name}`; // Unique file name
-        const fileRef = storageRef.child(`images/${currentUserUid}/${fileName}`);
-        const snapshot = await fileRef.put(file);
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        displayMessage(downloadURL, 'user', side);
-        saveChatHistory(downloadURL, 'user', side);
-        callRasaAPI(`Image uploaded: ${downloadURL}`, {}, side);
-        return downloadURL;
-    } catch (error) {
-        showErrorMessage('ইমেজ আপলোডে সমস্যা: ' + error.message, side);
-        return null;
-    } finally {
-        typingDiv?.remove();
-    }
-}
-
+// Image Handling Functions
 function clearPreview(side) {
     selectedFile = null;
     editedImage = null;
@@ -643,7 +591,7 @@ function renderGenres2() {
 
         const subQuestionsDiv = document.createElement('div');
         subQuestionsDiv.className = 'sub-questions';
-        subQuestionsDiv.style.display = 'none';
+        subQuestionsDiv.style.display = 'none'; // Initially hidden
         category.subQuestions.forEach(subQ => {
             const subItem = document.createElement('div');
             subItem.className = 'sub-question-item ripple-btn';
@@ -728,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter' && !e.repeat) sendMessage('right');
     });
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
-    elements.fileInput?.addEventListener('change', async () => {
+    elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
         if (file) {
             selectedFile = file;
@@ -739,9 +687,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'left');
             reader.readAsDataURL(file);
-            await uploadImageToFirebase(file, 'left');
-            elements.fileInput.value = '';
         }
+        elements.fileInput.value = '';
     });
     elements.uploadBtnRight?.addEventListener('click', () => elements.fileInputRight?.click());
     elements.fileInputRight?.addEventListener('change', () => {
@@ -755,15 +702,15 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'right');
             reader.readAsDataURL(file);
-            elements.fileInputRight.value = '';
         }
+        elements.fileInputRight.value = '';
     });
     elements.previewImage?.addEventListener('click', () => {
-        if (elements.reviewImage && elements.previewImage.src) elements.reviewImage.src = elements.previewImage.src;
+        if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
     elements.previewImageRight?.addEventListener('click', () => {
-        if (elements.reviewImage && elements.previewImageRight.src) elements.reviewImage.src = elements.previewImageRight.src;
+        if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
     elements.previewImage?.addEventListener('dblclick', () => {
@@ -803,25 +750,21 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.brightness?.addEventListener('input', e => { brightnessValue = parseInt(e.target.value); drawImage(); });
     elements.contrast?.addEventListener('input', e => { contrastValue = parseInt(e.target.value); drawImage(); });
     elements.backgroundColor?.addEventListener('change', e => { bgColor = e.target.value; drawImage(); });
-    elements.editApplyBtn?.addEventListener('click', async () => {
+    elements.editApplyBtn?.addEventListener('click', () => {
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = cropRect.width;
         tempCanvas.height = cropRect.height;
         const tempCtx = tempCanvas.getContext('2d');
-        if (tempCtx && selectedFile) {
+        if (tempCtx && editedImage) {
             tempCtx.fillStyle = bgColor === 'transparent' ? 'rgba(0,0,0,0)' : bgColor;
             tempCtx.fillRect(0, 0, cropRect.width, cropRect.height);
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
             tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
-            tempCanvas.toBlob(async (blob) => {
-                const editedFile = new File([blob], `edited_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                const downloadURL = await uploadImageToFirebase(editedFile, 'left');
-                if (downloadURL) {
-                    if (elements.previewImage.src) elements.previewImage.src = downloadURL;
-                    if (elements.previewImageRight.src) elements.previewImageRight.src = downloadURL;
-                }
-                if (elements.editModal) elements.editModal.style.display = 'none';
-            }, 'image/jpeg');
+            editedImage = tempCanvas.toDataURL('image/jpeg');
+            if (elements.previewImage.src) elements.previewImage.src = editedImage;
+            if (elements.previewImageRight.src) elements.previewImageRight.src = editedImage;
+            callRasaAPI("show_review");
+            if (elements.editModal) elements.editModal.style.display = 'none';
         }
     });
     elements.editCancelBtn?.addEventListener('click', () => {
@@ -837,8 +780,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearPreview('right');
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'none';
     });
-    elements.moreOptionsBtn?.addEventListener('click', openGenresModal);
-    elements.moreOptionsBtnRight?.addEventListener('click', openGenres2Modal);
+    elements.moreOptionsBtn?.addEventListener('click', openGenresModal); // Left "আরও" opens genresModal
+    elements.moreOptionsBtnRight?.addEventListener('click', openGenres2Modal); // Right "আরও" opens genres2Modal
     elements.closeGenresModal?.addEventListener('click', closeGenresModal);
     elements.closeGenres2Modal?.addEventListener('click', closeGenres2Modal);
     document.querySelectorAll('.welcome-buttons button[data-genre]').forEach(button => {
@@ -847,6 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const genreName = button.getAttribute('data-genre');
             const genre = genres.find(g => g.name === genreName);
             if (genre?.message) {
+                // Determine the side based on the parent welcome-message
                 const side = button.closest('#welcomeMessage') ? 'left' : 'right';
                 displayMessage(sanitizeMessage(genre.message), 'user', side);
                 saveChatHistory(genre.message, 'user', side);
