@@ -283,36 +283,59 @@ async function callFastAPI(message, side) {
 }
 
 // Existing Rasa API Function (only for left side)
-async function callRasaAPI(message, reviewData = {}, side) {
-    if (side !== 'left') return; // শুধু left side-এর জন্য
+function callRasaAPI(message, metadata = {}) {
+    const typingDiv = showTypingIndicator();
+    const payload = { sender: currentChatId || 'default', message, ...metadata };
 
-    const typingDiv = showTypingIndicator(side);
-    try {
-        const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+    setTimeout(() => {
+        if (typeof $ === 'undefined') {
+            typingDiv.remove();
+            showErrorMessage('jQuery লোড হয়নি।');
+            return;
+        }
+
+        $.ajax({
+            url: 'http://localhost:5005/webhooks/rest/webhook',
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sender: 'user', message })
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: data => {
+                typingDiv.remove();
+                if (!data || !data.length) {
+                    showErrorMessage('কোনো সাড়া পাওয়া যায়নি।');
+                    saveChatHistory('কোনো সাড়া পাওয়া যায়নি।', 'bot');
+                    return;
+                }
+                data.forEach(response => {
+                    if (response.text && !response.text.toLowerCase().includes('hi')) {
+                        displayMessage(sanitizeMessage(response.text), 'bot');
+                        saveChatHistory(sanitizeMessage(response.text), 'bot');
+                    }
+                    if (response.custom?.review_data) {
+                        displayReview(response.custom.review_data);
+                    }
+                    if (response.buttons) {
+                        const buttonDiv = document.createElement('div');
+                        buttonDiv.classList.add('welcome-buttons');
+                        response.buttons.forEach(btn => {
+                            const button = document.createElement('button');
+                            button.textContent = sanitizeMessage(btn.title);
+                            button.classList.add('ripple-btn');
+                            button.addEventListener('click', () => sendMessage(btn.payload));
+                            buttonDiv.appendChild(button);
+                        });
+                        elements.messagesDiv?.appendChild(buttonDiv);
+                    }
+                });
+            },
+            error: () => {
+                typingDiv.remove();
+                showErrorMessage('বট সংযোগে সমস্যা।');
+                saveChatHistory('বট সংযোগে সমস্যা।', 'bot');
+            }
         });
-
-        if (!response.ok) {
-            throw new Error('Rasa API error: ' + response.statusText);
-        }
-
-        const data = await response.json();
-        if (data.length > 0) {
-            const botResponse = data[0].text;
-            displayMessage(botResponse, 'bot', side);
-            saveChatHistory(botResponse, 'bot', side);
-        } else {
-            showErrorMessage('Rasa থেকে কোনো রেসপন্স পাওয়া যায়নি।', side);
-        }
-    } catch (error) {
-        showErrorMessage('Rasa API কল করতে সমস্যা: ' + error.message, side);
-    } finally {
-        typingDiv?.remove();
-    }
+    }, 500);
 }
-
 // Chat History Functions
 async function startNewChat(side) {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।', side);
