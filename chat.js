@@ -49,9 +49,6 @@ if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// xAI Grok API Key (Replace with your actual API key from https://x.ai/api)
-const GROK_API_KEY = 'YOUR_XAI_API_KEY_HERE'; // <-- এখানে আপনার API কী পেস্ট করুন
-
 // Global Variables
 let leftChatId = localStorage.getItem('leftChatId') || null;
 let rightChatId = localStorage.getItem('rightChatId') || null;
@@ -256,34 +253,30 @@ function showTypingIndicator(side) {
     return typingDiv;
 }
 
-// New Function for Right Side: Call xAI Grok API
-async function callGrokAPI(message, side) {
+// New Function for Right Side: Call FastAPI
+async function callFastAPI(message, side) {
     if (side !== 'right') return; // শুধু right side-এর জন্য
 
     const typingDiv = showTypingIndicator(side);
     try {
-        const response = await fetch('https://api.x.ai/v1/chat/completions', {
+        const response = await fetch('http://localhost:8000/chat', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${GROK_API_KEY}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                model: 'grok-4', // বা 'grok-3' যেটা চান
-                messages: [{ role: 'user', content: message }]
-            })
+            body: JSON.stringify({ question: message })
         });
 
         if (!response.ok) {
-            throw new Error('Grok API error: ' + response.statusText);
+            throw new Error('FastAPI error: ' + response.statusText);
         }
 
         const data = await response.json();
-        const botResponse = data.choices[0].message.content;
+        const botResponse = data.answer;
         displayMessage(botResponse, 'bot', side);
         saveChatHistory(botResponse, 'bot', side);
     } catch (error) {
-        showErrorMessage('Grok API কল করতে সমস্যা: ' + error.message, side);
+        showErrorMessage('FastAPI কল করতে সমস্যা: ' + error.message, side);
     } finally {
         typingDiv?.remove();
     }
@@ -493,7 +486,7 @@ async function sendMessage(side) {
     if (side === 'left') {
         callRasaAPI(message, {}, side);
     } else {
-        callGrokAPI(message, side); // Right side-এর জন্য Grok API কল
+        callFastAPI(message, side); // Right side-এর জন্য FastAPI কল
     }
 }
 
@@ -605,7 +598,7 @@ function renderGenres2() {
                 if (subQ.message) {
                     displayMessage(sanitizeMessage(subQ.message), 'user', 'right');
                     saveChatHistory(sanitizeMessage(subQ.message), 'user', 'right');
-                    callGrokAPI(subQ.message, 'right');
+                    callFastAPI(subQ.message, 'right');
                     hideWelcomeMessage('right');
                 } else {
                     showErrorMessage('এই প্রশ্ন উপলব্ধ নয়।', 'right');
