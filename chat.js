@@ -10,9 +10,12 @@
  * Updated genres2 to have categories like NID, Passport, Company Registration with toggle sub-questions.
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
- * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
+ * Removed Rasa API call from left side; added rule-based flow integration for left side responses.
+ * Removed xAI Grok API integration; kept FastAPI for right side.
  */
- 
+
+import { startFlow, handleFormFlow, confirmFlow } from './ruleflow.js';
+
 document.getElementById('videoIcon').addEventListener('click', function() {
        document.getElementById('videoModal').style.display = 'flex';
        // Reset video to start when modal opens
@@ -124,6 +127,41 @@ const genres = [
     { name: 'এনআইডি আবেদন', icon: 'fas fa-id-card', message: 'আমার জন্য একটি এনআইডি তৈরি করতে চাই' },
     { name: 'পাসপোর্ট আবেদন', icon: 'fas fa-passport', message: 'আমি পাসপোর্ট আবেদন করতে চাই' },
     { name: 'কোম্পানি রেজিস্ট্রেশন', icon: 'fas fa-building', message: 'আমি কোম্পানি রেজিস্ট্রেশন করতে চাই' },
+    { name: 'পেনশন আবেদন ফর্ম', icon: 'fas fa-money-check-alt', message: 'আমি পেনশন আবেদন করতে চাই' },
+    { name: 'টিআইএন (TIN) সার্টিফিকেট আবেদন', icon: 'fas fa-file-invoice', message: 'আমি টিআইএন সার্টিফিকেট আবেদন করতে চাই' },
+    { name: 'ভূমি নামজারি (Mutation) আবেদনপত্র', icon: 'fas fa-map-marked-alt', message: 'আমি ভূমি নামজারি আবেদন করতে চাই' },
+    { name: 'উপবৃত্তি বা শিক্ষাবৃত্তির আবেদন', icon: 'fas fa-graduation-cap', message: 'আমি উপবৃত্তি বা শিক্ষাবৃত্তির আবেদন করতে চাই' },
+    { name: 'জন্ম ও মৃত্যু নিবন্ধন', icon: 'fas fa-certificate', message: 'আমি জন্ম ও মৃত্যু নিবন্ধন করতে চাই' },
+    { name: 'ড্রাইভিং লাইসেন্স আবেদন', icon: 'fas fa-car', message: 'আমি ড্রাইভিং লাইসেন্স আবেদন করতে চাই' },
+    { name: 'নাগরিক সনদ (Citizen Certificate) আবেদন', icon: 'fas fa-user-check', message: 'আমি নাগরিক সনদ আবেদন করতে চাই' },
+    { name: 'চারিত্রিক সনদপত্র (Character Certificate) আবেদন', icon: 'fas fa-award', message: 'আমি চারিত্রিক সনদপত্র আবেদন করতে চাই' },
+    { name: 'ট্রেড লাইসেন্স', icon: 'fas fa-store', message: 'আমি ট্রেড লাইসেন্স আবেদন করতে চাই' },
+    { name: 'ভ্যাট রেজিস্ট্রেশন', icon: 'fas fa-calculator', message: 'আমি ভ্যাট রেজিস্ট্রেশন করতে চাই' },
+    { name: 'প্রপার্টি রেজিস্ট্রেশন', icon: 'fas fa-home', message: 'আমি প্রপার্টি রেজিস্ট্রেশন করতে চাই' },
+    { name: 'ব্যাংক অ্যাকাউন্ট খোলা', icon: 'fas fa-university', message: 'আমি ব্যাংক অ্যাকাউন্ট খুলতে চাই' },
+    { name: 'ঢাকা বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি ঢাকা বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'খুলনা বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি খুলনা বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'রাজশাহী বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি রাজশাহী বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'চট্টগ্রাম বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি চট্টগ্রাম বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'জাহাঙ্গীরনগর বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি জাহাঙ্গীরনগর বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'বাংলাদেশ কৃষি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি বাংলাদেশ কৃষি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'শাহজালাল বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি শাহজালাল বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'জগন্নাথ বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি জগন্নাথ বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'কুমিল্লা বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি কুমিল্লা বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'বরিশাল বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি বরিশাল বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'নোয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি নোয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'হাজী মোহাম্মদ দানেশ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি হাজী মোহাম্মদ দানেশ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'মাওলানা ভাসানী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি মাওলানা ভাসানী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি পটুয়াখালী বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'ইসলামী বিশ্ববিদ্যালয় ভর্তি আবেদন', icon: 'fas fa-university', message: 'আমি ইসলামী বিশ্ববিদ্যালয় ভর্তি আবেদন করতে চাই' },
+    { name: 'গ্যাস সংযোগ আবেদন', icon: 'fas fa-fire', message: 'আমি গ্যাস সংযোগ আবেদন করতে চাই' },
+    { name: 'বিদ্যুৎ সংযোগ আবেদন', icon: 'fas fa-bolt', message: 'আমি বিদ্যুৎ সংযোগ আবেদন করতে চাই' },
+    { name: 'পানি সংযোগ আবেদন', icon: 'fas fa-faucet', message: 'আমি পানি সংযোগ আবেদন করতে চাই' },
+    { name: 'জমির খতিয়ান সংশোধন', icon: 'fas fa-file-alt', message: 'আমি জমির খতিয়ান সংশোধন করতে চাই' },
+    { name: 'ভূমি উন্নয়ন কর পরিশোধ', icon: 'fas fa-money-bill', message: 'আমি ভূমি উন্নয়ন কর পরিশোধ করতে চাই' },
+    { name: 'ইমিগ্রেশন ক্লিয়ারেন্স', icon: 'fas fa-plane-departure', message: 'আমি ইমিগ্রেশন ক্লিয়ারেন্সের জন্য আবেদন করতে চাই' },
+    { name: 'ওয়ারিশ সনদ আবেদন', icon: 'fas fa-users', message: 'আমি ওয়ারিশ সনদ আবেদন করতে চাই' },
+ 
 ];
 
 // Genres2 Data (for right chat, with sub-questions)
@@ -277,44 +315,6 @@ async function callFastAPI(message, side) {
         saveChatHistory(botResponse, 'bot', side);
     } catch (error) {
         showErrorMessage('FastAPI কল করতে সমস্যা: ' + error.message, side);
-    } finally {
-        typingDiv?.remove();
-    }
-}
-
-// Existing Rasa API Function (only for left side)
-async function callRasaAPI(message, reviewData = {}, side) {
-    if (side !== 'left') return; // শুধু left side-এর জন্য
-
-    const typingDiv = showTypingIndicator(side);
-    try {
-        const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sender: 'user', message })
-        });
-
-        if (!response.ok) {
-            throw new Error('Rasa API error: ' + response.statusText);
-        }
-
-        const data = await response.json();
-        if (data.length > 0) {
-            data.forEach(res => {
-                if (res.text) {
-                    const botResponse = res.text;
-                    displayMessage(botResponse, 'bot', side);
-                    saveChatHistory(botResponse, 'bot', side);
-                }
-                if (res.custom?.review_data) {
-                    displayReview(res.custom.review_data, side);
-                }
-            });
-        } else {
-            showErrorMessage('Rasa থেকে কোনো রেসপন্স পাওয়া যায়নি।', side);
-        }
-    } catch (error) {
-        showErrorMessage('Rasa API কল করতে সমস্যা: ' + error.message, side);
     } finally {
         typingDiv?.remove();
     }
@@ -698,7 +698,14 @@ async function sendMessage(side) {
     userInput.value = '';
     hideWelcomeMessage(side);
     if (side === 'left') {
-        callRasaAPI(message, {}, side);
+        // Rule-based flow for left side
+        if (message.includes("এনআইডি") || message.includes("nid")) {
+            startFlow("nid_apply", displayMessage);
+        } else if (message.includes("পাসপোর্ট") || message.includes("passport")) {
+            startFlow("passport_apply", displayMessage);
+        } else {
+            handleFormFlow(message, displayMessage, displayReview);
+        }
     } else {
         callFastAPI(message, side); // Right side-এর জন্য FastAPI কল
     }
@@ -749,7 +756,7 @@ function renderGenres() {
             if (genre.message) {
                 displayMessage(sanitizeMessage(genre.message), 'user', 'left');
                 saveChatHistory(sanitizeMessage(genre.message), 'user', 'left');
-                callRasaAPI(genre.message, {}, 'left');
+                sendMessage('left');  // Trigger rule-based flow
                 hideWelcomeMessage('left');
             } else {
                 showErrorMessage('এই সেবা উপলব্ধ নয়।', 'left');
@@ -1001,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const side = button.closest('#welcomeMessage') ? 'left' : 'right';
                 displayMessage(sanitizeMessage(genre.message), 'user', side);
                 saveChatHistory(genre.message, 'user', side);
-                callRasaAPI(genre.message, {}, side);
+                sendMessage(side);  // Trigger flow
                 hideWelcomeMessage(side);
             } else {
                 showErrorMessage('এই সেবা উপলব্ধ নয়।', button.closest('#welcomeMessage') ? 'left' : 'right');
