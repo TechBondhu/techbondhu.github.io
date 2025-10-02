@@ -910,57 +910,7 @@ body {
         max-width: 40px;
     }
 }
-@media (max-width: 480px) {
-    .input-area {
-        padding: 8px;
-    }
-    .input-wrapper {
-        width: 95%;
-        padding: 6px 10px;
-    }
-    #userInput, #userInput-right {
-        font-size: 12px;
-        min-height: 40px;
-        max-height: 80px;
-    }
-    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
-        width: 25px;
-        height: 25px;
-        font-size: 12px;
-    }
-    #uploadBtn i, #uploadBtn-right i {
-        font-size: 12px;
-    }
-    .preview-container, #previewContainer, #previewContainer-right {
-        max-width: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .input-area {
-        padding: 8px;
-    }
-    .input-wrapper {
-        width: 95%;
-        padding: 6px 10px;
-    }
-    #userInput, #userInput-right {
-        font-size: 12px;
-        min-height: 40px;
-        max-height: 80px;
-    }
-    #sendBtn, #sendBtn-right, #uploadBtn, #uploadBtn-right {
-        width: 25px;
-        height: 25px;
-        font-size: 12px;
-    }
-    #uploadBtn i, #uploadBtn-right i {
-        font-size: 12px;
-    }
-    .preview-container, #previewContainer, #previewContainer-right {
-        max-width: 40px;
-    }
-}
+ 
 .preview-image {
     width: 40px;
     height: 40px;
@@ -1542,65 +1492,7 @@ body {
     .image-preview {
         max-width: 150px;
     }
-    .input-area {
-        padding: 10px;
-        gap: 8px;
-    }
-    .input-wrapper {
-        padding: 8px 12px;
-        gap: 8px;
-        flex-direction: column;
-        width: 100%;
-        max-width: none;
-        align-items: flex-end;
-    }
-    #userInput, #userInputApplication, #userInputQuestion {
-        padding: 8px 12px;
-        font-size: 16px;
-        min-height: 50px;
-        max-height: 100px;
-        width: 100%;
-        line-height: 1.6;
-        transition: height 0.3s ease;
-    }
-    #userInput:focus, #userInputApplication:focus, #userInputQuestion:focus {
-        min-height: 60px;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-        outline: none;
-    }
-    #sendBtn, #sendBtnApplication, #sendBtnQuestion {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        background: #1E3A8A;
-        color: #fff;
-    }
-    #sendBtn:hover, #sendBtnApplication:hover, #sendBtnQuestion:hover {
-        background: #3B82F6;
-        transform: scale(1.1);
-    }
-    #uploadBtn, #uploadBtnApplication, #uploadBtnQuestion {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
-        background: #1E3A8A;
-        color: #fff;
-        margin-right: 0;
-        margin-left: 8px;
-    }
-    #uploadBtn i, #uploadBtnApplication i, #uploadBtnQuestion i {
-        font-size: 16px;
-    }
-    #uploadBtn:hover, #uploadBtnApplication:hover, #uploadBtnQuestion:hover {
-        background: #3B82F6;
-        transform: scale(1.1);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-    }
-    .button-container {
-        display: flex;
-        gap: 5px;
-        justify-content: flex-end;
-    }
+  
     .preview-image {
         width: 30px;
         height: 30px;
