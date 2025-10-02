@@ -14,7 +14,6 @@
  * Kept FastAPI for right side.
  */
 
-import { startFlow, handleFormFlow, confirmFlow } from './ruleflow.js';
 
 document.getElementById('videoIcon').addEventListener('click', function() {
        document.getElementById('videoModal').style.display = 'flex';
