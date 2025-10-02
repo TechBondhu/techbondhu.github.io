@@ -941,6 +941,7 @@ function closeGenres2Modal() {
     }
 }
 
+
 // Toggle Sidebar
 function toggleSidebar() {
     elements.sidebar.classList.toggle('open');
@@ -1113,6 +1114,86 @@ document.addEventListener('DOMContentLoaded', () => {
                 openGenres2Modal();
             } else {
                 showErrorMessage('এই সেবা উপলব্ধ নয়।', 'right');
+            }
+         // Resizable + Draggable Divider Functionality
+const mainDivider = document.getElementById('mainDivider');
+const subDivider = document.getElementById('subDivider');
+const leftColumn = document.querySelector('.left-column');
+const rightColumn = document.querySelector('.right-column');
+const subLeft = document.querySelector('.sub-header-left');
+const subRight = document.querySelector('.sub-header-right');
+
+let isDraggingMain = false;
+let isDraggingSub = false;
+
+// Function to start dragging (for both dividers)
+function startDrag(e, dividerType) {
+  if (dividerType === 'main') {
+    isDraggingMain = true;
+    mainDivider.classList.add('dragging');
+  } else if (dividerType === 'sub') {
+    isDraggingSub = true;
+    subDivider.classList.add('dragging');
+  }
+  document.body.style.userSelect = 'none'; // Prevent text selection during drag
+  e.preventDefault(); // Prevent default touch behavior
+}
+
+// Function to stop dragging (for both dividers)
+function stopDrag(dividerType) {
+  if (dividerType === 'main') {
+    isDraggingMain = false;
+    mainDivider.classList.remove('dragging');
+  } else if (dividerType === 'sub') {
+    isDraggingSub = false;
+    subDivider.classList.remove('dragging');
+  }
+  document.body.style.userSelect = ''; // Re-enable text selection
+}
+
+// Function to handle dragging (resize columns)
+function handleDrag(e) {
+  const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+  if (isDraggingMain && leftColumn && rightColumn) {
+    const containerRect = document.querySelector('.split-chat').getBoundingClientRect();
+    const newLeftWidth = ((clientX - containerRect.left) / containerRect.width) * 100;
+    const newRightWidth = 100 - newLeftWidth;
+
+    // Apply flex basis with min/max constraints
+    leftColumn.style.flex = `0 0 ${Math.max(20, Math.min(80, newLeftWidth))}%`;
+    rightColumn.style.flex = `0 0 ${Math.max(20, Math.min(80, newRightWidth))}%`;
+  }
+
+  if (isDraggingSub && subLeft && subRight) {
+    const subContainerRect = document.querySelector('.sub-header').getBoundingClientRect();
+    const newSubLeftWidth = ((clientX - subContainerRect.left) / subContainerRect.width) * 100;
+    const newSubRightWidth = 100 - newSubLeftWidth;
+
+    // Apply flex basis with min/max constraints
+    subLeft.style.flex = `0 0 ${Math.max(20, Math.min(80, newSubLeftWidth))}%`;
+    subRight.style.flex = `0 0 ${Math.max(20, Math.min(80, newSubRightWidth))}%`;
+  }
+}
+
+// Add event listeners for main divider (mouse and touch)
+if (mainDivider) {
+  mainDivider.addEventListener('mousedown', (e) => startDrag(e, 'main'));
+  mainDivider.addEventListener('touchstart', (e) => startDrag(e, 'main'));
+}
+
+document.addEventListener('mouseup', () => stopDrag('main'));
+document.addEventListener('touchend', () => stopDrag('main'));
+document.addEventListener('mousemove', handleDrag);
+document.addEventListener('touchmove', handleDrag);
+
+// Add event listeners for sub divider (mouse and touch)
+if (subDivider) {
+  subDivider.addEventListener('mousedown', (e) => startDrag(e, 'sub'));
+  subDivider.addEventListener('touchstart', (e) => startDrag(e, 'sub'));
+}
+
+document.addEventListener('mouseup', () => stopDrag('sub'));
+document.addEventListener('touchend', () => stopDrag('sub'));
             }
         });
     });
