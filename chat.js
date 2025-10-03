@@ -1250,7 +1250,4 @@ window.addEventListener('orientationchange', handleLayoutChange);
 
 // Initial layout check
 handleLayoutChange();
- 
-}  // <- Fixed: Added missing closing brace for if block
-});
 });
