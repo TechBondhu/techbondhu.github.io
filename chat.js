@@ -1191,4 +1191,6 @@ document.addEventListener('touchmove', handleDrag, { passive: false });
 window.addEventListener('resize', () => {
   if (splitChatContainer && mainDivider && !isDragging) {
     mainDivider.style.left = '50%';
+}  // <- Fixed: Added missing closing brace for if block
+});
 });
