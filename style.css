@@ -362,15 +362,7 @@ body {
 
 /* Resizable + Draggable Sub-Divider for Sub-Header */
 
-.divider {
-    width: 2px;
-    background: #1E3A8A;
-    height: 100%;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1;
-}
+
 .chat-column .welcome-message {
     position: relative;
     top: auto;
