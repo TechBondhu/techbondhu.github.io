@@ -311,53 +311,96 @@ body {
     border-left: 1px solid #ccc;
 }
 
-/* Professional Resizable Main Divider (Smooth Animation) */
-.divider {
-    width: 2px; /* টানা সহজ */
-    background: #1E3A8A;
-    height: 100%;
-    position: absolute;
-    left: 50%; /* Initial center */
-    top: 0;
-    z-index: 10;
-    cursor: col-resize;
-    transition: background 0.3s ease, left 0.1s ease; /* Normal transition */
-    user-select: none;
-    will-change: left; /* Optimize for smooth movement */
-}
-
-.divider:hover {
-    background: #3B82F6;
-}
-
-.divider.dragging {
-    background: #3B82F6 !important;
-    transition: none !important; /* No transition during drag for instant response */
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* Visual feedback during drag */
-}
-
-/* Container and columns for smooth resize */
+/* Resizable + Draggable Sub-Divider for Sub-Header */
 .split-chat {
     position: relative;
     display: flex;
-    flex-direction: row;
+    flex-direction: row; /* Default: Horizontal layout for desktop */
     width: 100%;
     height: calc(100% - 60px);
     overflow: hidden;
+    transition: flex-direction 0.3s ease; /* Smooth layout switch */
+}
+
+.divider {
+    width: 8px; /* Desktop: Vertical divider */
+    height: 100%;
+    background: #1E3A8A;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 10;
+    cursor: col-resize; /* Horizontal resize cursor */
+    transition: background 0.3s ease, left 0.1s ease;
+    user-select: none;
+    will-change: left;
+}
+
+.divider:hover, .divider.dragging {
+    background: #3B82F6 !important;
+    transition: background 0.3s ease;
+}
+
+.divider.dragging {
+    transition: none !important;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
 }
 
 .left-column, .right-column {
     flex: 1;
     min-width: 200px;
     max-width: 80%;
-    transition: flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Easing for natural feel */
-    will-change: flex; /* Optimize for smooth flex changes */
+    transition: flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: flex;
     position: relative;
 }
 
-.left-column.dragging ~ .divider,
-.right-column.dragging ~ .divider {
-    /* No extra rules needed */
+/* Mobile/Tablet: Switch to Vertical Layout (Up-Down Resize) */
+@media (max-width: 768px) {
+    .split-chat {
+        flex-direction: column; /* Vertical stack */
+        height: auto;
+        min-height: calc(100% - 60px);
+    }
+    
+    .divider {
+        width: 100%; /* Horizontal divider */
+        height: 8px; /* Thin horizontal line */
+        left: 0;
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%);
+        cursor: row-resize; /* Vertical resize cursor */
+        will-change: top;
+    }
+    
+    .divider:hover, .divider.dragging {
+        height: 10px; /* Slightly thicker on hover for touch */
+        background: #3B82F6 !important;
+    }
+    
+    .left-column, .right-column {
+        min-height: 200px; /* Min height for vertical resize */
+        max-height: 80vh; /* Max height constraint */
+        width: 100%; /* Full width in vertical layout */
+        min-width: auto;
+        max-width: none;
+    }
+    
+    /* Ensure touch-friendly on mobile */
+    .divider {
+        touch-action: none; /* Prevent default touch scroll */
+    }
+}
+
+/* Extra small screens (phones) */
+@media (max-width: 480px) {
+    .divider {
+        height: 10px; /* Even thicker for easy touch */
+    }
+    
+    .left-column, .right-column {
+        min-height: 150px; /* Smaller min height on tiny screens */
+    }
 }
 
 /* Resizable + Draggable Sub-Divider for Sub-Header */
