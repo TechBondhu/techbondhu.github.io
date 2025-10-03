@@ -313,7 +313,7 @@ body {
 
 /* Professional Resizable Main Divider (Smooth Animation) */
 .divider {
-    width: 8px; /* টানা সহজ */
+    width: 2px; /* টানা সহজ */
     background: #1E3A8A;
     height: 100%;
     position: absolute;
@@ -361,6 +361,7 @@ body {
 }
 
 /* Resizable + Draggable Sub-Divider for Sub-Header */
+
 
 
 .chat-column .welcome-message {
