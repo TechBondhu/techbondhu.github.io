@@ -49,13 +49,13 @@
                         <button id="moreOptionsBtn"><i class="fas fa-ellipsis-h"></i> আরও </button>
                     </div>
                 </div>
-                <div class="messages" id="messages">
+               <div class="messages chat-messages" id="messages"></div>
                     <!-- ইউজার/বট মেসেজ এখানে ডাইনামিক্যালি যোগ হবে -->
                 </div>
                 <div class="input-area">
                     <div class="input-wrapper">
-                        <div class="preview-container" id="previewContainer">
-                            <img id="previewImage" class="preview-image" src="" alt="Image Preview">
+                  <div id="previewContainer" style="display: none;">
+                     <img id="previewImage" src="" alt="Preview" style="max-width: 100%; cursor: pointer;">
                         </div>
                         <textarea id="userInput" placeholder="আপনার বার্তা লিখুন..."></textarea>
                         <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg, image/jpg">
@@ -77,13 +77,13 @@
                         <button id="moreOptionsBtn-right"><i class="fas fa-ellipsis-h"></i> আরও </button>
                     </div>
                 </div>
-                <div class="messages" id="messages-right">
+                <div class="messages chat-messages" id="messages-right"></div>
                     <!-- ইউজার/বট মেসেজ এখানে ডাইনামিক্যালি যোগ হবে -->
                 </div>
                 <div class="input-area">
                     <div class="input-wrapper">
-                        <div class="preview-container" id="previewContainer-right">
-                            <img id="previewImage-right" class="preview-image" src="" alt="Image Preview">
+                     <div id="previewContainer-right" style="display: none;">
+                         <img id="previewImage-right" src="" alt="Preview" style="max-width: 100%; cursor: pointer;">
                         </div>
                         <textarea id="userInput-right" placeholder="আপনার প্রশ্ন লিখুন..."></textarea>
                         <input type="file" id="fileInput-right" style="display: none;" accept="image/png, image/jpeg, image/jpg">
