@@ -311,10 +311,10 @@ body {
     border-left: 1px solid #ccc;
 }
 
-/* Resizable + Draggable Sub-Divider for Sub-Header */
-.sub-divider {
-    width: 8px; /* বেশি পুরু করে টানা সহজ করা */
-    background: #fff; /* সাব-হেডারের সাথে মিল রাখতে */
+/* Resizable Main Divider for Chat Columns */
+.divider {
+    width: 8px; /* টানা সহজ করার জন্য পুরু */
+    background: #1E3A8A;
     height: 100%;
     position: absolute;
     left: 50%;
@@ -324,43 +324,37 @@ body {
     transition: background 0.3s ease;
 }
 
-.sub-divider:hover, .sub-divider.dragging {
-    background: #3B82F6; /* হোভার বা ড্র্যাগ করার সময় রঙ পরিবর্তন */
+.divider:hover, .divider.dragging {
+    background: #3B82F6; /* হোভার/ড্র্যাগের সময় রঙ পরিবর্তন */
 }
 
-/* চ্যাট কলামগুলোর ফ্লেক্স সাইজিং নিশ্চিত করা */
+/* চ্যাট কলামগুলোর ফ্লেক্স সাইজিং */
 .split-chat {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: calc(100% - 60px); /* হেডার ও সাব-হেডারের উচ্চতা বাদ দিয়ে */
+    height: calc(100% - 60px); /* হেডার/সাব-হেডার বাদ দিয়ে */
     position: relative;
 }
 
 .left-column, .right-column {
-    flex: 1; /* সমানভাবে স্পেস ভাগ করে নেবে */
-    min-width: 200px; /* খুব ছোট হওয়া রোধ করতে */
-    max-width: 80%; /* খুব বড় হওয়া রোধ করতে */
-    transition: flex 0.3s ease; /* রিসাইজের সময় স্মুথ ট্রানজিশন */
-}
-
-/* সাব-হেডার কলামগুলোর ফ্লেক্স সাইজিং */
-.sub-header {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    position: relative;
-}
-
-.sub-header-left, .sub-header-right {
-    flex: 1; /* সমানভাবে স্পেস ভাগ করে নেবে */
-    min-width: 150px; /* খুব ছোট হওয়া রোধ করতে */
-    max-width: 80%; /* খুব বড় হওয়া রোধ করতে */
-    transition: flex 0.3s ease; /* রিসাইজের সময় স্মুথ ট্রানজিশন */
+    flex: 1; /* প্রাথমিকভাবে সমান */
+    min-width: 200px; /* খুব ছোট হওয়া রোধ */
+    max-width: 80%; /* খুব বড় হওয়া রোধ */
+    transition: flex 0.3s ease; /* স্মুথ রিসাইজ */
 }
 
 /* Resizable + Draggable Sub-Divider for Sub-Header */
 
+.divider {
+    width: 2px;
+    background: #1E3A8A;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
 .chat-column .welcome-message {
     position: relative;
     top: auto;
