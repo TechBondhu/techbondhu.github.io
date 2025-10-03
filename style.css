@@ -311,96 +311,53 @@ body {
     border-left: 1px solid #ccc;
 }
 
-/* Resizable + Draggable Sub-Divider for Sub-Header */
-.split-chat {
-    position: relative;
-    display: flex;
-    flex-direction: row; /* Default: Horizontal layout for desktop */
-    width: 100%;
-    height: calc(100% - 60px);
-    overflow: hidden;
-    transition: flex-direction 0.3s ease; /* Smooth layout switch */
-}
-
+/* Professional Resizable Main Divider (Smooth Animation) */
 .divider {
-    width: 3px; /* Desktop: Vertical divider */
-    height: 100%;
+    width: 2px; /* টানা সহজ */
     background: #1E3A8A;
+    height: 100%;
     position: absolute;
-    left: 50%;
+    left: 50%; /* Initial center */
     top: 0;
     z-index: 10;
-    cursor: col-resize; /* Horizontal resize cursor */
-    transition: background 0.3s ease, left 0.1s ease;
+    cursor: col-resize;
+    transition: background 0.3s ease, left 0.1s ease; /* Normal transition */
     user-select: none;
-    will-change: left;
+    will-change: left; /* Optimize for smooth movement */
 }
 
-.divider:hover, .divider.dragging {
-    background: #3B82F6 !important;
-    transition: background 0.3s ease;
+.divider:hover {
+    background: #3B82F6;
 }
 
 .divider.dragging {
-    transition: none !important;
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    background: #3B82F6 !important;
+    transition: none !important; /* No transition during drag for instant response */
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* Visual feedback during drag */
+}
+
+/* Container and columns for smooth resize */
+.split-chat {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: calc(100% - 60px);
+    overflow: hidden;
 }
 
 .left-column, .right-column {
     flex: 1;
     min-width: 200px;
     max-width: 80%;
-    transition: flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    will-change: flex;
+    transition: flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Easing for natural feel */
+    will-change: flex; /* Optimize for smooth flex changes */
     position: relative;
 }
 
-/* Mobile/Tablet: Switch to Vertical Layout (Up-Down Resize) */
-@media (max-width: 768px) {
-    .split-chat {
-        flex-direction: column; /* Vertical stack */
-        height: auto;
-        min-height: calc(100% - 60px);
-    }
-    
-    .divider {
-        width: 100%; /* Horizontal divider */
-        height: 8px; /* Thin horizontal line */
-        left: 0;
-        top: 50%; /* Center vertically */
-        transform: translateY(-50%);
-        cursor: row-resize; /* Vertical resize cursor */
-        will-change: top;
-    }
-    
-    .divider:hover, .divider.dragging {
-        height: 10px; /* Slightly thicker on hover for touch */
-        background: #3B82F6 !important;
-    }
-    
-    .left-column, .right-column {
-        min-height: 200px; /* Min height for vertical resize */
-        max-height: 80vh; /* Max height constraint */
-        width: 100%; /* Full width in vertical layout */
-        min-width: auto;
-        max-width: none;
-    }
-    
-    /* Ensure touch-friendly on mobile */
-    .divider {
-        touch-action: none; /* Prevent default touch scroll */
-    }
-}
-
-/* Extra small screens (phones) */
-@media (max-width: 480px) {
-    .divider {
-        height: 10px; /* Even thicker for easy touch */
-    }
-    
-    .left-column, .right-column {
-        min-height: 150px; /* Smaller min height on tiny screens */
-    }
+.left-column.dragging ~ .divider,
+.right-column.dragging ~ .divider {
+    /* No extra rules needed */
 }
 
 /* Resizable + Draggable Sub-Divider for Sub-Header */
@@ -920,11 +877,33 @@ body {
     margin-right: 10px;
 }
 
+/* প্রিভিউ কনটেইনার স্টাইল (ইমেজ প্রিভিউ দেখানোর জন্য) */
 #previewContainer, #previewContainer-right {
-    display: none;
-    max-width: 60px;
-    margin-right: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+    max-height: 200px;
+    overflow: hidden;
 }
+
+#previewImage, #previewImage-right {
+    max-height: 180px;
+    object-fit: contain;
+}
+
+/* চ্যাটে ইমেজ স্টাইল (চ্যাট মেসেজে ইমেজ রেন্ডারের জন্য) */
+.chat-messages img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 5px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: block;
+}
+
 
 .preview-image {
     width: 100%;
@@ -1020,54 +999,77 @@ body {
 .edit-btn:hover {
     background: #2563EB;
 }
+/* ইমেজ রিভিউ মোডাল স্টাইল (রিভিউ মোডালে ইমেজ দেখানোর জন্য) */
 .image-review-modal {
     display: none;
     position: fixed;
-    top: 0;
+    z-index: 1000;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
 }
 .image-review-content {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
+    background: #fff;
     padding: 20px;
-    max-width: 90%;
-    max-height: 90%;
-    position: relative;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-}
-.review-image {
-    max-width: 500px;
-    max-height: 500px;
     border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    position: relative;
+    max-width: 80%;
+    max-height: 80vh;
+    overflow: auto;
 }
+#reviewImage {
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+}
+
 .delete-image-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #EF4444;
+    background: #ff0000;
     color: #fff;
     border: none;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 5px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    font-size: 16px;
 }
+
 .delete-image-btn:hover {
-    background: #DC2626;
+    background: #cc0000;
 }
+
+/* মোবাইল রেসপন্সিভ ফিক্স (ইমেজের জন্য) */
+@media (max-width: 768px) {
+    #previewContainer, #previewContainer-right {
+        max-height: 150px;
+    }
+
+    #previewImage, #previewImage-right {
+        max-height: 130px;
+    }
+
+    .chat-messages img {
+        max-width: 90%;
+        margin: 10px auto;
+    }
+
+    .image-review-content {
+        max-width: 90%;
+    }
+
+    #reviewImage {
+        max-height: 50vh;
+    }
+}
+
 .edit-modal {
     display: none;
     position: fixed;
