@@ -49,13 +49,11 @@
                         <button id="moreOptionsBtn"><i class="fas fa-ellipsis-h"></i> আরও </button>
                     </div>
                 </div>
-                <div class="messages" id="messages">
-                    <!-- ইউজার/বট মেসেজ এখানে ডাইনামিক্যালি যোগ হবে -->
-                </div>
+                <div class="messages chat-messages" id="messages"></div>
                 <div class="input-area">
                     <div class="input-wrapper">
-                        <div class="preview-container" id="previewContainer">
-                            <img id="previewImage" class="preview-image" src="" alt="Image Preview">
+                        <div id="previewContainer" style="display: none; margin: 10px 0; text-align: center;">
+                            <img id="previewImage" src="" alt="Preview" style="max-width: 100%; max-height: 150px; object-fit: contain; cursor: pointer;">
                         </div>
                         <textarea id="userInput" placeholder="আপনার বার্তা লিখুন..."></textarea>
                         <input type="file" id="fileInput" style="display: none;" accept="image/png, image/jpeg, image/jpg">
@@ -77,19 +75,18 @@
                         <button id="moreOptionsBtn-right"><i class="fas fa-ellipsis-h"></i> আরও </button>
                     </div>
                 </div>
-                <div class="messages" id="messages-right">
-                    <!-- ইউজার/বট মেসেজ এখানে ডাইনামিক্যালি যোগ হবে -->
-                </div>
+                <div class="messages chat-messages" id="messages-right"></div>
                 <div class="input-area">
                     <div class="input-wrapper">
-                        <div class="preview-container" id="previewContainer-right">
-                            <img id="previewImage-right" class="preview-image" src="" alt="Image Preview">
+                        <div id="previewContainer-right" style="display: none; margin: 10px 0; text-align: center;">
+                            <img id="previewImage-right" src="" alt="Preview" style="max-width: 100%; max-height: 150px; object-fit: contain; cursor: pointer;">
                         </div>
                         <textarea id="userInput-right" placeholder="আপনার প্রশ্ন লিখুন..."></textarea>
                         <input type="file" id="fileInput-right" style="display: none;" accept="image/png, image/jpeg, image/jpg">
                         <div class="button-container">
-                       <button id="sendBtn-right" title="Send Message"><i class="fas fa-arrow-up"></i></button>
-                      </div>
+                            <button id="uploadBtn-right" title="Upload Image"><i class="fas fa-paperclip"></i></button>
+                            <button id="sendBtn-right" title="Send Message"><i class="fas fa-arrow-up"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,9 +97,7 @@
                 <i class="fas fa-times close-sidebar" id="closeSidebar"></i>
             </div>
             <input type="text" class="search-input" id="searchInput" placeholder="চ্যাট অনুসন্ধান করুন...">
-            <div class="history-list" id="historyList">
-                <!-- ডাইনামিক চ্যাট ইতিহাস এখানে যোগ হবে -->
-            </div>
+            <div class="history-list" id="historyList"></div>
         </div>
         <div class="modal" id="deleteModal">
             <div class="modal-content">
@@ -144,7 +139,7 @@
         </div>
         <div class="image-review-modal" id="imageReviewModal">
             <div class="image-review-content">
-                <img class="review-image" id="reviewImage" src="" alt="Review Image">
+                <img class="review-image" id="reviewImage" src="" alt="Review Image" style="max-width: 100%; max-height: 80vh; object-fit: contain;">
                 <button class="delete-image-btn" id="deleteImageBtn"><i class="fas fa-trash"></i></button>
             </div>
         </div>
@@ -193,17 +188,17 @@
                 </div>
             </div>
         </div>
-       <div class="video-modal" id="videoModal">
-    <div class="video-modal-content">
-        <video controls>
-            <source src="videos/মাত্র ১ দিনে নতুন ভোটার হওয়া যাবে _ How to Apply for New NID Card 2025.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        <div class="video-modal-buttons">
-            <button class="close-video" id="closeVideoModal">বন্ধ করুন</button>
+        <div class="video-modal" id="videoModal">
+            <div class="video-modal-content">
+                <video controls>
+                    <source src="videos/মাত্র ১ দিনে নতুন ভোটার হওয়া যাবে _ How to Apply for New NID Card 2025.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-modal-buttons">
+                    <button class="close-video" id="closeVideoModal">বন্ধ করুন</button>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
     </div>
     <script src="chat.js"></script>
 </body>
