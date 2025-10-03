@@ -1117,15 +1117,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-// Resizable Divider Functionality (Professional Level - Divider Moves with Cursor)
+// Professional Resizable Divider (Smooth, No Jitter)
 const mainDivider = document.getElementById('mainDivider');
 const leftColumn = document.querySelector('.left-column');
 const rightColumn = document.querySelector('.right-column');
 const splitChatContainer = document.querySelector('.split-chat');
 
 let isDragging = false;
-let startX = 0;
-let startLeftWidth = 0;
 
 // Function to start dragging main divider
 function startDrag(e) {
@@ -1133,12 +1131,15 @@ function startDrag(e) {
   if (mainDivider) {
     mainDivider.classList.add('dragging');
   }
-  startX = e.clientX || (e.touches && e.touches[0].clientX);
-  if (leftColumn) {
-    startLeftWidth = parseFloat(getComputedStyle(leftColumn).flexBasis) || 50; // Initial width in %
+  if (leftColumn && rightColumn) {
+    // Disable transitions during drag for smoothness
+    leftColumn.style.transition = 'none';
+    rightColumn.style.transition = 'none';
+    mainDivider.style.transition = 'none';
   }
-  document.body.style.userSelect = 'none'; // Prevent text selection during drag
-  e.preventDefault(); // Prevent default touch behavior
+  document.body.style.userSelect = 'none';
+  e.preventDefault();
+  e.stopPropagation();
 }
 
 // Function to stop dragging main divider
@@ -1147,36 +1148,53 @@ function stopDrag() {
   if (mainDivider) {
     mainDivider.classList.remove('dragging');
   }
-  document.body.style.userSelect = ''; // Re-enable text selection
+  if (leftColumn && rightColumn) {
+    // Re-enable transitions after drag
+    leftColumn.style.transition = 'flex 0.3s ease';
+    rightColumn.style.transition = 'flex 0.3s ease';
+    mainDivider.style.transition = 'left 0.1s ease, background 0.3s ease';
+  }
+  document.body.style.userSelect = '';
 }
 
-// Function to handle dragging (divider moves with cursor + resize columns)
+// Function to handle dragging (absolute position for smoothness)
 function handleDrag(e) {
-  if (!isDragging || !mainDivider || !leftColumn || !rightColumn || !splitChatContainer) return;
+  if (!isDragging) return;
   
   const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-  const deltaX = clientX - startX;
+  if (!splitChatContainer || !leftColumn || !rightColumn || !mainDivider) return;
+  
   const containerRect = splitChatContainer.getBoundingClientRect();
   const containerWidth = containerRect.width;
   
-  // Calculate new left column width (with constraints: 20% to 80%)
-  let newLeftWidth = (startLeftWidth + (deltaX / containerWidth) * 100);
-  newLeftWidth = Math.max(20, Math.min(80, newLeftWidth)); // Min 20%, Max 80%
+  // Absolute calculation: new width based on current mouse position
+  let newLeftWidth = ((clientX - containerRect.left) / containerWidth) * 100;
+  
+  // Apply constraints (20% to 80%)
+  newLeftWidth = Math.max(20, Math.min(80, newLeftWidth));
   const newRightWidth = 100 - newLeftWidth;
   
-  // Update column widths
+  // Update column widths immediately
   leftColumn.style.flex = `0 0 ${newLeftWidth}%`;
   rightColumn.style.flex = `0 0 ${newRightWidth}%`;
   
-  // Calculate and update divider position to follow the cursor
-  const newDividerLeft = (newLeftWidth / 100) * containerWidth;
-  mainDivider.style.left = newDividerLeft + 'px'; // Move divider to new position
+  // Update divider position exactly at the boundary (smooth follow)
+  const newDividerLeft = containerRect.left + (newLeftWidth / 100) * containerWidth;
+  mainDivider.style.left = `${newDividerLeft}px`;
+  mainDivider.style.transform = 'none'; // Remove transform during drag for precision
   
-  // Update startX for smooth dragging
-  startX = clientX;
+  e.preventDefault();
+  e.stopPropagation();
 }
 
-// Add event listeners for main divider (mouse and touch support)
+// Use requestAnimationFrame for ultra-smooth updates
+function rafHandleDrag(e) {
+  if (isDragging) {
+    requestAnimationFrame(() => handleDrag(e));
+  }
+}
+
+// Add event listeners for main divider (mouse and touch)
 if (mainDivider) {
   mainDivider.addEventListener('mousedown', startDrag);
   mainDivider.addEventListener('touchstart', startDrag, { passive: false });
@@ -1184,13 +1202,16 @@ if (mainDivider) {
 
 document.addEventListener('mouseup', stopDrag);
 document.addEventListener('touchend', stopDrag);
-document.addEventListener('mousemove', handleDrag);
-document.addEventListener('touchmove', handleDrag, { passive: false });
+document.addEventListener('mousemove', rafHandleDrag);
+document.addEventListener('touchmove', rafHandleDrag, { passive: false });
 
-// Optional: Reset divider position on window resize (to center it initially)
+// Reset divider to center on window resize (if not dragging)
 window.addEventListener('resize', () => {
   if (splitChatContainer && mainDivider && !isDragging) {
     mainDivider.style.left = '50%';
+    mainDivider.style.transform = 'translateX(-50%)';
+    leftColumn.style.flex = '1';
+    rightColumn.style.flex = '1';
 }  // <- Fixed: Added missing closing brace for if block
 });
 });
