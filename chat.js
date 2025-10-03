@@ -1117,22 +1117,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-// Professional Resizable Divider (Smooth, No Jitter)
+// Responsive Resizable Divider (All Devices: Auto Horizontal/Vertical)
 const mainDivider = document.getElementById('mainDivider');
 const leftColumn = document.querySelector('.left-column');
 const rightColumn = document.querySelector('.right-column');
 const splitChatContainer = document.querySelector('.split-chat');
 
 let isDragging = false;
+let isMobileLayout = window.innerWidth <= 768; // Detect initial layout
 
-// Function to start dragging main divider
+// Check if layout is vertical (mobile)
+function isVerticalLayout() {
+  return window.innerWidth <= 768 || getComputedStyle(splitChatContainer).flexDirection === 'column';
+}
+
+// Function to start dragging (handles both horizontal/vertical)
 function startDrag(e) {
   isDragging = true;
   if (mainDivider) {
     mainDivider.classList.add('dragging');
   }
   if (leftColumn && rightColumn) {
-    // Disable transitions during drag for smoothness
+    // Disable transitions for instant response
     leftColumn.style.transition = 'none';
     rightColumn.style.transition = 'none';
     mainDivider.style.transition = 'none';
@@ -1142,59 +1148,92 @@ function startDrag(e) {
   e.stopPropagation();
 }
 
-// Function to stop dragging main divider
+// Function to stop dragging
 function stopDrag() {
   isDragging = false;
   if (mainDivider) {
     mainDivider.classList.remove('dragging');
   }
   if (leftColumn && rightColumn) {
-    // Re-enable transitions after drag
-    leftColumn.style.transition = 'flex 0.3s ease';
-    rightColumn.style.transition = 'flex 0.3s ease';
-    mainDivider.style.transition = 'left 0.1s ease, background 0.3s ease';
+    // Re-enable transitions
+    leftColumn.style.transition = 'flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    rightColumn.style.transition = 'flex 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    mainDivider.style.transition = isVerticalLayout() ? 'top 0.1s ease, background 0.3s ease' : 'left 0.1s ease, background 0.3s ease';
   }
   document.body.style.userSelect = '';
 }
 
-// Function to handle dragging (absolute position for smoothness)
+// Function to handle dragging (horizontal or vertical based on layout)
 function handleDrag(e) {
   if (!isDragging) return;
   
-  const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-  if (!splitChatContainer || !leftColumn || !rightColumn || !mainDivider) return;
-  
+  const clientPos = isVerticalLayout() ? (e.clientY || (e.touches && e.touches[0].clientY)) : (e.clientX || (e.touches && e.touches[0].clientX));
   const containerRect = splitChatContainer.getBoundingClientRect();
-  const containerWidth = containerRect.width;
+  const containerSize = isVerticalLayout() ? containerRect.height : containerRect.width;
+  const containerStart = isVerticalLayout() ? containerRect.top : containerRect.left;
   
-  // Absolute calculation: new width based on current mouse position
-  let newLeftWidth = ((clientX - containerRect.left) / containerWidth) * 100;
+  // Calculate new "top/left" size based on position
+  let newTopLeftSize = ((clientPos - containerStart) / containerSize) * 100;
   
   // Apply constraints (20% to 80%)
-  newLeftWidth = Math.max(20, Math.min(80, newLeftWidth));
-  const newRightWidth = 100 - newLeftWidth;
+  newTopLeftSize = Math.max(20, Math.min(80, newTopLeftSize));
+  const newBottomRightSize = 100 - newTopLeftSize;
   
-  // Update column widths immediately
-  leftColumn.style.flex = `0 0 ${newLeftWidth}%`;
-  rightColumn.style.flex = `0 0 ${newRightWidth}%`;
+  // Update sizes (flex for both directions)
+  if (leftColumn && rightColumn) {
+    leftColumn.style.flex = `0 0 ${newTopLeftSize}%`;
+    rightColumn.style.flex = `0 0 ${newBottomRightSize}%`;
+  }
   
-  // Update divider position exactly at the boundary (smooth follow)
-  const newDividerLeft = containerRect.left + (newLeftWidth / 100) * containerWidth;
-  mainDivider.style.left = `${newDividerLeft}px`;
-  mainDivider.style.transform = 'none'; // Remove transform during drag for precision
+  // Update divider position (top for vertical, left for horizontal)
+  if (mainDivider) {
+    if (isVerticalLayout()) {
+      const newTop = containerStart + (newTopLeftSize / 100) * containerSize;
+      mainDivider.style.top = `${newTop}px`;
+      mainDivider.style.left = '0';
+      mainDivider.style.transform = 'none';
+    } else {
+      const newLeft = containerStart + (newTopLeftSize / 100) * containerSize;
+      mainDivider.style.left = `${newLeft}px`;
+      mainDivider.style.top = '0';
+      mainDivider.style.transform = 'none';
+    }
+  }
   
   e.preventDefault();
   e.stopPropagation();
 }
 
-// Use requestAnimationFrame for ultra-smooth updates
+// Smooth update with requestAnimationFrame
 function rafHandleDrag(e) {
   if (isDragging) {
     requestAnimationFrame(() => handleDrag(e));
   }
 }
 
-// Add event listeners for main divider (mouse and touch)
+// Handle orientation/screen size changes
+function handleLayoutChange() {
+  isMobileLayout = window.innerWidth <= 768;
+  if (!isDragging && mainDivider && splitChatContainer) {
+    // Reset to center on layout change
+    if (isMobileLayout) {
+      mainDivider.style.top = '50%';
+      mainDivider.style.transform = 'translateY(-50%)';
+      mainDivider.style.left = '0';
+    } else {
+      mainDivider.style.left = '50%';
+      mainDivider.style.transform = 'translateX(-50%)';
+      mainDivider.style.top = '0';
+    }
+    // Reset column sizes
+    if (leftColumn && rightColumn) {
+      leftColumn.style.flex = '1';
+      rightColumn.style.flex = '1';
+    }
+  }
+}
+
+// Add event listeners
 if (mainDivider) {
   mainDivider.addEventListener('mousedown', startDrag);
   mainDivider.addEventListener('touchstart', startDrag, { passive: false });
@@ -1205,13 +1244,12 @@ document.addEventListener('touchend', stopDrag);
 document.addEventListener('mousemove', rafHandleDrag);
 document.addEventListener('touchmove', rafHandleDrag, { passive: false });
 
-// Reset divider to center on window resize (if not dragging)
-window.addEventListener('resize', () => {
-  if (splitChatContainer && mainDivider && !isDragging) {
-    mainDivider.style.left = '50%';
-    mainDivider.style.transform = 'translateX(-50%)';
-    leftColumn.style.flex = '1';
-    rightColumn.style.flex = '1';
+// Listen for screen/orientation changes
+window.addEventListener('resize', handleLayoutChange);
+window.addEventListener('orientationchange', handleLayoutChange);
+
+// Initial layout check
+handleLayoutChange();
 }  // <- Fixed: Added missing closing brace for if block
 });
 });
