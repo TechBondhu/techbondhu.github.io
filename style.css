@@ -323,7 +323,7 @@ body {
 }
 
 .divider {
-    width: 8px; /* Desktop: Vertical divider */
+    width: 3px; /* Desktop: Vertical divider */
     height: 100%;
     background: #1E3A8A;
     position: absolute;
