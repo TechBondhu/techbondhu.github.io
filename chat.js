@@ -11,12 +11,6 @@
  * No message sent on category click; toggle shows/hides sub-questions.
  * Sub-questions send message on click.
  * Removed Rasa API call from right side; added xAI Grok API integration for right side responses.
- * Fixed image upload: Now uploads to Cloudinary via Flask backend (/upload endpoint) instead of Firebase Storage.
- * Added error handling for upload failures.
- * Fixed UI issues: Added styles for preview and chat images, removed invalid onclick, added classes for CSS targeting.
- * Ensured preview and chat images are visible with proper sizing and display.
- * Added console logs for debugging upload and UI rendering.
- * Cleaned up duplicates and fixed event listeners.
  */
  
 document.getElementById('videoIcon').addEventListener('click', function() {
@@ -61,7 +55,6 @@ let rightChatId = localStorage.getItem('rightChatId') || null;
 let currentUserUid = null;
 let selectedFile = null;
 let editedImage = null;
-let currentChatId = null;
 
 // DOM Elements
 const elements = {
@@ -266,48 +259,22 @@ const genres2 = [
 // Auth State Listener
 function initializeApp() {
     auth.onAuthStateChanged(user => {
-        currentUserUid = user ? user.uid : null;
-        if (!currentUserUid) {
-            console.warn('User not authenticated. Image upload may fail.');
-            // অপশনাল: অথেনটিকেট করো, যেমন auth.signInAnonymously();
-            // auth.signInAnonymously(); // যদি চাও
-        }
-        if (elements.messagesDiv && elements.historyList && elements.messagesRight) {
-            loadChatHistory();
-            if (leftChatId) loadChatMessages(leftChatId, 'left');
-            else startNewChat('left');
-            if (rightChatId) loadChatMessages(rightChatId, 'right');
-            else startNewChat('right');
+        if (user) {
+            currentUserUid = user.uid;
+            if (elements.messagesDiv && elements.historyList && elements.messagesRight) {
+                loadChatHistory();
+                if (leftChatId) loadChatMessages(leftChatId, 'left');
+                else startNewChat('left');
+                if (rightChatId) loadChatMessages(rightChatId, 'right');
+                else startNewChat('right');
+            } else {
+                showErrorMessage('DOM elements not found. Please check your HTML.', 'left');
+            }
         } else {
-            showErrorMessage('DOM elements not found. Please check your HTML.', 'left');
+            currentUserUid = null;
+            window.location.href = 'login.html';
         }
     });
-}
-
-// Image Upload to Cloudinary via Flask
-async function uploadImageToCloudinary(file, side) {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-        const response = await fetch('/upload', {  // Flask endpoint
-            method: 'POST',
-            body: formData
-        });
-        if (!response.ok) {
-            throw new Error(`Upload failed with status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        console.log('Image uploaded to Cloudinary:', data.url);
-        return data.url;  // Return the Cloudinary URL
-    } catch (error) {
-        console.error('Upload failed:', error);
-        showErrorMessage('ইমেজ আপলোড ফেল: ' + error.message, side);
-        throw error;
-    }
 }
 
 // Utility Functions
@@ -317,17 +284,32 @@ function sanitizeMessage(message) {
     return div.innerHTML;
 }
 
-function displayMessage(message, sender, side, imageUrl = null) {
-    const messagesDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-    const msgDiv = document.createElement('div');
-    msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
-    let content = sanitizeMessage(message);
-    if (imageUrl) {
-        content += `<img src="${imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto; display: block; border-radius: 8px; margin: 5px 0;">`;
+function displayMessage(message, sender, side) {
+    const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
+    if (!messagesContainer) {
+        console.error(`${side} messages container not found`);
+        return;
     }
-    msgDiv.innerHTML = content;
-    messagesDiv.appendChild(msgDiv);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
+    if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
+        const img = document.createElement('img');
+        img.src = message;
+        img.classList.add('chat-image');
+        img.alt = 'Uploaded Image';
+        img.addEventListener('click', () => openImageModal(message));
+        messageDiv.appendChild(img);
+    } else {
+        messageDiv.innerHTML = sanitizeMessage(message);
+    }
+    if (side === 'right') {
+        messageDiv.style.margin = '10px 0';
+        messageDiv.style.padding = '10px';
+        messageDiv.style.borderRadius = '8px';
+        messageDiv.style.backgroundColor = sender === 'user' ? '#e0f7fa' : '#f1f8e9';
+    }
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 function showErrorMessage(message, side) {
@@ -367,7 +349,7 @@ function showTypingIndicator(side) {
     return typingDiv;
 }
 
-// API Calls
+// New Function for Right Side: Call FastAPI
 async function callFastAPI(message, side) {
     if (side !== 'right') return; // শুধু right side-এর জন্য
 
@@ -396,16 +378,16 @@ async function callFastAPI(message, side) {
     }
 }
 
+// Existing Rasa API Function (only for left side)
 async function callRasaAPI(message, reviewData = {}, side) {
     if (side !== 'left') return; // শুধু left side-এর জন্য
 
     const typingDiv = showTypingIndicator(side);
     try {
-        const payload = { sender: 'user', message }; // If needed, add image_url: imageUrl here
         const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ sender: 'user', message })
         });
 
         if (!response.ok) {
@@ -434,7 +416,7 @@ async function callRasaAPI(message, reviewData = {}, side) {
     }
 }
 
-// Review and PDF Functions
+// আপডেটেড displayReview ফাংশন
 function displayReview(reviewData, side) {
     const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
     if (!messagesContainer) return;
@@ -495,7 +477,7 @@ function displayReview(reviewData, side) {
                 uid: currentUserUid // UID যোগ করা
             });
             displayMessage('তথ্য সফলভাবে সংরক্ষিত!', 'bot', side);
-            generatePDF(updatedData, reviewCard, side);
+            generatePDF(reviewData, reviewCard, side);
             reviewCard.setAttribute('data-confirmed', 'true');
             reviewCard.setAttribute('data-editable', 'false');
             editBtn.disabled = true;
@@ -534,6 +516,7 @@ function displayReview(reviewData, side) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+// আপডেটেড toggleEdit ফাংশন
 function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, side) {
     if (reviewCard.getAttribute('data-confirmed') === 'true') {
         showErrorMessage('ডেটা কনফার্ম হয়ে গেছে। এডিট করা যাবে না।', side);
@@ -600,6 +583,7 @@ function toggleEdit(reviewCard, editBtn, reviewContent, confirmBtn, reviewData, 
     }
 }
 
+// আপডেটেড generatePDF ফাংশন
 function generatePDF(reviewData, reviewCard, side) {
     const formType = reviewData.form_type || 'generic';
     const payload = {
@@ -668,9 +652,9 @@ async function startNewChat(side) {
     }
 }
 
-async function saveChatHistory(message, sender, side, imageUrl = null) {
+async function saveChatHistory(message, sender, side) {
     if (!currentUserUid) return showErrorMessage('ইউজার লগইন করেননি।', side);
-    if (!message && !imageUrl) return showErrorMessage('অবৈধ মেসেজ।', side);
+    if (!message || typeof message !== 'string') return showErrorMessage('অবৈধ মেসেজ।', side);
     const chatId = side === 'left' ? leftChatId : rightChatId;
     if (!chatId) await startNewChat(side);
     if (!chatId) return showErrorMessage('চ্যাট তৈরি ব্যর্থ।', side);
@@ -679,13 +663,12 @@ async function saveChatHistory(message, sender, side, imageUrl = null) {
         if (!chatDoc.exists) return showErrorMessage('চ্যাট ডকুমেন্ট পাওয়া যায়নি।', side);
         await db.collection('chats').doc(chatId).collection('messages').add({
             uid: currentUserUid,
-            text: message,
+            message,
             sender,
-            imageUrl: imageUrl,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         await db.collection('chats').doc(chatId).update({
-            last_message: (message || 'Image uploaded').substring(0, 50),
+            last_message: message.substring(0, 50),
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         });
     } catch (error) {
@@ -694,19 +677,37 @@ async function saveChatHistory(message, sender, side, imageUrl = null) {
 }
 
 async function loadChatMessages(chatId, side) {
+    const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
+    if (!messagesContainer) return;
+    if (side === 'left') leftChatId = chatId;
+    else rightChatId = chatId;
+    localStorage.setItem(`${side}ChatId`, chatId);
+    messagesContainer.innerHTML = '';
     try {
-        const messagesRef = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp');
-        const snapshot = await messagesRef.get();
-        const messagesDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-        messagesDiv.innerHTML = '';
+        const snapshot = await db.collection('chats').doc(chatId).collection('messages')
+            .orderBy('timestamp', 'asc').get();
+        let hasNonSystemMessages = false;
         snapshot.forEach(doc => {
-            const msg = doc.data();
-            displayMessage(msg.text || '', msg.sender, side, msg.imageUrl);
+            const data = doc.data();
+            if (data.sender !== 'system') {
+                displayMessage(data.message, data.sender, side);
+                hasNonSystemMessages = true;
+            }
         });
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        hideWelcomeMessage(side);
+        if (side === 'left') {
+            const submissions = await db.collection('submissions').where('chat_id', '==', chatId).get();
+            submissions.forEach(doc => {
+                const sub = doc.data();
+                if (sub.review_data) displayReview(sub.review_data, side);
+            });
+        }
+        if (hasNonSystemMessages) {
+            hideWelcomeMessage(side);
+        } else {
+            showWelcomeMessage(side);
+        }
     } catch (error) {
-        console.error('চ্যাট মেসেজ লোডে সমস্যা: ' + error.message);
+        showErrorMessage('মেসেজ লোডে সমস্যা: ' + error.message, side);
     }
 }
 
@@ -727,30 +728,17 @@ async function loadChatHistory(searchTerm = '') {
                 <i class="fas fa-edit rename-icon" data-id="${doc.id}"></i>
                 <i class="fas fa-trash delete-icon" data-id="${doc.id}"></i>
             `;
-            item.addEventListener('click', () => {
-                currentChatId = doc.id;
-                if (data.side === 'left') {
-                    leftChatId = doc.id;
-                    localStorage.setItem('leftChatId', leftChatId);
-                    loadChatMessages(leftChatId, 'left');
-                } else {
-                    rightChatId = doc.id;
-                    localStorage.setItem('rightChatId', rightChatId);
-                    loadChatMessages(rightChatId, 'right');
-                }
-                closeSidebarHandler();
-            });
+            item.addEventListener('click', () => loadChatMessages(doc.id, data.side));
             elements.historyList.appendChild(item);
         });
-        // Add listeners after rendering
-        elements.historyList.querySelectorAll('.delete-icon').forEach(icon => {
+        document.querySelectorAll('.delete-icon').forEach(icon => {
             icon.addEventListener('click', e => {
                 e.stopPropagation();
                 currentChatId = e.target.getAttribute('data-id');
                 elements.deleteModal.style.display = 'block';
             });
         });
-        elements.historyList.querySelectorAll('.rename-icon').forEach(icon => {
+        document.querySelectorAll('.rename-icon').forEach(icon => {
             icon.addEventListener('click', e => {
                 e.stopPropagation();
                 currentChatId = e.target.getAttribute('data-id');
@@ -796,30 +784,15 @@ async function renameChat() {
     }
 }
 
-// Send Message Function (Updated to handle image upload before sending)
+// Send Message Function
 async function sendMessage(side) {
     const userInput = side === 'left' ? elements.userInput : elements.userInputRight;
     const message = userInput.value.trim();
-    let imageUrl = null;
-
-    if (selectedFile) {
-        try {
-            imageUrl = await uploadImageToCloudinary(selectedFile, side);
-            displayMessage('', 'user', side, imageUrl);  // Display image in chat
-            saveChatHistory('', 'user', side, imageUrl);  // Save image URL to history
-            clearPreview(side);  // Clear preview after upload
-        } catch (error) {
-            return;  // Stop if upload fails
-        }
-    }
-
     if (!message) return;
-
     displayMessage(message, 'user', side);
     saveChatHistory(message, 'user', side);
     userInput.value = '';
     hideWelcomeMessage(side);
-
     if (side === 'left') {
         callRasaAPI(message, {}, side);
     } else {
@@ -1009,22 +982,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.fileInput?.addEventListener('change', () => {
         const file = elements.fileInput.files[0];
         if (file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Only images are allowed!');
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                alert('File too large! Max 10MB.');
-                return;
-            }
             selectedFile = file;
             const reader = new FileReader();
             reader.onload = e => {
                 if (elements.previewImage) elements.previewImage.src = e.target.result;
-                if (elements.previewContainer) {
-                    elements.previewContainer.style.display = 'block';
-                    console.log('Preview src set:', elements.previewImage.src);
-                }
+                if (elements.previewContainer) elements.previewContainer.style.display = 'block';
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'left');
             reader.readAsDataURL(file);
@@ -1035,22 +997,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.fileInputRight?.addEventListener('change', () => {
         const file = elements.fileInputRight.files[0];
         if (file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Only images are allowed!');
-                return;
-            }
-            if (file.size > 10 * 1024 * 1024) { // 10MB limit
-                alert('File too large! Max 10MB.');
-                return;
-            }
             selectedFile = file;
             const reader = new FileReader();
             reader.onload = e => {
                 if (elements.previewImageRight) elements.previewImageRight.src = e.target.result;
-                if (elements.previewContainerRight) {
-                    elements.previewContainerRight.style.display = 'block';
-                    console.log('Preview src set:', elements.previewImageRight.src);
-                }
+                if (elements.previewContainerRight) elements.previewContainerRight.style.display = 'block';
             };
             reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'right');
             reader.readAsDataURL(file);
@@ -1113,8 +1064,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tempCtx.filter = `brightness(${100 + brightnessValue}%) contrast(${100 + contrastValue}%)`;
             tempCtx.drawImage(image, cropRect.x, cropRect.y, cropRect.width, cropRect.height, 0, 0, cropRect.width, cropRect.height);
             editedImage = tempCanvas.toDataURL('image/jpeg');
-            if (elements.previewImage) elements.previewImage.src = editedImage;
-            if (elements.previewImageRight) elements.previewImageRight.src = editedImage;
+            if (elements.previewImage.src) elements.previewImage.src = editedImage;
+            if (elements.previewImageRight.src) elements.previewImageRight.src = editedImage;
             callRasaAPI("show_review");
             if (elements.editModal) elements.editModal.style.display = 'none';
         }
