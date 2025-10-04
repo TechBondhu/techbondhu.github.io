@@ -259,23 +259,53 @@ const genres2 = [
 // Auth State Listener
 function initializeApp() {
     auth.onAuthStateChanged(user => {
-        if (user) {
-            currentUserUid = user.uid;
-            if (elements.messagesDiv && elements.historyList && elements.messagesRight) {
-                loadChatHistory();
-                if (leftChatId) loadChatMessages(leftChatId, 'left');
-                else startNewChat('left');
-                if (rightChatId) loadChatMessages(rightChatId, 'right');
-                else startNewChat('right');
-            } else {
-                showErrorMessage('DOM elements not found. Please check your HTML.', 'left');
-            }
+        currentUserUid = user ? user.uid : null;
+        if (!currentUserUid) {
+            console.warn('User not authenticated. Image upload may fail.');
+            // অপশনাল: অথেনটিকেট করো, যেমন auth.signInAnonymously();
+            // auth.signInAnonymously(); // যদি চাও
+        }
+        if (elements.messagesDiv && elements.historyList && elements.messagesRight) {
+            loadChatHistory();
+            if (leftChatId) loadChatMessages(leftChatId, 'left');
+            else startNewChat('left');
+            if (rightChatId) loadChatMessages(rightChatId, 'right');
+            else startNewChat('right');
         } else {
-            currentUserUid = null;
-            window.location.href = 'login.html';
+            showErrorMessage('DOM elements not found. Please check your HTML.', 'left');
         }
     });
 }
+
+// Image Upload to Cloudinary via Flask (New Function)
+async function uploadImageToCloudinary(file, side) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await fetch('/upload', {  // Flask endpoint
+            method: 'POST',
+            body: formData
+        });
+        if (!response.ok) {
+            throw new Error(`Upload failed with status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        console.log('Image uploaded to Cloudinary:', data.url);
+        return data.url;  // Return the Cloudinary URL
+    } catch (error) {
+        console.error('Upload failed:', error);
+        showErrorMessage('ইমেজ আপলোড ফেল: ' + error.message, side);
+        throw error;
+    }
+}
+
+// উদাহরণ (তোমার কোডে অ্যাডজাস্ট করো)
+const payload = { message: message, image_url: imageUrl };
+callRasaAPI(payload, {}, side);
 
 // Utility Functions
 function sanitizeMessage(message) {
@@ -285,31 +315,18 @@ function sanitizeMessage(message) {
 }
 
 function displayMessage(message, sender, side) {
-    const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-    if (!messagesContainer) {
-        console.error(`${side} messages container not found`);
-        return;
+// Display Message (Updated to handle images)
+function displayMessage(message, sender, side, imageUrl = null) {
+    const messagesDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+    let content = sanitizeMessage(message);
+    if (imageUrl) {
+        content += `<img src="${imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto; display: block; border-radius: 8px; margin: 5px 0;">`;
     }
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message', 'slide-in');
-    if (typeof message === 'string' && (message.startsWith('http') || message.startsWith('data:image'))) {
-        const img = document.createElement('img');
-        img.src = message;
-        img.classList.add('chat-image');
-        img.alt = 'Uploaded Image';
-        img.addEventListener('click', () => openImageModal(message));
-        messageDiv.appendChild(img);
-    } else {
-        messageDiv.innerHTML = sanitizeMessage(message);
-    }
-    if (side === 'right') {
-        messageDiv.style.margin = '10px 0';
-        messageDiv.style.padding = '10px';
-        messageDiv.style.borderRadius = '8px';
-        messageDiv.style.backgroundColor = sender === 'user' ? '#e0f7fa' : '#f1f8e9';
-    }
-    messagesContainer.appendChild(messageDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    msgDiv.innerHTML = content;
+    messagesDiv.appendChild(msgDiv);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
 function showErrorMessage(message, side) {
@@ -677,37 +694,19 @@ async function saveChatHistory(message, sender, side) {
 }
 
 async function loadChatMessages(chatId, side) {
-    const messagesContainer = side === 'left' ? elements.messagesDiv : elements.messagesRight;
-    if (!messagesContainer) return;
-    if (side === 'left') leftChatId = chatId;
-    else rightChatId = chatId;
-    localStorage.setItem(`${side}ChatId`, chatId);
-    messagesContainer.innerHTML = '';
     try {
-        const snapshot = await db.collection('chats').doc(chatId).collection('messages')
-            .orderBy('timestamp', 'asc').get();
-        let hasNonSystemMessages = false;
+        const messagesRef = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp');
+        const snapshot = await messagesRef.get();
+        const messagesDiv = side === 'left' ? elements.messagesDiv : elements.messagesRight;
+        messagesDiv.innerHTML = '';
         snapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.sender !== 'system') {
-                displayMessage(data.message, data.sender, side);
-                hasNonSystemMessages = true;
-            }
+            const msg = doc.data();
+            displayMessage(msg.text, msg.sender, side, msg.imageUrl);  // Added imageUrl support
         });
-        if (side === 'left') {
-            const submissions = await db.collection('submissions').where('chat_id', '==', chatId).get();
-            submissions.forEach(doc => {
-                const sub = doc.data();
-                if (sub.review_data) displayReview(sub.review_data, side);
-            });
-        }
-        if (hasNonSystemMessages) {
-            hideWelcomeMessage(side);
-        } else {
-            showWelcomeMessage(side);
-        }
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        hideWelcomeMessage(side);
     } catch (error) {
-        showErrorMessage('মেসেজ লোডে সমস্যা: ' + error.message, side);
+        console.error('চ্যাট মেসেজ লোডে সমস্যা: ' + error.message);
     }
 }
 
@@ -785,14 +784,30 @@ async function renameChat() {
 }
 
 // Send Message Function
+// Send Message Function (Updated to handle image upload before sending)
 async function sendMessage(side) {
     const userInput = side === 'left' ? elements.userInput : elements.userInputRight;
     const message = userInput.value.trim();
+    let imageUrl = null;
+
+    if (selectedFile) {
+        try {
+            imageUrl = await uploadImageToCloudinary(selectedFile, side);
+            displayMessage('', 'user', side, imageUrl);  // Display image in chat
+            saveChatHistory('', 'user', side, imageUrl);  // Save image URL to history
+            clearPreview(side);  // Clear preview after upload
+        } catch (error) {
+            return;  // Stop if upload fails
+        }
+    }
+
     if (!message) return;
+
     displayMessage(message, 'user', side);
     saveChatHistory(message, 'user', side);
     userInput.value = '';
     hideWelcomeMessage(side);
+
     if (side === 'left') {
         callRasaAPI(message, {}, side);
     } else {
@@ -979,7 +994,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter' && !e.repeat) sendMessage('right');
     });
     elements.uploadBtn?.addEventListener('click', () => elements.fileInput?.click());
-    elements.fileInput?.addEventListener('change', () => {
+    
         const file = elements.fileInput.files[0];
         if (file) {
             selectedFile = file;
@@ -1012,6 +1027,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImage.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
     });
+    elements.fileInput?.addEventListener('change', () => {
+    const file = elements.fileInput.files[0];
+    if (file) {
+        if (!file.type.startsWith('image/')) {
+            alert('Only images are allowed!');
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            alert('File too large! Max 10MB.');
+            return;
+        }
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = e => {
+            if (elements.previewImage) elements.previewImage.src = e.target.result;
+            if (elements.previewContainer) {
+                elements.previewContainer.style.display = 'block';
+                console.log('Preview src set:', elements.previewImage.src);
+            }
+        };
+        reader.onerror = () => showErrorMessage('ইমেজ লোডে সমস্যা।', 'left');
+        reader.readAsDataURL(file);
+    }
+    elements.fileInput.value = '';
+});
     elements.previewImageRight?.addEventListener('click', () => {
         if (elements.reviewImage) elements.reviewImage.src = elements.previewImageRight.src;
         if (elements.imageReviewModal) elements.imageReviewModal.style.display = 'block';
